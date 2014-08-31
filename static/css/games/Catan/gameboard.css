@@ -117,7 +117,7 @@ line.player3:hover {
 }
 
 .player3 {
-	stroke:green !important;
+	color:green !important;
 }
 
 circle.player4 {
@@ -133,7 +133,7 @@ line.player4:hover {
 	stroke:darkgray !important;
 }
 .player4 {
-	stroke:darkgray !important;
+	color:darkgray !important;
 }
 
 text {
