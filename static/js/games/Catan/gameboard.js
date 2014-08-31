@@ -212,6 +212,8 @@ function CatanGame (game) {
 	this.disableControls = function(){
 		//Use when you're asking a user to perform action
 		$("#controls").css("display","none");
+		
+		$("#actions").addClass("hideActions");
 	}
 	
 	this.enableControls = function(){
