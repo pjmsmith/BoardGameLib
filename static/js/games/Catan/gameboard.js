@@ -1,5 +1,6 @@
-function CatanGame () {
-	
+var playerColors = ['red', 'blue', 'green', 'lightorange', 'darkgray']
+function CatanGame (game) {
+	this.game = game;
 	this.currentPlayer = "";
 	this.el = $("#gameBoard");
 	var self = this;
@@ -38,7 +39,6 @@ function CatanGame () {
 
 		self.showControls();
 		
-		self.currentPlayer = "player1"
 	}
 	this.renderActions = function() {
 		$('#game-content').append('\
@@ -133,12 +133,27 @@ function CatanGame () {
 		})
 		
 		console.log("set up button listeners");
+		game.connection.on('applyAction', function(data) {
+			self.actions[data.action](data.element, data.user);
+		});
 	}
 	
 	this.hideModals = function(){
 		self.hideModalHack();
 	}
-	
+	this.actions = {
+		 'placeSettlement': function(vid, player) {
+			if($("#"+vid).attr("class") == "vertex unassigned") {
+				$("#"+vid).attr("class","vertex "+"player"+player)
+				$("#vertices .unassigned").css("display","none");
+			}
+		}
+		,'placeRoad': function(eid, player) {
+			if($("#"+eid).attr("class") == "edge unassigned") {
+				$("#"+eid).attr("class","edge "+ "player"+player)
+				$("#edges .unassigned").css("display","none");
+			}
+		}};
 	this.placeSettlement = function() {
 		
 		self.hideModals();
@@ -152,11 +167,13 @@ function CatanGame () {
 			
 			if($("#"+vid).attr("class") == "vertex unassigned")
 			{
-				$("#"+vid).attr("class","vertex "+player)
+
+				$("#"+vid).attr("class","vertex "+"player"+player)
 				$("#vertices .unassigned").css("display","none");
 				self.el.off("vertexClick")
 				self.enableControls();
-				
+
+				self.game.connection.emit('doAction', {game: game.uniqueKey, action: 'placeSettlement', user: game.username, element: vid})
 			
 			} else {
 				alert("Location already chosen, select an unassigned spot ")

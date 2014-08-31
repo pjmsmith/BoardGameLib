@@ -43,7 +43,7 @@ module.exports = function(server) {
     var games = global.games;
     var GameState = global.GameState;
     var gameResources = getGameResources(req.params.game);
-    
+
     log(logObject(games[uniqueKey]));
     if (typeof games[uniqueKey] !== 'undefined' && games[uniqueKey].state != GameState.WAITING_FOR_PLAYERS) {
       //game already started, redirect to new game screen, send error msg

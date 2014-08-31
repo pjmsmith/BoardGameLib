@@ -1,7 +1,8 @@
 
-var Game = function(title, username, uniqueKey, connection) {
+var Game = function(title, username, playerNumber, uniqueKey, connection) {
 	this.title = title;
 	this.username = username;
+	this.playerNumber = playerNumber;
 	this.uniqueKey = uniqueKey;
 	this.connection = connection;
 	this.players = {
@@ -84,10 +85,10 @@ Game.prototype.waitForPlayers = function() {
 	this.connection.on('startGame', function() {
 		$('#readyButton').hide();
 		//instantiate game from game specific js
-		var catan = new CatanGame();
+		var catan = new CatanGame(this);
 		catan.startGame();
 
-	});
+	}.bind(this));
 }
 
 if (typeof exports !== 'undefined') {

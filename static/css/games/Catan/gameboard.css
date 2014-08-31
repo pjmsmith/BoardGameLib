@@ -76,6 +76,45 @@ line.player1:hover {
 	stroke:red !important;
 }
 
+circle.player2 {
+	fill:blue !important;
+}
+circle.player2:hover {
+	fill:blue !important;
+}
+line.player2 {
+	stroke:blue !important;
+}
+line.player2:hover {
+	stroke:blue !important;
+}
+
+circle.player3 {
+	fill:green !important;
+}
+circle.player3:hover {
+	fill:green !important;
+}
+line.player3 {
+	stroke:green !important;
+}
+line.player3:hover {
+	stroke:green !important;
+}
+
+circle.player4 {
+	fill:darkgray !important;
+}
+circle.player4:hover {
+	fill:darkgray !important;
+}
+line.player4 {
+	stroke:darkgray !important;
+}
+line.player4:hover {
+	stroke:darkgray !important;
+}
+
 text {
 	font-size:22pt;
 	font-weight:bold;

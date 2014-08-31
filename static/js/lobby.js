@@ -45,7 +45,7 @@ $(document).ready(function() {
 	} else {
 		//shouldn't happen until game data is stored in a cookie or session variable to allow reconnect
 		console.log('good to go');
-		var currentGame = new Game(gameName, username, uniqueKey, socket);
+		var currentGame = new Game(gameName, username, playerNumber, uniqueKey, socket);
 		console.log(currentGame.title);
 		currentGame.setupSocketListeners();
 		currentGame.waitForPlayers();
@@ -69,13 +69,14 @@ $(document).ready(function() {
 			$('.floating-info').stop().animate({opacity: 0.3, queue: false});
 		}, 500);
 	});
-	socket.on('loginSuccess', function() {
+	socket.on('loginSuccess', function(data) {
+		var playerNumber = data.playerNumber;
 		$('#error-msg').html();
 	    $('#error').slideUp('fast');
 		$('#loginContainer').hide();
 		$('#gameTitle').switchClass('title', 'title-small', 500);
 
-		var currentGame = new Game(gameName, username, uniqueKey, socket);
+		var currentGame = new Game(gameName, username, playerNumber, uniqueKey, socket);
 		console.log(currentGame.title);
 		currentGame.setupSocketListeners();
 		currentGame.waitForPlayers();

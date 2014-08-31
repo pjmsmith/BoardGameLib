@@ -122,7 +122,8 @@ io.sockets.on('connection', function(socket){
           users: games[game].userList,
           newUser: userSession
         });
-        socket.emit('loginSuccess', {}); 
+        var playerNumber = Object.keys(games[game].userList).indexOf(userSession) + 1;
+        socket.emit('loginSuccess', {playerNumber: playerNumber}); 
         socket.emit('updatebuddies', {
           users: games[game].userList,
           newUser: userSession
@@ -142,6 +143,10 @@ io.sockets.on('connection', function(socket){
     
   socket.on('doAction', function(data) {
     log('doing action');
+    var game = games[data.game];
+    var playerNum = Object.keys(game.userList).indexOf(data.user) + 1;
+    data.user = playerNum;
+    io.sockets.in(data.game).emit('applyAction', data);
   });
   
   socket.on('ready', function(data) {
