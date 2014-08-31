@@ -72,11 +72,9 @@ function CatanGame (game) {
 					<input id="endTurn_button" value="End Turn" type="button">\
 					<input id="showActions_button" value="Actions" type="button">\
 				</div>\
-				
 				<div id="purchaseControls">\
-					<input id="cancelAction_button" value="cancel" type="button">\\
-				</div>\
-				'
+					<input id="cancelAction_button" value="cancel" type="button">\
+				</div>'
 			);
 			$("#showHideCards_button").click(function(){
 				$("#hand").toggleClass("hideCards");
@@ -96,6 +94,14 @@ function CatanGame (game) {
 			
 			$("#showActions_button").fastButton(function(){
 				$("#actions").toggleClass("hideActions");
+			});
+			
+			$("#cancelAction_button").click(function(){
+				self.cancelAction();
+			});
+			
+			$("#cancelAction_button").fastButton(function(){
+				self.cancelAction();
 			});
 		}
 		$("#controls").css("display","block");
@@ -195,6 +201,7 @@ function CatanGame (game) {
 				$("#vertices .unassigned").css("display","none");
 				self.el.off("vertexClick")
 				self.enableControls();
+				self.hidePurchaseControls();
 
 				self.game.connection.emit('doAction', {game: game.uniqueKey, action: 'placeSettlement', playerNumber: game.playerNumber, element: vid})
 			
@@ -231,6 +238,7 @@ function CatanGame (game) {
 			$("#edges .unassigned").css("display","none");
 			self.el.off("edgeClick")
 			self.enableControls();
+			self.hidePurchaseControls();
 			
 			self.game.connection.emit('doAction', {game: game.uniqueKey, action: 'placeRoad', playerNumber: game.playerNumber, element: eid})
 			
@@ -246,6 +254,8 @@ function CatanGame (game) {
 		self.el.off("vertexClick");
 		$("#edges .unassigned").css("display","none");
 		$("#vertices .unassigned").css("display","none");
+		self.hidePurchaseControls();
+		self.enableControls();
 	}
 	
 	this.disableControls = function(){
