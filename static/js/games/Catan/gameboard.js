@@ -54,11 +54,13 @@ function CatanGame (game) {
 		$("#purchase_button").click(function(){
 			if(!$("#purchase_modal").hasClass("show_modal")) {
 				$("#purchase_modal").addClass("show_modal")
+				self.disableControls();
 			}
 		});
 		
 		$("#cancelPurchase_button").click(function(){
 			$("#purchase_modal").removeClass("show_modal")
+			self.enableControls();
 		});
 
 	};
@@ -69,9 +71,9 @@ function CatanGame (game) {
 			$('#game-content').append(' \
 				<div id="controls"> \
 					<input id="showHideCards_button" value="Cards" type="button" style="display:none;">\
-					<input id="endTurn_button" value="End Turn" type="button">\
 					<input id="showActions_button" value="Actions" type="button">\
 				</div>\
+				<input id="endTurn_button" value="End Turn" type="button">\
 				<div id="purchaseControls">\
 					<input id="cancelAction_button" value="cancel" type="button">\
 				</div>'
@@ -105,6 +107,7 @@ function CatanGame (game) {
 			});
 		}
 		$("#controls").css("display","block");
+		$("#endTurn_button").css("display","block");
 	}
 	
 	this.setupListeners = function() {
@@ -264,12 +267,13 @@ function CatanGame (game) {
 	this.disableControls = function(){
 		//Use when you're asking a user to perform action
 		$("#controls").css("display","none");
-		
+		$("#endTurn_button").css("display","none");
 		$("#actions").addClass("hideActions");
 	}
 	
 	this.enableControls = function(){
 		$("#controls").css("display","block");
+		$("#endTurn_button").css("display","block");
 	}
 	
 	this.renderTiles = function() {

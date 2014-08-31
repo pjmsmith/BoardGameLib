@@ -9,10 +9,16 @@ svg {
 	padding-bottom:0;
 }
 
-#controls input[type="button"], #startgame_button {
+#controls input[type="button"], #startgame_button, #cancelAction_button, #endTurn_button {
 	font-size:3em;
 	background-color:gray;
 	margin-left:10px; margin-right:20px;
+}
+
+#endTurn_button {
+	position:absolute;
+	top:0;
+	left:0;
 }
 
 .tile {
