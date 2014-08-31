@@ -93,9 +93,7 @@ function CatanGame (game) {
 				$("#actions").toggleClass("hideActions");
 			});
 		}
-		if (self.currentPlayer === self.game.playerNumber) {
-			$("#controls").css("display","block")
-		}
+		$("#controls").css("display","block");
 	}
 	
 	this.setupListeners = function() {
