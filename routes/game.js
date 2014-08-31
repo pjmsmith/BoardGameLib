@@ -15,11 +15,18 @@ module.exports = function(server) {
   server.get('/:game', function(req,res){
     var userList = global.userList;
    	var gameResources = getGameResources(req.params.game);
+   	var gameList = Object.keys(global.games);
+   	var lobbies = [];
+   	for (var game in gameList) {
+   		lobbies[game] = {};
+   		lobbies[game].key = gameList[game];
+   	}
 
     res.render('index.jade', {
         locals : {
             uniqueKey: null
            ,username: null
+           ,lobbies: lobbies
            ,gameResources: gameResources
            ,messages: (req.session.messages) ? JSON.stringify(req.session.messages) : '{}'
            ,userlist: userList
@@ -56,6 +63,7 @@ module.exports = function(server) {
         locals : {
                   uniqueKey: uniqueKey
                  ,username: null
+           		 ,lobbies: []
                  ,gameResources: gameResources
                  ,messages: '{}'
                  ,userlist: userList

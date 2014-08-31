@@ -18,6 +18,9 @@ block content
 			#loginContainer
 				.instructions Enter your name
 				input#playerName.name-input(style="display:none")
+			#lobbies
+				each lobby in lobbies
+					a.game(href='#{title}/lobby/#{lobby.key}') #{lobby.key}
 			#readyButton(style="display:none") Start Game
 			#gameBoard
 			#players.floating-info(style="display:none")
