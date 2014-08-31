@@ -1,0 +1,30 @@
+game
+	title
+	socket
+		uniqueKey
+	board
+		tiles
+
+	deck
+		cards
+	state = [waiting, active, gameover]
+	players
+		ready = boolean
+		cards
+			knight
+			victory point
+			special card
+		pices
+			roads
+			settlements
+			cities
+		state = [trading, building, rolling, waiting]
+	activePlayer = playerId
+	maxPlayers = int
+	minPlayers = int
+	dice = {
+		number: int
+		sides: int
+		roll()
+	}
+

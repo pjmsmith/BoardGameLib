@@ -1,0 +1,28 @@
+!!! 5
+//if lt IE 7
+  html.no-js.ie6.oldie(lang='en')
+//if IE 7
+  html.no-js.ie7.oldie(lang='en')
+//if IE 8
+  html.no-js.ie8.oldie(lang='en') 
+//[if gt IE 8]><!
+html.no-js(lang='en', style="min-height:100%;position:relative;")
+  //<![end if]
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
+    title=title
+    meta(name="description", content=description)
+    meta(name="author", content=author)
+    block globalVariables
+
+    script(src='/js/lib/jquery-2.0.3.min.js')
+    script(src='/js/lib/jquery-ui.min.js')
+    script(src='/socket.io/socket.io.js')
+    script(src='/js/utility.js')
+    script(src='/js/classes/game.js')
+    script(src='/js/game.js')
+    meta(name="viewport", content='width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no')
+    link(rel='stylesheet', href='/css/style.css')
+  body
+    block content
