@@ -4,8 +4,27 @@ var Game = function(title, username, uniqueKey, connection) {
 	this.username = username;
 	this.uniqueKey = uniqueKey;
 	this.connection = connection;
-	this.players = {};
+	this.players = {
+		ready: false,
+		cards: [],
+		pieces: [],
+		state: null
+	};
 	this.currentPlayer = null;
+	this.board = {
+		tiles: []
+	};
+	this.deck: {
+		cards: []
+	};
+	this.state = null,
+	this.activePlayer = null,
+	this.maxPlayers: 5,
+	this.minPlayers: 2,
+	this.dice = {
+		number: 2
+		sides: 6
+	}
 
 	$('#readyButton').fadeIn('fast');
 };
