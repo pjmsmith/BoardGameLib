@@ -18,6 +18,14 @@ input[disabled]{
 	height:70px;
 	background-color:gray;
 }
+
+#purchaseControls {
+	position:absolute;
+	width:100%;
+	bottom:0;
+	left:0;
+	display:none;
+}
 	
 #cancelPurchase_button{
 	position:absolute;
