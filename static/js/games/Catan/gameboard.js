@@ -65,17 +65,22 @@ function CatanGame (game) {
 	};
 
 	this.showControls = function() {
-		if (!$('#controls').length) {
+		if (!$('#controls').length) { //render if doesn't exist yet
 
 			$('#game-content').append(' \
 				<div id="controls"> \
-					<input id="showHideCards_button" value="Cards" type="button">\
+					<input id="showHideCards_button" value="Cards" type="button" style="display:none;">\
+					<input id="endTurn_button" value="End Turn" type="button">\
 					<input id="showActions_button" value="Actions" type="button">\
 				</div>'
 			);
 			$("#showHideCards_button").click(function(){
 				$("#hand").toggleClass("hideCards");
 			});
+			
+			$("#endTurn_button").click(function(){
+				self.endPlayerTurn();
+			})
 			
 			$("#showHideCards_button").fastButton(function(){
 				$("#hand").toggleClass("hideCards");
@@ -183,6 +188,18 @@ function CatanGame (game) {
 			}
 			
 		})
+	}
+	
+	this.endPlayerTurn = function(){
+		//disable build controls
+		$("#purchase_button").attr("disabled","disabled")
+		$("#endTurn_button").attr("disabled","disabled")
+	}
+	
+	this.startPlayerTurn = function(){
+		$("#purchase_button").removeAttr("disabled")
+		$("#endTurn_button").removeAttr("disabled")
+		
 	}
 	
 	this.placeRoadMode = function(){
