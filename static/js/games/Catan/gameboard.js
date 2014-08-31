@@ -216,6 +216,9 @@ function CatanGame (game) {
 		//disable build controls
 		$("#purchase_button").attr("disabled","disabled")
 		$("#endTurn_button").attr("disabled","disabled")
+		
+		self.game.connection.emit('doAction', {game: game.uniqueKey, action: 'endTurn', playerNumber: game.playerNumber})
+		
 	}
 	
 	this.startPlayerTurn = function(){
