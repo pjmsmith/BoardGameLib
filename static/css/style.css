@@ -112,6 +112,24 @@ body {
     text-shadow:-1px -1px 0 #000, 1px -1px 0 #000,-1px 1px 0 #000, 1px 1px 0 #000;
 }
 
+#games {
+	width: 100%;
+	text-align: center;
+}
+.list-header {
+	font-size: 4em;
+	color: #ffffff;
+	text-decoration: underline;
+}
+.game {
+	font-size: 3em;
+	color: #ffffff;
+	text-decoration: none;
+}
+.game:hover {
+	color: #3333ff;
+	text-decoration: underline;
+}
 
 #game-content {
     width: 100%;

@@ -1,5 +1,8 @@
 extends layout
 block gameSpecific
+	script(src='/js/classes/game.js')
+	script(src='/js/lobby.js')
+
 	each jsFile in gameResources['js']
 		script(src='#{jsFile}')
 	each cssFile in gameResources['css']
