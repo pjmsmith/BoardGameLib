@@ -56,24 +56,7 @@ $(document).ready(function() {
 		$('.choice').slideUp('fast');
 		$('#loginContainer').fadeIn('fast');
 	});
-	//show and hide user list
-	/*$('.floating-info').on('mouseenter', function() { 
-		if (timeout !== null) clearTimeout(timeout);
-			if (!$('#playerList').is(':visible')) {
-				$('#playerList').slideDown({queue: false});
-			}
-			$('.floating-info').animate({opacity: 1, queue: false});
-			$('#playerList').animate({opacity: 1, queue: false});
-		});
-		$('.floating-info').on('mouseleave',function() {
-		timeout = setTimeout(function() {
-			if ($('#playerList').is(':visible')) {
-				$('#playerList').stop().slideUp({queue: false})
-				.animate({opacity: 0.3, queue: false});
-			}
-			$('.floating-info').stop().animate({opacity: 0.3, queue: false});
-		}, 500);
-	});*/
+
 	socket.on('loginSuccess', function(data) {
 		var playerNumber = data.playerNumber;
 		$('#error-msg').html();
