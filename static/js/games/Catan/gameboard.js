@@ -71,7 +71,12 @@ function CatanGame (game) {
 					<input id="showHideCards_button" value="Cards" type="button" style="display:none;">\
 					<input id="endTurn_button" value="End Turn" type="button">\
 					<input id="showActions_button" value="Actions" type="button">\
-				</div>'
+				</div>\
+				
+				<div id="purchaseControls">\
+					<input id="cancelAction_button" value="cancel" type="button">\\
+				</div>\
+				'
 			);
 			$("#showHideCards_button").click(function(){
 				$("#hand").toggleClass("hideCards");
@@ -164,12 +169,23 @@ function CatanGame (game) {
 				$('#'+eid).show();
 			}
 		}};
+		
+	this.showPurchaseControls = function() {
+		$("#purchaseControls").css("display","block")
+	}
+	
+	this.hidePurchaseControls = function() {
+		$("#purchaseControls").css("display","none")
+	}
+		
 	this.placeSettlement = function() {
 		
 		self.hideModals();
 		
 		console.log("Waiting for player to place settlement...")
 		self.disableControls();
+		
+		self.showPurchaseControls();
 		
 		$("#vertices .unassigned").css("display","block");
 		
@@ -207,6 +223,7 @@ function CatanGame (game) {
 		self.hideModals();
 		console.log("Waiting for player to place road...")
 		self.disableControls();
+		self.showPurchaseControls();
 		$("#edges .unassigned").css("display","block");
 				
 		self.el.on("edgeClick",function(e,eid,player){
@@ -224,7 +241,13 @@ function CatanGame (game) {
 		}
 		
 		})
-		
+	}
+	
+	this.cancelAction = function(){
+		self.el.off("edgeClick");
+		self.el.off("vertexClick");
+		$("#edges .unassigned").css("display","none");
+		$("#vertices .unassigned").css("display","none");
 	}
 	
 	this.disableControls = function(){
