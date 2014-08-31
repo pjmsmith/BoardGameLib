@@ -14,19 +14,19 @@ var getGameResources = function(game) {
 module.exports = function(server) {
   server.get('/:game', function(req,res){
     var userList = global.userList;
+    var GameState = global.GameState;
    	var gameResources = getGameResources(req.params.game);
-   	var gameList = Object.keys(global.games);
    	var lobbies = [];
-   	for (var game in gameList) {
-   		lobbies[game] = {};
-   		lobbies[game].key = gameList[game];
+   	for (var game in global.games) {
+   		if (global.games[game].state === GameState.WAITING_FOR_PLAYERS) {
+   			lobbies.push({'key': game});
+   		}
    	}
-
     res.render('index.jade', {
         locals : {
             uniqueKey: null
            ,username: null
-           ,lobbies: lobbies
+           ,lobbies: lobbies.length > 0 ? lobbies : null
            ,gameResources: gameResources
            ,messages: (req.session.messages) ? JSON.stringify(req.session.messages) : '{}'
            ,userlist: userList
@@ -63,7 +63,7 @@ module.exports = function(server) {
         locals : {
                   uniqueKey: uniqueKey
                  ,username: null
-           		 ,lobbies: []
+           		 ,lobbies: null
                  ,gameResources: gameResources
                  ,messages: '{}'
                  ,userlist: userList

@@ -50,7 +50,12 @@ $(document).ready(function() {
 		currentGame.setupSocketListeners();
 		currentGame.waitForPlayers();
 	}
-
+	$('#newLobby').click(function() {
+		$('#newLobby').fadeOut('fast');
+		$('#lobbies').fadeOut('fast');
+		$('.choice').slideUp('fast');
+		$('#loginContainer').fadeIn('fast');
+	});
 	//show and hide user list
 	$('.floating-info').on('mouseenter', function() { 
 		if (timeout !== null) clearTimeout(timeout);

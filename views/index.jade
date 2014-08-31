@@ -15,13 +15,22 @@ block content
 			#error(style="display:none")
 				#error-box
 					#error-msg
-			#loginContainer
-				.instructions Enter your name
-				input#playerName.name-input(style="display:none")
-			#lobbies
-				each lobby in lobbies
-					a.game(href='#{title}/lobby/#{lobby.key}') #{lobby.key}
-			#readyButton(style="display:none") Start Game
+			#game-choices
+				if lobbies
+					span.choice Start a new lobby or join an existing one:
+					br
+					button#newLobby.btn New Lobby
+				#loginContainer(style=(lobbies ? "display:none" : "display: block"))
+						.instructions Enter your name
+						input#playerName.name-input(style="display:none")
+				#lobbies(style="margin-top:20px")
+					if lobbies
+						span.choice Open Lobbies
+						br
+						each lobby in lobbies
+							a.game(href='#{title}/lobby/#{lobby.key}') #{lobby.key}
+							br
+			button#readyButton.btn(style="display:none") Start Game
 			#gameBoard
 			#players.floating-info(style="display:none")
 				u Current Players

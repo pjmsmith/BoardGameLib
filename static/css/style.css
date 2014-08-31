@@ -113,6 +113,11 @@ body {
 	color: #ffffff;
 	text-decoration: underline;
 }
+.choice {
+	font-size: 2em;
+	color: #ffffff;
+	text-decoration: underline;
+}
 .game {
 	font-size: 3em;
 	color: #ffffff;
@@ -142,7 +147,7 @@ body {
     width: 18.750em;
 }
 
-#readyButton {
+.btn {
     position: relative;
     top: 50%;
     background-color:white;
@@ -167,13 +172,13 @@ body {
     text-align:center;
     text-shadow:1px 1px 0px #ffffff;
 }
-#readyButton:hover:enabled {
+.btn:hover:enabled {
     background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #cccccc), color-stop(1, #ededed) );
     background:-moz-linear-gradient( center top, #cccccc 5%, #ededed 100% );
     filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc', endColorstr='#ededed');
     background-color:#dfdfdf;
 }
-#readyButton:active:enabled {
+.btn:active:enabled {
     position: relative;
     color: #000000;
     top: 50%;
@@ -181,7 +186,6 @@ body {
 
 .ready-waiting{
     background-color: #efefef;
-    background: transparent;
     opacity: 0.5;
 }
 
