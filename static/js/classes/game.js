@@ -14,8 +14,8 @@ var Game = function(title, username, uniqueKey, connection) {
 	this.board = {
 
 	};
-	this.deck = {
-		cards: []
+	this.decks = {
+		//cards: []
 	};
 	this.state = null;
 	this.activePlayer = null;

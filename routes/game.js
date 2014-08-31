@@ -1,28 +1,40 @@
 
-var utility = require('../static/js/utility');
+var   utility = require('../static/js/utility')
+    , resources = require('../static/js/games/resources');
+
+
 var logObject = utility.logObject;
 var log = utility.log;
+
+var getGameResources = function(game) {
+	var gameResources = resources.gameResources;
+   	return gameResources[game];
+}
+
 module.exports = function(server) {
   server.get('/:game', function(req,res){
     var userList = global.userList;
-      res.render('index.jade', {
+   	var gameResources = getGameResources(req.params.game);
+
+    res.render('index.jade', {
         locals : {
-                 uniqueKey: null
-                 ,username: null
-                 ,messages: (req.session.messages) ? JSON.stringify(req.session.messages) : '{}'
-                 ,userlist: userList
-                 ,title : req.params.game
-                 ,description: req.params.game
-                 ,author: 'Patrick Smith'
-                 ,analyticssiteid: 'XXXXXXX' 
-                }
+            uniqueKey: null
+           ,username: null
+           ,gameResources: gameResources
+           ,messages: (req.session.messages) ? JSON.stringify(req.session.messages) : '{}'
+           ,userlist: userList
+           ,title : req.params.game
+           ,description: req.params.game
+           ,author: 'Patrick Smith'
+           ,analyticssiteid: 'XXXXXXX' 
+          }
       });
     });
 
   server.get('/:game/generateKey', function(req,res){
     var uniqueKeyIndex = global.uniqueKeyIndex;
     var uniqueKey = uniqueKeyIndex.toString(36);
-    uniqueKeyIndex += Math.floor(Math.random() * 10);
+    global.uniqueKeyIndex += Math.floor(Math.random() * 10);
     res.send(uniqueKey);
   });
 
@@ -30,6 +42,8 @@ module.exports = function(server) {
     var uniqueKey = req.params.uniqueKey;
     var games = global.games;
     var GameState = global.GameState;
+    var gameResources = getGameResources(req.params.game);
+    
     log(logObject(games[uniqueKey]));
     if (typeof games[uniqueKey] !== 'undefined' && games[uniqueKey].state != GameState.WAITING_FOR_PLAYERS) {
       //game already started, redirect to new game screen, send error msg
@@ -42,6 +56,7 @@ module.exports = function(server) {
         locals : {
                   uniqueKey: uniqueKey
                  ,username: null
+                 ,gameResources: gameResources
                  ,messages: '{}'
                  ,userlist: userList
                  ,title : req.params.game

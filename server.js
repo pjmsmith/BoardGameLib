@@ -1,5 +1,5 @@
 //setup Dependencies
-var connect = require('connect')
+var   connect = require('connect')
     , express = require('express')
     , io = require('socket.io')
     , port = (process.env.PORT || 8081)
@@ -14,6 +14,7 @@ var NotFound = function(msg){
     Error.call(this, msg);
     Error.captureStackTrace(this, arguments.callee);
 }
+global.NotFound = NotFound;
 
 //Setup Express
 var server = express.createServer();
@@ -50,7 +51,7 @@ server.listen(port);
 var routes = require('./routes')(server);
 
 //Setup Socket.IO
-var io = io.listen(server);
+var io = io.listen(server, {log: utility.debug});
 io.set('close timeout', 60);
 io.set('heartbeat timeout', 15);
 var games = {};

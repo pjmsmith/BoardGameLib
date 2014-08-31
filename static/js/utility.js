@@ -130,4 +130,5 @@ if (typeof exports !== 'undefined') {
   exports.Color = Color;
   exports.log = log;
   exports.logObject = logObject;
+  exports.debug = debug;
 }
