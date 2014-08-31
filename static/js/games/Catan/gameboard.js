@@ -1,7 +1,7 @@
 var playerColors = ['red', 'blue', 'green', 'lightorange', 'darkgray']
 function CatanGame (game) {
 	this.game = game;
-	this.currentPlayer = "";
+	this.currentPlayer = this.game.currentPlayer;
 	this.el = $("#gameBoard");
 	var self = this;
 	

@@ -169,8 +169,7 @@ io.sockets.on('connection', function(socket){
       
       if (startGame) {
         game.state = GameState.STARTED;
-        io.sockets.in(data.game).emit('startGame', {
-        }); 
+        io.sockets.in(data.game).emit('startGame', {currentPlayer: 1}); //start with first player 
       } else {
         game.state = GameState.WAITING_FOR_PLAYERS;
         io.sockets.in(data.game).emit('ready', {
@@ -190,7 +189,7 @@ io.sockets.on('connection', function(socket){
         log('disconnect: ' + logObject(games[usersGame]));
         log(socket.nickname + ' disconnected');
         games[usersGame].userList[socket.nickname] = undefined;
-
+        delete games[usersGame].userList[socket.nickname];
         socket.leave(usersGame);
 
         if (games[usersGame].userCount > 0) {
