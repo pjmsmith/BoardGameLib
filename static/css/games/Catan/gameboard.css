@@ -82,6 +82,10 @@ line.player1:hover {
 	stroke:red !important;
 }
 
+.player1 {
+	color:red !important;
+}
+
 circle.player2 {
 	fill:blue !important;
 }
@@ -93,6 +97,10 @@ line.player2 {
 }
 line.player2:hover {
 	stroke:blue !important;
+}
+
+.player2 {
+	color:blue !important;
 }
 
 circle.player3 {
@@ -108,6 +116,10 @@ line.player3:hover {
 	stroke:green !important;
 }
 
+.player3 {
+	stroke:green !important;
+}
+
 circle.player4 {
 	fill:darkgray !important;
 }
@@ -118,6 +130,9 @@ line.player4 {
 	stroke:darkgray !important;
 }
 line.player4:hover {
+	stroke:darkgray !important;
+}
+.player4 {
 	stroke:darkgray !important;
 }
 

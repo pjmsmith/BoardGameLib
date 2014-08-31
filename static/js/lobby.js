@@ -57,7 +57,7 @@ $(document).ready(function() {
 		$('#loginContainer').fadeIn('fast');
 	});
 	//show and hide user list
-	$('.floating-info').on('mouseenter', function() { 
+	/*$('.floating-info').on('mouseenter', function() { 
 		if (timeout !== null) clearTimeout(timeout);
 			if (!$('#playerList').is(':visible')) {
 				$('#playerList').slideDown({queue: false});
@@ -73,7 +73,7 @@ $(document).ready(function() {
 			}
 			$('.floating-info').stop().animate({opacity: 0.3, queue: false});
 		}, 500);
-	});
+	});*/
 	socket.on('loginSuccess', function(data) {
 		var playerNumber = data.playerNumber;
 		$('#error-msg').html();

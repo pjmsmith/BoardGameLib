@@ -34,7 +34,7 @@ Game.prototype.updateUserList = function(users) {
 	for (var userId in users) {
 		var userClass = '';
 		if (userId === this.username) {
-			userClass = 'class="user-self" title="This is you"';
+			userClass = 'class="user-self player' +(Object.keys(users).indexOf(userId)+1) +'" title="This is you"';
 		}
 		$('#playerList').append('<li id="' + userId + '" ' + userClass + '">' + 
 		users[userId].username + '</li>');
@@ -43,13 +43,14 @@ Game.prototype.updateUserList = function(users) {
 		clearTimeout(timeout);
 	}
 	$('#playerList').slideDown({queue: false});
-	$('.floating-info').animate({opacity: 1, queue:false});
+	//Should always show player list
+	/*$('.floating-info').animate({opacity: 1, queue:false});
 	$('#playerList').animate({opacity: 1, queue:false});
 	timeout = setTimeout(function() {
 		$('#playerList').slideUp({queue: false});
 		$('.floating-info').animate({opacity: 0.3, queue:false});
 		$('#playerList').animate({opacity: 0.3, queue:false});
-	}, 5000);
+	}, 5000);*/
 };
 Game.prototype.setupSocketListeners = function() {
 	//update user list when people join or leave chat

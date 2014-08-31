@@ -14,7 +14,8 @@ var updateUserList = function(users) {
       $('#msg').focus();
     });
   }
-  if (timeout !== null) clearTimeout(timeout);
+	//Should always show friend list
+  /*if (timeout !== null) clearTimeout(timeout);
   $('#buddylist').slideDown({queue: false});
   $('.floating-info').animate({opacity: 1, queue:false});
   $('#buddylist').animate({opacity: 1, queue:false});
@@ -22,7 +23,7 @@ var updateUserList = function(users) {
     $('#buddylist').slideUp({queue: false});
     $('.floating-info').animate({opacity: 0.3, queue:false});
     $('#buddylist').animate({opacity: 0.3, queue:false});
-  }, 5000);
+  }, 5000);*/ 
 };
 
 $(document).ready(function() {  
@@ -181,7 +182,7 @@ $(document).ready(function() {
   
 
   //show and hide user list
-  $('.floating-info').on('mouseenter', function() { 
+  /*$('.floating-info').on('mouseenter', function() { 
     if (timeout !== null) clearTimeout(timeout);
     if (!$('#buddylist').is(':visible')) {
       $('#buddylist').slideDown({queue: false});
@@ -197,7 +198,7 @@ $(document).ready(function() {
       }
       $('.floating-info').stop().animate({opacity: 0.3, queue: false});
     }, 500);
-  });
+  });*/
 
   $('#msg').focus();
 });
