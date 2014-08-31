@@ -98,20 +98,199 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
+body { 
+    height:100%;
+    margin: 0;
+    background-color:darkred;
+}
+
+.visible-text {
+    font-size:18px;
+    font-weight:100px;
+    color:white;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    text-shadow:-1px -1px 0 #000, 1px -1px 0 #000,-1px 1px 0 #000, 1px 1px 0 #000;
+}
 
 
+#game-content {
+    width: 100%;
+    height: 100%;
+    background-color:darkred;
+    text-align:center;
+}
 
+#playerName {
+    text-align:center;
+    left:50%;
+    top:50%;
+    width: 300px;
+}
 
+#readyButton {
+    position: relative;
+    top: 50%;
+    background-color:white;
+    width:300px;
+    border-radius: 10px;
+    box-shadow:inset 0px 1px 0px 0px #ffffff;
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #cccccc) );
+    background:-moz-linear-gradient( center top, #ededed 5%, #cccccc 100% );
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#cccccc');
+    background-color:#ffffff;
+    text-indent:0;
+    border:1px solid #dcdcdc;
+    display:inline-block;
+    color:#555555;
+    font-family:arial;
+    font-size:15px;
+    font-weight:bold;
+    font-style:normal;
+    height:70px;
+    line-height:70px;
+    text-decoration:none;
+    text-align:center;
+    text-shadow:1px 1px 0px #ffffff;
+}
+#readyButton:hover:enabled {
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #cccccc), color-stop(1, #ededed) );
+    background:-moz-linear-gradient( center top, #cccccc 5%, #ededed 100% );
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc', endColorstr='#ededed');
+    background-color:#dfdfdf;
+}
+#readyButton:active:enabled {
+    position: relative;
+    color: #000000;
+    top: 50%;
+}
 
+.ready-waiting{
+    background-color: #efefef;
+    background: transparent;
+    opacity: 0.5;
+}
 
+.title {
+    font-family: Georgia, serif;
+    line-height: 1em;
+    color: #ffffff;
+    font-weight:bold;
+    font-size: 134px;
+    text-shadow:0px 0px 0 rgb(231,231,231),1px 1px 0 rgb(216,216,216),2px 2px 0 rgb(202,202,202),3px 3px 0 rgb(187,187,187),4px 4px 0 rgb(173,173,173),5px 5px 0 rgb(158,158,158), 6px 6px 0 rgb(144,144,144),7px 7px 6px rgba(0,0,0,0.6),7px 7px 1px rgba(0,0,0,0.5),0px 0px 6px rgba(0,0,0,.2);
+}
 
+.title-small {
+    font-family: Garamond, serif;
+    line-height: 1em;
+    color: #ffffff;
+    font-weight:bold;
+    font-size: 35px;
+    text-shadow:0px 0px 0 rgb(212,212,212),1px 1px 0 rgb(169,169,169),2px 2px 0 rgb(126,126,126), 3px 3px 0 rgb(83,83,83),4px 4px 3px rgba(0,0,0,0.6),4px 4px 1px rgba(0,0,0,0.5),0px 0px 3px rgba(0,0,0,.2);
+}
 
+.instructions {
+    font-family: Georgia, serif;
+    color: #ffffff;
+    font-size:36px;
+}
 
+.name-input {
+    box-shadow:inset -5px 2px 8px 0px #000;
+    color:black;
+    font-size:18px;
+    padding-left:20px;
+    padding-right:20px;
+    border-radius:20px;
+    border:none;
+    height:45px;
+    background-color:rgba(99, 99 99, 0.6);
+}
 
+.floating-info {
+    z-index: 20;
+    position: fixed;
+    right: 10px;
+    top: 10px;
+    border-radius: 10px;
+    background-color: rgba(33, 33, 33, 0.6);
+    color: white;
+    font-size: 16px;
+    font-weight: 100;
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    padding: 15px;
+    min-width: 100px;
+    word-wrap: break-word;
+    max-width: 50%;
+    max-height: 75%;
+    overflow-y: auto;
+    user-select: none;
+    -moz-user-select: none;
+}
 
+.floating-info > u {
+    text-align: center;
+    display: block;
+}
 
+.floating-info > ul {
+    text-align: left;
+    display: block;
+    padding-left: 15px;
+    cursor: pointer;
+}
+.floating-info > li {
+    margin-left: 5px;
+}
 
+#error {
+    width: 100%;
+    position: relative;
+}
 
+#error-box {
+    background-color: #ffffff;
+    opacity: 0.6;
+}
+
+#error-msg {
+    max-width: 100%;
+    margin: 0 auto;
+    font-family: Georgia, serif;
+    font-size: 24px;
+    opacity: 1;
+    border: 2px solid #ffffff;
+}
+
+#retry-login {
+    position: relative;
+    clear: both;
+    float: right;
+    margin-right: 10px; 
+}
+
+#new-username {
+    width: 300px;
+    margin-left: 10px;
+    margin-bottom: 8px;
+    clear: both;
+    float: left;
+    z-index: 40;
+}
+
+::-webkit-input-placeholder { 
+    color:#ccc; 
+}
+
+::-moz-placeholder { 
+    color:#ccc; 
+}
+
+:-ms-input-placeholder { 
+    color:#ccc; 
+
+}input:-moz-placeholder { 
+    color:#ccc; 
+}
 
 
 /* ==========================================================================

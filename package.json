@@ -1,7 +1,7 @@
 {
-  "name": "YOUR-PROJECT-NAME-HERE",
-  "description": "YOUR PROJECT DESCRIPTION HERE",
-  "author": "YOUR NAME <your@emailaddress.com>",
+  "name": "BoardGameLib",
+  "description": "Simple board game library to quickly prototype board games with multiplayer lobby functionality",
+  "author": "Patrick Smith <pat@boddies.com>",
   "version": "0.0.1",
   "dependencies": {
     "connect": "1.8.5",
@@ -15,5 +15,5 @@
 	"mocha": "*",
 	"should": "*"
   },
-  "engine": "node >= 0.6.6"
+  "engine": "node >= 0.10.31"
 }

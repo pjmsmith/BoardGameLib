@@ -1,6 +1,20 @@
 extends layout
 
 block content
-	div
-		a(id='sender')='Send a Message'
-		ul(id='receiver')
+	#game-window(style="width:100%;height:100%;position:fixed;")
+		#game-content
+			#gameTitle.title #{title}
+			#error(style="display:none")
+				#error-box
+					#error-msg
+			#loginContainer
+				.instructions Enter your name
+				input#playerName.name-input(style="display:none")
+			#readyButton(style="display:none") Start Game
+			#gameBoard
+			#players.floating-info(style="display:none")
+				u Current Players
+				ul#playerList
+					each user in userlist
+						li #{userlist[user]}
+
