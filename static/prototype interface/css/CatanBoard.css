@@ -1,0 +1,92 @@
+* {
+	/*Removes gray highlight box on touch events*/
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-touch-callout: none;
+}
+
+svg {
+	padding:20px;
+	padding-bottom:0;
+}
+
+#controls input[type="button"], #startgame_button {
+	font-size:3em;
+	background-color:gray;
+	margin-left:10px; margin-right:20px;
+}
+
+.tile {
+	fill:white !important;
+	stroke-width:5;
+	stroke:#444444;
+}
+
+.grain { fill:yellow; background-color:yellow; fill:url(#grainPattern) !important}
+.sheep {fill:rgb(142,233,138) !important; background-color:rgb(142,233,138) ; fill:url(#sheepPattern) !important}
+.wood {fill:green !important; background-color:green; fill:url(#woodPattern) !important}
+.ore {fill:gray !important; background-color:gray; fill:url(#orePattern) !important}
+.brick {fill:rgb(255, 143, 68) !important; background-color:rgb(255, 143, 68); fill:url(#brickPattern) !important}
+.water {fill:blue !important; background-color:blue; fill:url(#waterPattern)}
+.desert {fill:rgb(247,252,194) !important; background-color:yellow; fill:url(#desertPattern) !important}
+	
+
+/*.tile:hover {
+	fill:gray !important;
+}*/
+
+.vertex {
+	stroke:black;
+	stroke-width:2;
+	fill:white !important;
+}
+
+circle.unassigned:hover {
+	fill:gray !important;
+	cursor:pointer;
+}
+
+.edge {
+	stroke:rgb(220,220,220);
+	stroke-width:10;
+}
+
+line.unassigned:hover {
+	stroke:gray !important;
+	cursor:pointer;
+}
+
+#h0, #h4, #h9, #h19, #h20, #h24 {
+	display:none;
+}
+
+.unassigned {
+	display:none;
+}
+
+circle.player1 {
+	fill:red !important;
+}
+circle.player1:hover {
+	fill:red !important;
+}
+line.player1 {
+	stroke:red !important;
+}
+line.player1:hover {
+	stroke:red !important;
+}
+
+text {
+	font-size:22pt;
+	font-weight:bold;
+	text-shadow: 0px 0px 5px black, -2px -2px 5px black;
+}
+
+#controls {
+	position:absolute;
+	bottom:150px;
+	height:70px;
+	display:none;
+	left:0;
+	width:100%;
+}

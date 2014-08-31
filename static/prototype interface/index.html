@@ -1,0 +1,251 @@
+<html>
+<head>
+	
+	<!-- 
+	
+	The hex tiles are hard coded in an SVG canvas as a grid of polygons (hexagons) in the "gameboard_catan.js" file. Vertices and edges are generated onload by iterating over the static tile set.
+	Some tiles are ignored by setting css property display:none
+	
+	New boards can be generated here: http://axiscity.hexamon.net/users/isomage/misc/svg-hex.cgi
+	Default catan was:
+	Hex radius = 1
+	grid columns = 5
+	Grid rows = 5
+	
+	-->
+	
+	
+	<script src="js/jquery.js"></script>
+	<script src="js/gameboard_catan.js"></script>
+	<script src='js/fastbutton.js'></script>
+	
+	<link rel="stylesheet" type="text/css" href="css/CatanBoard.css">
+	
+	<meta name="viewport" content="width=800, minimal-ui">
+	
+	<style>
+
+	#container {
+		width: 800px;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top:40px;
+
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		-khtml-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}	
+	
+	#debug {
+		width:30%;
+		min-width:300px;
+		padding:20px;
+		position:absolute;
+		top:0;
+		right:0;
+		color:gray;
+		font-weight:100;
+		font-size:1.5em;
+		font-family:courier;
+	}
+	
+	#hand,#actions {
+		position:absolute;
+		bottom:50;
+		left:0;
+		width:100%;
+		height:100px;
+	}
+	
+	#actions>input, #purchase_modal input {
+		font-size:3em;
+		text-align:center;
+		display:inline-block;
+		color:black;
+		height:70px;
+		background-color:gray;
+	}
+	
+	#cancelPurchase_button{
+		position:absolute;
+		bottom:5px;
+		right:5px;
+	}
+	
+	#hand span, #hand>input[type="text"], #hand div{
+		font-size:3em;
+		text-align:center;
+		display:inline-block;
+		width:18%;
+		color:black;
+		height:70px;
+	}
+	
+	.hideCards,.hideActions {
+		display:none;
+	}
+	
+	.trade_controls>input {
+		width:50%;
+		font-size: 1em;
+		background-color: white;
+		border-radius:3px;
+		display:none;
+	}
+	
+	.trade_controls {
+		height:30px;
+		padding:10px 0;
+	}
+	
+	#purchase_modal {
+		-webkit-transition: all 0.2s ease-out;
+		
+		position:absolute;
+		top:-400px;
+		width:80%;
+		height:300px;
+		margin-left:10%;
+		min-height:30px;
+		background-color:white;
+		border:1px solid gray;
+		box-sizing:border-box;
+		
+		border-radius:15px;
+	}
+	
+	.show_modal {
+		transform: translate3d(0,500px,0);
+		-webkit-transform: translate3d(0,500px,0);
+		box-shadow:20px 60px 30px rgba(0,0,0,0.5);
+	}
+	
+	input[type="button"]:active {
+		background-color:red;
+	}
+	
+	</style>
+</head>
+
+<body class='use-fastclick'>
+
+<div id="container">
+</div>
+
+<div id="debug">
+	
+</div>
+
+
+<div id="controls">
+<!-- <input id="endTurn_button" value="End Turn" type="button"/> 
+<input id="placeCity_button" value="Place City" type="button"/>
+<input id="placeRoad_button" value="Place Road" type="button"/>-->
+<input id="showHideCards_button" value="Cards" type="button">
+<input id="showActions_button" value="Actions" type="button">
+</div>
+
+<div id="hand" class="hideCards">
+	<!--<div id="grain_trade" class="trade_controls"><input type="button" value="+"/><input type="button" value="-"/></div>
+	<div id="sheep_trade" class="trade_controls"><input type="button" value="+"/><input type="button" value="-"/></div>
+	<div id="ore_trade" class="trade_controls"><input type="button" value="+"/><input type="button" value="-"/></div>
+	<div id="brick_trade" class="trade_controls"><input type="button" value="+"/><input type="button" value="-"/></div>
+	<div id="wood_trade" class="trade_controls"><input type="button" value="+"/><input type="button" value="-"/></div>
+	<br>-->
+	<span class="grain">Grain</span>
+	<span class="sheep">Sheep</span>
+	<span class="ore">Ore</span>
+	<span class="brick">Brick</span>
+	<span class="wood">Wood</span>
+	<br>
+	<input id="grain_cards_held" type="text" value ="0" readonly/>
+	<input id="sheep_cards_held" type="text" value ="0" readonly/>
+	<input id="ore_cards_held" type="text" value ="0" readonly/>
+	<input id="brick_cards_held" type="text" value ="0" readonly/>
+	<input id="wood_cards_held" type="text" value ="0" readonly/>
+	
+</div>
+
+<div id="actions" class="hideActions">
+	<input id="trade_button" value="Trade" type="button">
+	<input id="purchase_button" value="Purchase" type="button">
+</div>
+
+<div id="purchase_modal" class="">
+	
+	<input id="placeCity_button" value="Place City" type="button"/>
+	<input id="placeRoad_button" value="Place Road" type="button"/>
+	
+	<input type="button" id="cancelPurchase_button" value="cancel"/>
+	
+</div>
+
+<input type="submit" id="startgame_button" value="Start Game"></input>
+
+<script>
+	
+	$( document ).ready(function() {
+		
+		var newGame = new CatanGame();
+		
+		$("#showHideCards_button").click(function(){
+			$("#hand").toggleClass("hideCards");
+		})
+		
+		$("#showHideCards_button").fastButton(function(){
+			$("#hand").toggleClass("hideCards");
+		})
+		
+		$("#showActions_button").click(function(){
+			$("#actions").toggleClass("hideActions");
+		})
+		
+		$("#showActions_button").fastButton(function(){
+			$("#actions").toggleClass("hideActions");
+		})
+		
+		$("#startgame_button").fastButton(function(){
+			startNewGame();
+		});
+		
+		$("#startgame_button").click(function(){
+			startNewGame();
+		});
+		
+		$("#purchase_button").click(function(){
+			if(!$("#purchase_modal").hasClass("show_modal")) {
+				$("#purchase_modal").addClass("show_modal")
+			}
+		})
+		
+		$("#cancelPurchase_button").click(function(){
+			$("#purchase_modal").removeClass("show_modal")
+		})
+		
+		function startNewGame(){
+			$("#startgame_button").val("loading...").attr("disabled","disabled").css("background-color","rgb(200,200,200)") //prevent double clicks
+			setTimeout(function(){ //Need to do this otherwise button label doesn't get updated in Chrome
+				newGame.startGame();
+					$("#startgame_button").css("display","none")
+				}, 10);
+		}
+		
+		//$('#startgame_button').fastButton(function() { ... })
+		
+		function showTradeControls() {
+			$(".trade_controls>input").css("display","inline-block")
+		}
+		
+		function hideTradeControls() {
+			$(".trade_controls>input").css("display","none")
+		}
+
+	});
+	
+</script>
+
+</body>
+</html>
