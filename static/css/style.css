@@ -120,6 +120,11 @@ body {
     text-align:center;
 }
 
+#gameBoard {
+	height: 100%;
+	width: 100%;
+}
+
 #playerName {
     text-align:center;
     left:50%;

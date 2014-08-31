@@ -1,9 +1,15 @@
- var jsPath = 'static/js/games/';
- var cssPath = 'static/css/games/';
+ var jsPath = '/js/games/';
+ var cssPath = '/css/games/';
  var gameResources = {
 	'Catan': {
-       'js' : [jsPath + 'Catan/gameboard.js']
-      ,'css': [cssPath + 'Catan/gameboard.css']
+       'js' : [
+       			 jsPath + 'Catan/gameboard.js'
+       			,jsPath + 'Catan/catan.js'
+       		]
+      ,'css': [
+      			 cssPath + 'Catan/gameboard.css'
+      			,cssPath + 'Catan/interface.css'
+      		]
   	}
 };
 /*

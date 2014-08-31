@@ -16,13 +16,14 @@ html.no-js(lang='en', style="min-height:100%;position:relative;")
     meta(name="author", content=author)
     block globalVariables
 
-    script(src='/js/lib/jquery-2.0.3.min.js')
+    //script(src='/js/lib/jquery-2.0.3.min.js')
+    script(src='/js/lib/jquery.js')
     script(src='/js/lib/jquery-ui.min.js')
     script(src='/socket.io/socket.io.js')
     script(src='/js/lib/fastbutton.js')
     script(src='/js/utility.js')
     script(src='/js/classes/game.js')
-    script(src='/js/game.js')
+    script(src='/js/lobby.js')
     block gameSpecific
 
     meta(name="viewport", content='width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no')

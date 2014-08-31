@@ -1,5 +1,7 @@
 var Game = Game || {};
 
-Game.Catan = Class.create(Game, {
+/*Game.Catan = function(Game, {
 
 });
+
+var gameClass = Game.Catan;*/

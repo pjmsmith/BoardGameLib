@@ -83,6 +83,10 @@ Game.prototype.waitForPlayers = function() {
 	}.bind(this));
 	this.connection.on('startGame', function() {
 		$('#readyButton').hide();
+		//instantiate game from game specific js
+		var catan = new CatanGame();
+		catan.startGame();
+
 	});
 }
 
