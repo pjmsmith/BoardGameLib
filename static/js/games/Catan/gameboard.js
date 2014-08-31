@@ -38,7 +38,7 @@ function CatanGame (game) {
 		self.setupListeners();
 
 		self.showControls();
-		
+
 	}
 	this.renderActions = function() {
 		$('#game-content').append('\
@@ -134,7 +134,7 @@ function CatanGame (game) {
 		
 		console.log("set up button listeners");
 		game.connection.on('applyAction', function(data) {
-			self.actions[data.action](data.element, data.user);
+			self.actions[data.action](data.element, data.playerNumber);
 		});
 	}
 	
@@ -143,15 +143,19 @@ function CatanGame (game) {
 	}
 	this.actions = {
 		 'placeSettlement': function(vid, player) {
+		 	console.log('place settlement: ' + vid + '; ' + player);
 			if($("#"+vid).attr("class") == "vertex unassigned") {
 				$("#"+vid).attr("class","vertex "+"player"+player)
 				$("#vertices .unassigned").css("display","none");
+				$('#'+vid).show();
 			}
 		}
 		,'placeRoad': function(eid, player) {
+			console.log('place road: ' + eid + '; ' + player);
 			if($("#"+eid).attr("class") == "edge unassigned") {
 				$("#"+eid).attr("class","edge "+ "player"+player)
 				$("#edges .unassigned").css("display","none");
+				$('#'+eid).show();
 			}
 		}};
 	this.placeSettlement = function() {
@@ -167,13 +171,12 @@ function CatanGame (game) {
 			
 			if($("#"+vid).attr("class") == "vertex unassigned")
 			{
-
 				$("#"+vid).attr("class","vertex "+"player"+player)
 				$("#vertices .unassigned").css("display","none");
 				self.el.off("vertexClick")
 				self.enableControls();
 
-				self.game.connection.emit('doAction', {game: game.uniqueKey, action: 'placeSettlement', user: game.username, element: vid})
+				self.game.connection.emit('doAction', {game: game.uniqueKey, action: 'placeSettlement', playerNumber: game.playerNumber, element: vid})
 			
 			} else {
 				alert("Location already chosen, select an unassigned spot ")
@@ -191,11 +194,13 @@ function CatanGame (game) {
 		self.el.on("edgeClick",function(e,eid,player){
 			
 		if($("#"+eid).attr("class") == "edge unassigned") {
-			$("#"+eid).attr("class","edge "+player)
+			$("#"+eid).attr("class","edge "+"player"+player)
 			$("#edges .unassigned").css("display","none");
 			self.el.off("edgeClick")
 			self.enableControls();
-		
+			
+			self.game.connection.emit('doAction', {game: game.uniqueKey, action: 'placeRoad', playerNumber: game.playerNumber, element: eid})
+			
 		} else {
 			alert("Location already chosen, select an unassigned spot ")
 		}
@@ -338,7 +343,7 @@ function CatanGame (game) {
 	this.edgeClicked = function(edgeThis){
 		console.log($(edgeThis).attr("id"))
 	
-		var pNumber = self.currentPlayer // current player
+		var pNumber = self.game.playerNumber; // current player
 	
 		self.el.trigger("edgeClick",[$(edgeThis).attr("id"),pNumber]);
 	}
@@ -346,7 +351,7 @@ function CatanGame (game) {
 	this.vertexClicked = function(vertexThis){
 		console.log($(vertexThis).attr("id"))
 	
-		var pNumber = self.currentPlayer // current player
+		var pNumber = self.game.playerNumber; // current player
 	
 		self.el.trigger("vertexClick",[$(vertexThis).attr("id"),pNumber]);
 	}

@@ -144,8 +144,6 @@ io.sockets.on('connection', function(socket){
   socket.on('doAction', function(data) {
     log('doing action');
     var game = games[data.game];
-    var playerNum = Object.keys(game.userList).indexOf(data.user) + 1;
-    data.user = playerNum;
     io.sockets.in(data.game).emit('applyAction', data);
   });
   
