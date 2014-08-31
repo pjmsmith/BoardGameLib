@@ -3,7 +3,8 @@ var connect = require('connect')
     , express = require('express')
     , io = require('socket.io')
     , port = (process.env.PORT || 8081)
-    , utility = require('./static/js/utility');
+    , utility = require('./static/js/utility')
+    , Game = require('./static/js/classes/game');
 
 var log = utility.log;
 var logObject = utility.logObject;
