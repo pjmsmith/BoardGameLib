@@ -35,13 +35,9 @@ function CatanGame (game) {
 		self.createEdges();
 		self.renderTiles();
 		self.setupListeners();
+
 		self.showControls();
-		if (self.currentPlayer === self.game.playerNumber) {
-			self.startPlayerTurn();
-		} else {
-			$('.player' + self.currentPlayer).addClass('player-turn');
-			self.disableBuildControls();
-		}
+
 	}
 	this.renderActions = function() {
 		$('#game-content').append('\
@@ -160,7 +156,7 @@ function CatanGame (game) {
 		
 		console.log("set up button listeners");
 		game.connection.on('applyAction', function(data) {
-			self.actions[data.action](data.element, data.playerNumber, data.args);
+			self.actions[data.action](data.element, data.playerNumber);
 		});
 	}
 	
@@ -184,21 +180,17 @@ function CatanGame (game) {
 				$('#'+eid).show();
 			}
 		}
-		,'endTurn': function(el, player, args) {
-
+		,'endTurn': function(el, player) {
 			console.log('endTurn: next player ' + player);
 			if (self.game.playerNumber === player) {
-				self.startPlayerTurn();
+				//disable build controls
+				$("#purchase_button").removeAttr("disabled");
+				$("#endTurn_button").removeAttr("disabled");
 			} else {
 				//disable build controls
 				$("#purchase_button").attr("disabled","disabled");
 				$("#endTurn_button").attr("disabled","disabled");
-				$('.player' + self.game.playerNumber).removeClass('player-turn');
 			}
-			if (typeof args !== 'undefined' && typeof args.lastPlayer !== 'undefined') {
-				$('.player' + args.lastPlayer).removeClass('player-turn');
-			}
-			$('.player' + player).addClass('player-turn');
 		}
 	};
 		
@@ -242,28 +234,19 @@ function CatanGame (game) {
 	}
 	
 	this.endPlayerTurn = function(){
-		self.disableBuildControls();
-		$('.player' + self.game.playerNumber).removeClass('player-turn');
-		self.game.connection.emit('doAction', {
-			  game: self.game.uniqueKey
-			, action: 'endTurn'
-			, playerNumber: ((self.game.playerNumber % self.game.numPlayers) + 1)
-			, args: {
-				lastPlayer: self.game.playerNumber}
-			}
-		);
-		
-	}
-
-	this.disableBuildControls = function() {
+		//disable build controls
 		$("#purchase_button").attr("disabled","disabled")
 		$("#endTurn_button").attr("disabled","disabled")
+		
+		$("#actions").addClass("hideActions");
+		
+		self.game.connection.emit('doAction', {game: self.game.uniqueKey, action: 'endTurn', playerNumber: ((self.game.playerNumber % self.game.numPlayers) + 1)})
+		
 	}
 	
 	this.startPlayerTurn = function(){
 		$("#purchase_button").removeAttr("disabled")
 		$("#endTurn_button").removeAttr("disabled")
-		$('.player' + self.game.playerNumber).addClass('player-turn');
 		
 	}
 	
