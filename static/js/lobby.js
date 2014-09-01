@@ -1,5 +1,5 @@
 var Lobby = function() {
-
+	this.lobbyId = uniqueKey;
 };
 Lobby.prototype = {
 	constructor: Lobby,

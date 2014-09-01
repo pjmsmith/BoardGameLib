@@ -468,6 +468,4 @@ function CatanGame (game) {
 		return c;
 		
 	}
-	
-	
 }
