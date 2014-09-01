@@ -22,6 +22,7 @@ var Game = function(title, username, playerNumber, uniqueKey, connection) {
 	this.activePlayer = null;
 	this.maxPlayers = 5;
 	this.minPlayers = 2;
+	this.numPlayers = 1;
 	this.dice = {
 		 number: 2
 		,sides: 6
@@ -54,6 +55,8 @@ Game.prototype.setupSocketListeners = function() {
 		if (!$('#players').is(':visible')) {
 			$('#players').fadeIn('fast');
 		}
+		
+		this.numPlayers = Object.keys(data.users).length;
 		this.updateUserList(data.users);
 	}.bind(this));
 	if (!$('#gameContent').is(':visible')) {
@@ -64,7 +67,8 @@ Game.prototype.setupSocketListeners = function() {
 	}
 	
 	this.connection.on('logout', function(data) {
-	  this.updateUserList(data.users); 
+		this.numPlayers = Object.keys(data.users).length;
+		this.updateUserList(data.users);
 	}.bind(this));
 	this.updateUserList({username: username});
 }

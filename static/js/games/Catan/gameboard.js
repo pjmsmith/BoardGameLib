@@ -175,7 +175,20 @@ function CatanGame (game) {
 				$("#edges .unassigned").css("display","none");
 				$('#'+eid).show();
 			}
-		}};
+		}
+		,'endTurn': function(el, player) {
+			console.log('endTurn: next player ' + player);
+			if (self.game.playerNumber === player) {
+				//disable build controls
+				$("#purchase_button").removeAttr("disabled");
+				$("#endTurn_button").removeAttr("disabled");
+			} else {
+				//disable build controls
+				$("#purchase_button").attr("disabled","disabled");
+				$("#endTurn_button").attr("disabled","disabled");
+			}
+		}
+	};
 		
 	this.showPurchaseControls = function() {
 		$("#purchaseControls").css("display","block")
@@ -220,7 +233,7 @@ function CatanGame (game) {
 		$("#purchase_button").attr("disabled","disabled")
 		$("#endTurn_button").attr("disabled","disabled")
 		
-		self.game.connection.emit('doAction', {game: game.uniqueKey, action: 'endTurn', playerNumber: game.playerNumber})
+		self.game.connection.emit('doAction', {game: self.game.uniqueKey, action: 'endTurn', playerNumber: ((self.game.playerNumber % self.game.numPlayers) + 1)})
 		
 	}
 	
