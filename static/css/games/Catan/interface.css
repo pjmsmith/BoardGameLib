@@ -2,7 +2,7 @@ input[disabled]{
 	opacity:0.5;
 }
 
-#hand,#actions {
+#hand {
 	position:absolute;
 	bottom:50px;
 	left:0;
@@ -10,7 +10,27 @@ input[disabled]{
 	height:100px;
 }
 
-#actions>input, #purchase_modal input {
+#actions {
+	position:absolute;
+	bottom:200px;
+	right:0;
+	width:20%;
+	min-width:70px;
+	height:100px;
+}
+
+#actions>input {
+	font-size:1em;
+	text-align:center;
+	display:block;
+	color:black;
+	height:70px;
+	width:70px;
+	overflow:hidden;
+	background-color:gray;
+}
+
+#purchase_modal input {
 	font-size:3em;
 	text-align:center;
 	display:inline-block;
