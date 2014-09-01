@@ -1,0 +1,309 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"file",
+				"file_node"
+			],
+			[
+				"parse",
+				"parse_xml_session"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 58.0,
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"default",
+				"Preferences: Settings - Default"
+			],
+			[
+				"user",
+				"Preferences: Settings - User"
+			],
+			[
+				"pack",
+				"Package Control: Install Package"
+			],
+			[
+				"pac",
+				"Package Control: Discover Packages"
+			],
+			[
+				"packa",
+				"Package Control: Install Package"
+			],
+			[
+				"",
+				"TortoiseSVN: Log"
+			],
+			[
+				"reform",
+				"Pretty JSON: Format (Pretty Print) JSON"
+			],
+			[
+				"A",
+				"ANF: New File"
+			],
+			[
+				"Pac",
+				"Package Control: Install Package"
+			],
+			[
+				"j",
+				"Pretty JSON: Format (Pretty Print) JSON"
+			],
+			[
+				"P",
+				"Package Control: Install Package"
+			],
+			[
+				"p",
+				"Preferences: Browse Packages"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Discover Packages"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			],
+			[
+				"Package",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 512.0
+	},
+	"console":
+	{
+		"height": 215.0,
+		"history":
+		[
+			"sublime.clear()",
+			"sublime.console",
+			"clear()",
+			"clear",
+			"sublime.log_commands(False)",
+			"sublime.log_commands(True)",
+			"sublime.log_commands(true)",
+			"sublime.keymap",
+			"sublime.commands",
+			"sublime",
+			"subline",
+			"commandlist",
+			"sublime.log_commands(False)",
+			"sublime.log_input(False)",
+			"window.run_command(\"prompt_open_file\")",
+			"self.run_command(\"prompt_open_file\")",
+			"sublime.View.insert(\"Hello, World!\")",
+			"sublime.View",
+			"view.runCommand('load_npp_setting')",
+			"sublime.log_input(True)",
+			"sublime.log_commands(True)",
+			"sublime.log_commands(true)",
+			"sublime.log_commands(true);",
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by) "
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/Users/Patrick's Desktop/Box Sync/catanclone"
+	],
+	"file_history":
+	[
+		"/C/Program Files (x86)/Steam/steamapps/common/Kerbal Space Program/GameData/LICENSE.md",
+		"/C/Users/Patrick's Desktop/AppData/Roaming/Sublime Text 3/Packages/load_npp_session.py",
+		"/C/Users/Patrick's Desktop/AppData/Roaming/Sublime Text 3/Packages/User/Default (Windows).sublime-keymap",
+		"/C/Users/Patrick's Desktop/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/C/Users/Patrick's Desktop/AppData/Roaming/Sublime Text 3/Packages/lunchit.npp",
+		"/C/Users/Patrick's Desktop/AppData/Roaming/Sublime Text 3/Packages/Default.sublime-commands",
+		"/C/Users/Patrick's Desktop/AppData/Roaming/Sublime Text 3/Packages/Default/Default (Windows).sublime-keymap",
+		"/C/Users/Patrick's Desktop/Desktop/lunchit.npp",
+		"/C/Program Files/Sublime Text 3/Packages/Default.sublime-package",
+		"/C/Users/Patrick's Desktop/AppData/Roaming/Sublime Text 3/Packages/User/Package Control.cache/ad7758d143e99a76034aad71ae2a1f3b",
+		"/C/Users/Patrick's Desktop/AppData/Roaming/Sublime Text 3/Packages/User/Package Control.sublime-settings",
+		"/C/Users/Patrick's Desktop/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchadmin/todo.txt",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/settings.py",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/polls/urls.py",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/polls/models.py",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/polls/views.py",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/templates/polls/dashboard.html",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/templates/polls/base.html",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/site_media/lunch.js",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/site_media/lunch.css",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/templates/polls/poll_detail.html",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/templates/polls/results.html",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/site_media/dashboard.js",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/templates/registration/login.html",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/templates/registration/forgot.html",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/templates/registration/register.html",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/templates/polls/poll_list.html",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/site_media/group.js",
+		"/C/Users/Patrick's Desktop/Documents/My Sites/lunchit/site_media/detail.js",
+		"/C/Program Files (x86)/Apache Software Foundation/Apache2.2/conf/httpd.conf",
+		"/C/Users/Patrick's Desktop/AppData/Roaming/Sublime Text 3/Packages/load_npp_setting.py",
+		"/C/Users/Patrick's Desktop/AppData/Roaming/Sublime Text 3/Packages/User/load_npp_setting.py",
+		"/C/Users/Patrick's Desktop/AppData/Roaming/Sublime Text 3/Packages/User/Package Control.last-run",
+		"/C/Program Files/Sublime Text 3/Packages/JavaScript.sublime-package"
+	],
+	"find":
+	{
+		"height": 23.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"maximize",
+			"/",
+			"?",
+			"menu",
+			"])\n",
+			":\n",
+			"new_window",
+			"window",
+			"open",
+			"plus",
+			"space",
+			"whitespace"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "C:\\Users\\Patrick's Desktop\\Box Sync\\catanclone"
+		}
+	],
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 30.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"project": "",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 243.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

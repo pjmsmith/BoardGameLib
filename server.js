@@ -2,7 +2,7 @@
 var   connect = require('connect')
     , express = require('express')
     , io = require('socket.io')
-    , port = (process.env.PORT || 8081)
+    , port = (process.env.PORT || 8888)
     , utility = require('./static/js/utility')
     , Game = require('./static/js/classes/game');
 

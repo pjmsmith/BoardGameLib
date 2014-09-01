@@ -22,21 +22,26 @@ module.exports = function(server) {
    			lobbies.push({'key': game});
    		}
    	}
-    res.render('index.jade', {
-        locals : {
-            uniqueKey: null
-           ,username: null
-           ,lobbies: lobbies.length > 0 ? lobbies : null
-           ,gameResources: gameResources
-           ,messages: (req.session.messages) ? JSON.stringify(req.session.messages) : '{}'
-           ,userlist: userList
-           ,title : req.params.game
-           ,description: req.params.game
-           ,author: 'Patrick Smith'
-           ,analyticssiteid: 'XXXXXXX' 
-          }
-      });
-    });
+
+    if (typeof gameResources !== 'undefined') {
+      res.render('index.jade', {
+          locals : {
+              uniqueKey: null
+             ,username: null
+             ,lobbies: lobbies.length > 0 ? lobbies : null
+             ,gameResources: gameResources
+             ,messages: (req.session.messages) ? JSON.stringify(req.session.messages) : '{}'
+             ,userlist: userList
+             ,title : req.params.game
+             ,description: req.params.game
+             ,author: 'Patrick Smith'
+             ,analyticssiteid: 'XXXXXXX' 
+            }
+        });
+    } else {
+      res.redirect('/');
+    }
+  });
 
   server.get('/:game/generateKey', function(req,res){
     var uniqueKeyIndex = global.uniqueKeyIndex;
@@ -54,29 +59,32 @@ module.exports = function(server) {
     var games = global.games;
     var GameState = global.GameState;
     var gameResources = getGameResources(req.params.game);
-
-    log(logObject(games[uniqueKey]));
-    if (typeof games[uniqueKey] !== 'undefined' && games[uniqueKey].state != GameState.WAITING_FOR_PLAYERS) {
-      //game already started, redirect to new game screen, send error msg
-      log('uniqueKey handler: ' + logObject(games[uniqueKey]));
-      req.session.messages = {errorMsg: 'Sorry, that game has already started. Please start a new game.'};
-      res.redirect('/' + req.params.game);
+    if (typeof gameResources === 'undefined') {
+      res.redirect('/');
     } else {
-      req.session.messages = {};
-      res.render('index.jade', {
-        locals : {
-                  uniqueKey: uniqueKey
-                 ,username: null
-           		 ,lobbies: null
-                 ,gameResources: gameResources
-                 ,messages: '{}'
-                 ,userlist: userList
-                 ,title : req.params.game
-                 ,description: req.params.game
-                 ,author: 'Patrick Smith'
-                 ,analyticssiteid: 'XXXXXXX' 
-                }
-      });
+      log(logObject(games[uniqueKey]));
+      if (typeof games[uniqueKey] !== 'undefined' && games[uniqueKey].state != GameState.WAITING_FOR_PLAYERS) {
+        //game already started, redirect to new game screen, send error msg
+        log('uniqueKey handler: ' + logObject(games[uniqueKey]));
+        req.session.messages = {errorMsg: 'Sorry, that game has already started. Please start a new game.'};
+        res.redirect('/' + req.params.game);
+      } else {
+        req.session.messages = {};
+        res.render('index.jade', {
+          locals : {
+                    uniqueKey: uniqueKey
+                   ,username: null
+             		 ,lobbies: null
+                   ,gameResources: gameResources
+                   ,messages: '{}'
+                   ,userlist: userList
+                   ,title : req.params.game
+                   ,description: req.params.game
+                   ,author: 'Patrick Smith'
+                   ,analyticssiteid: 'XXXXXXX' 
+                  }
+        });
+      }
     }
   });
 };

@@ -12,9 +12,11 @@ block content
 	#game-window(style="width:100%;height:100%;position:fixed;")
 		#game-content
 			#gameTitle.title #{title}
+
 			#error(style="display:none")
 				#error-box
 					#error-msg
+
 			#game-choices
 				if lobbies
 					span.choice Start a new lobby or join an existing one:
@@ -30,10 +32,21 @@ block content
 						each lobby in lobbies
 							a.game(href='#{title}/lobby/#{lobby.key}') #{lobby.key}
 							br
+
 			button#readyButton.btn(style="display:none") Start Game
+
 			#gameBoard
+
 			#players.floating-info(style="display:none")
 				u Current Players
 				ul#playerList
 					each user in userlist
 						li #{userlist[user]}
+	//Create game lobby
+	script
+		//setup socket connection
+		var socket = io.connect();
+		$(document).ready(function() {
+			var lobby = new Lobby();
+			lobby.initialize();
+		});
