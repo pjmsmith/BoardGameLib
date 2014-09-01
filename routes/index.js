@@ -9,7 +9,6 @@ var requireFiles = function(directory, app) {
 			if (filename === 'index.js' && directory === __dirname) return;
 
 			if (validFileTypes.indexOf(filename.split('.').pop()) === -1) return;
-			console.log(directory + '/' + filename);
 			require(directory + '/' + filename)(app);
 		}
 	});

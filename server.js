@@ -209,7 +209,7 @@ io.sockets.on('connection', function(socket){
           }
           if (startGame) {
             games[usersGame].state = GameState.STARTED;
-            io.sockets.in(usersGame).emit('startGame');
+            io.sockets.in(usersGame).emit('startGame', {currentPlayer: 1});
           }
           io.sockets.in(usersGame).emit('logout', {
             leftUser: leftUser,

@@ -82,6 +82,7 @@ Game.prototype.waitForPlayers = function() {
 	}.bind(this));
 	this.connection.on('startGame', function(data) {
 		this.currentPlayer = data.currentPlayer;
+		console.log('player ' + this.currentPlayer + ' starting game');
 		$('#readyButton').hide();
 		//instantiate game from game specific js
 		var catan = new CatanGame(this);
