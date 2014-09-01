@@ -4,10 +4,14 @@ var   connect = require('connect')
 	, io = require('socket.io')
 	, port = (process.env.PORT || 8888)
 	, utility = require('./static/js/utility')
-	, Game = require('./static/js/classes/game');
+	, Game = require('./static/js/classes/game')
+	, Player = require('./static/js/classes/player');
 
 var log = utility.log;
 var logObject = utility.logObject;
+
+var Game = Game.Game;
+var Player = Player.Player;
 
 var NotFound = function(msg){
 	this.name = 'NotFound';
@@ -48,12 +52,16 @@ server.error(function(err, req, res, next){
 	}
 });
 server.listen(port);
+
+//Setup the routes
 var routes = require('./routes')(server);
 
 //Setup Socket.IO
 var io = io.listen(server, {log: utility.debug});
 io.set('close timeout', 60);
 io.set('heartbeat timeout', 15);
+
+//global server variables
 var games = {};
 var userList = {};
 var userCount = 0;
@@ -81,60 +89,69 @@ io.sockets.on('connection', function(socket){
 		var userSession = data.user.replace(/(<([^>]+)>)/ig,'');;
 		var game = data.game;
 		//add to global user list
-		userList[socket.id] = {
-			 username: userSession
+		userList[socket.id] = new Player({
+			 name: userSession
 			,id: socket.id
 			,game: game
-		}
+			,ready: false
+		});
 		socket.nickname = userSession;
 		userCount++;
 		log('loginUser userList: ' + logObject(userList));
 		if (typeof games[game] === 'undefined') {
-			games[game] = {
-				 userList: {}
-				,userCount: 0
+			games[game] = new Game({
+				 uniqueKey: game
+				,players: {}
+				,numPlayers: 0
 				,state: GameState.WAITING_FOR_PLAYERS
-			}
+			});
 			log('loginUser created new game: ' + game);
 		}
 
-		if (typeof games[game].userList[userSession] !== 'undefined' && games[game].userList[userSession].id !== socket.id ) {
-			log('duplicate username');
-			log(logObject(games[game].userList));
-			//collision - let's keep names unique so we can easily target specific users
-			socket.emit('loginError', { 
-				error: 'Please choose a unique name.'
-			});
-		} else {
-			log('unique user, join game');
-			if (games[game].state === GameState.WAITING_FOR_PLAYERS) {
-				//add to game's user list
-				games[game].userList[userSession] = userList[socket.id];
-				games[game].userList[userSession].ready = false;
-				games[game].userCount++;
-				log('loginUser game: ' + logObject(games[game]));
-				log('login request from ' + socket.nickname);
+		if (games[game].state === GameState.WAITING_FOR_PLAYERS) {
+			if (games[game].numPlayers + 1 <= games[game].maxPlayers && games[game].getAvailablePlayerNumber()) {
+				var playerNumber = games[game].getAvailablePlayerNumber();
+				if (typeof games[game].players[playerNumber] !== 'undefined' && games[game].players[playerNumber].id !== socket.id ) {
+					log('duplicate username');
+					log(logObject(games[game].players));
+					//collision - let's keep names unique so we can easily target specific users
+					socket.emit('loginError', { 
+						error: 'Please choose a unique name.'
+					});
+				} else {
+					log('unique user, join game');
+					//add to game's user list
+					games[game].players[playerNumber] = userList[socket.id];
+					games[game].players[playerNumber].playerNumber = playerNumber;
+					games[game].numPlayers++;
+					log('loginUser game: ' + logObject(games[game]));
+					log('login request from ' + socket.nickname);
 
-				//join game - new room
-				socket.join(game);
+					//join game - new room
+					socket.join(game);
 
-				io.sockets.in(game).emit('updatebuddies', {
-					users: games[game].userList,
-					newUser: userSession
-				});
-				var playerNumber = Object.keys(games[game].userList).indexOf(userSession) + 1;
-				socket.emit('loginSuccess', {playerNumber: playerNumber}); 
-				socket.emit('updatebuddies', {
-					users: games[game].userList,
-					newUser: userSession
-				});
-				log('Users:' + userCount);
+					io.sockets.in(game).emit('updatebuddies', {
+						users: games[game].players,
+						newUser: userSession
+					});
+					socket.emit('loginSuccess', {playerNumber: playerNumber}); 
+					socket.emit('updatebuddies', {
+						users: games[game].players,
+						newUser: userSession
+					});
+					log('Users:' + userCount);
+				}
 			} else {
 				//send error to socket
 				socket.emit('loginError', { 
-					error: 'Sorry, this game has already started. Join a new lobby.'
+					error: 'Sorry, this game is full. Join a new lobby.'
 				});
 			}
+		} else {
+			//send error to socket
+			socket.emit('loginError', { 
+				error: 'Sorry, this game has already started. Join a new lobby.'
+			});
 		}
 
 	};
@@ -152,10 +169,10 @@ io.sockets.on('connection', function(socket){
 			var startGame = true;
 			var game = games[data.game];
 			log('ready: ' + logObject(game));
-			if (typeof game.userList[data.user] !== 'undefined') {
-				game.userList[data.user].ready = true;
-				for (var username in game.userList) {
-					var user = game.userList[username];
+			if (typeof data.user !== 'undefined' && typeof game.players[data.user.playerNumber] !== 'undefined') {
+				game.players[data.user.playerNumber].ready = true;
+				for (var number in game.players) {
+					var user = game.players[number];
 					if (typeof user !== 'undefined') {
 						startGame &= user.ready;
 					}

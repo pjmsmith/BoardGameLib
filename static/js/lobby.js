@@ -1,4 +1,5 @@
-var Lobby = function() {
+var Lobby = function(uniqueKey, container) {
+	this.element = container;
 	this.lobbyId = uniqueKey;
 };
 Lobby.prototype = {
@@ -17,7 +18,9 @@ Lobby.prototype = {
 				errorMsgs += errors[msg] + '<br/>';
 			}
 			$('#error-msg').html(errorMsgs);
-			$('#error').slideDown('fast');
+			if (!$('#error').is('visible')) {
+				$('#error').slideDown('fast');
+			}
 		}
 	},
 
@@ -51,17 +54,20 @@ Lobby.prototype = {
 							socket.emit('login', {user: username, game: uniqueKey});
 						}
 					} else {
-						self.displayError('Your name needs to be longer than that!<br/> Use at least one character.');
+						self.displayError({error: 'Your name needs to be longer than that!<br/> Use at least one character.'});
 					}
 				}
 			}.bind(username));
 		} else {
 			//shouldn't happen until game data is stored in a cookie or session variable to allow reconnect
 			console.log('good to go');
-			var currentGame = new Game(gameName, username, playerNumber, uniqueKey, socket);
-			console.log(currentGame.title);
-			currentGame.setupSocketListeners();
-			currentGame.waitForPlayers();
+			self.createNewGame({
+				 title: gameName
+				,username: username
+				,playerNumber: playerNumber
+				,uniqueKey: uniqueKey
+				,connection: socket
+			});
 		}
 
 		$('#newLobby').click(function() {
@@ -82,6 +88,7 @@ Lobby.prototype = {
 			var playerNumber = data.playerNumber;
 			self.createNewGame({
 				 title: gameName
+				,element: this.element
 				,username: username
 				,playerNumber: playerNumber
 				,uniqueKey: uniqueKey
@@ -90,7 +97,7 @@ Lobby.prototype = {
 		});
 		socket.on('loginError', function(data) {
 			if (data.error) {
-				self.displayError();
+				self.displayError(data);
 			}
 			$('#ready-button').fadeOut('fast');
 		});

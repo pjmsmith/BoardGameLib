@@ -1,17 +1,19 @@
 
-var  utility = require('../static/js/utility')
-	,resources = require('../static/js/games/resources');
-
-
+var  utility = require('../static/js/utility');
 var logObject = utility.logObject;
 var log = utility.log;
 
+var resources = null;
+
 var getGameResources = function(game) {
-	var gameResources = resources.gameResources;
-		return gameResources[game];
-}
+	if (!resources) {
+		resources = require('../static/js/games/resources')
+	}
+	return resources.gameResources[game];
+};
 
 module.exports = function(server) {
+
 	server.get('/:game', function(req,res){
 		var userList = global.userList;
 		var GameState = global.GameState;

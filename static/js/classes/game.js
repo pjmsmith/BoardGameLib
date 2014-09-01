@@ -1,17 +1,21 @@
 
+if (typeof require !== 'undefined') {
+	var   env = require('jsdom').env
+		, html = '<html></html>';
+	var $;
+	env(html, function (errors, window) {
+		$ = require('jquery')(window);
+	});
+}
 var Game = function(options) {
 	this.options = {
 		  title: ''
+		, element: null
 		, username: ''
 		, playerNumber: 0
-		, uniqueKey: ''
+		, uniqueKey: null
 		, connection: null
-		, players: {
-			  ready: false
-			, cards: []
-			, pieces: []
-			, state: null
-		  }
+		, players: {}
 		, currentPlayer: null
 		, board: null
 		, decks: {
@@ -21,7 +25,7 @@ var Game = function(options) {
 		, activePlayer: null
 		, maxPlayers: 5
 		, minPlayers: 2
-		, numPlayers: 1
+		, numPlayers: 0
 		, dice: {
 			  number: 2
 			, sides: 6
@@ -36,16 +40,30 @@ var Game = function(options) {
 Game.prototype = {
 	constructor: Game,
 
+	getNextPlayer: function() {
+		return (this.activePlayer % this.numPlayers) + 1;
+	},
+
+	getAvailablePlayerNumber: function() {
+		for (var i = 1; i <= this.maxPlayers; i++) {
+			if (typeof this.players[i] === 'undefined') {
+				return i;
+			}
+		}
+		return null;
+	},
+
 	updateUserList: function(users) {
 		$('#playerList').empty();
 		for (var userId in users) {
 			var userClass = '';
-			var playerClass = 'class="player' + (Object.keys(users).indexOf(userId) + 1);
+			var user = users[userId];
+			var playerClass = 'class="player' + (user.playerNumber);
 			if (userId === this.username) {
 				playerClass = playerClass + ' user-self" title="This is you"';
 			}
 			$('#playerList').append('<li id="' + userId + '" ' + playerClass + '">' + 
-			users[userId].username + '</li>');
+			user.name + '</li>');
 		}
 		if (timeout !== null) {
 			clearTimeout(timeout);
@@ -65,6 +83,7 @@ Game.prototype = {
 			}
 
 			self.numPlayers = Object.keys(data.users).length;
+			self.players = data.users;
 			self.updateUserList(data.users);
 		});
 		if (!$('#gameContent').is(':visible')) {
@@ -76,16 +95,17 @@ Game.prototype = {
 		
 		this.connection.on('logout', function(data) {
 			self.numPlayers = Object.keys(data.users).length;
+			self.players = data.users;
 			self.updateUserList(data.users);
 		});
-		this.updateUserList({username: username});
+		this.updateUserList(this.players);
 	},
 
 	waitForPlayers: function() {
 		var self = this;
 		$('#readyButton').fadeIn('fast');
 		$('#readyButton').click(function() {
-			self.connection.emit('ready', {user: username, game: uniqueKey});
+			self.connection.emit('ready', {user: {playerNumber: self.playerNumber}, game: uniqueKey});
 			var btn = $('#readyButton');
 			btn.attr('disabled', 'disabled');
 			btn.html('Ready!');
@@ -95,11 +115,17 @@ Game.prototype = {
 			self.currentPlayer = data.currentPlayer;
 			Util.log('player ' + self.currentPlayer + ' starting game');
 			$('#readyButton').hide();
+
 			//instantiate game from game specific js
+			
 			var catan = new CatanGame(self);
 			catan.startGame();
 
 		});
+	},
+
+	render: function() {
+
 	}
 };
 

@@ -3,6 +3,7 @@ var fs = require('fs'),
 
 var requireFiles = function(directory, app) {
 	fs.readdirSync(directory).forEach(function(filename) {
+		console.log(directory + '/' + filename);
 		if (fs.lstatSync(directory + '/' + filename).isDirectory()) {
 			requireFiles(directory + '/' + filename, app);
 		} else {

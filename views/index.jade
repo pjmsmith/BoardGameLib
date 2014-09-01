@@ -1,5 +1,6 @@
 extends layout
 block gameSpecific
+	script(src='/js/classes/player.js')
 	script(src='/js/classes/game.js')
 	script(src='/js/lobby.js')
 
@@ -47,6 +48,6 @@ block content
 		//setup socket connection
 		var socket = io.connect();
 		$(document).ready(function() {
-			var lobby = new Lobby();
+			var lobby = new Lobby(uniqueKey, $('gameBoard'));
 			lobby.initialize();
 		});
