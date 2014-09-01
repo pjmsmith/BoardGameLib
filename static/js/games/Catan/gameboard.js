@@ -42,8 +42,12 @@ function CatanGame (game) {
 	this.renderActions = function() {
 		$('#game-content').append('\
 			<div id="actions" class="hideActions">\
-				<input id="trade_button" value="Trade" type="button">\
-				<input id="purchase_button" value="Purchase" type="button">\
+				<!--<input id="trade_button" value="Trade" type="button">\
+				<input id="purchase_button" value="Purchase" type="button">-->\
+				<input id="placeRoad_button" value="Road" type="button">\
+				<input id="placeCity_button" value="Settlement" type="button">\
+				<input id="upgradeSettle_button" value="City" type="button">\
+				<input id="buyDevCard_button" value="Dev. Card" type="button">\
 			</div>\
 			<div id="purchase_modal" class="">\
 				<input id="placeCity_button" value="Place City" type="button"/>\
@@ -218,6 +222,7 @@ function CatanGame (game) {
 				self.el.off("vertexClick")
 				self.enableControls();
 				self.hidePurchaseControls();
+				$("#actions").removeClass("hideActions");
 
 				self.game.connection.emit('doAction', {game: game.uniqueKey, action: 'placeSettlement', playerNumber: game.playerNumber, element: vid})
 			
@@ -258,6 +263,7 @@ function CatanGame (game) {
 			self.el.off("edgeClick")
 			self.enableControls();
 			self.hidePurchaseControls();
+			$("#actions").removeClass("hideActions");
 			
 			self.game.connection.emit('doAction', {game: game.uniqueKey, action: 'placeRoad', playerNumber: game.playerNumber, element: eid})
 			
