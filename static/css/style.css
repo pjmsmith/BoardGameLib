@@ -147,6 +147,10 @@ body {
     width: 18.750em;
 }
 
+.player-turn{
+	font-weight: bold;
+}
+
 .btn {
     position: relative;
     top: 50%;
