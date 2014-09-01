@@ -238,6 +238,8 @@ function CatanGame (game) {
 		$("#purchase_button").attr("disabled","disabled")
 		$("#endTurn_button").attr("disabled","disabled")
 		
+		$("#actions").addClass("hideActions");
+		
 		self.game.connection.emit('doAction', {game: self.game.uniqueKey, action: 'endTurn', playerNumber: ((self.game.playerNumber % self.game.numPlayers) + 1)})
 		
 	}
