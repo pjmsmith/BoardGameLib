@@ -61,7 +61,7 @@ var uniqueKeyIndex = Math.pow(10, 8);
 var GameState = {
    WAITING_FOR_PLAYERS: 1
   ,STARTED: 2
-  ,FIINISHED: 3
+  ,FINISHED: 3
 };
 //assign to globals
 global.games = games;
