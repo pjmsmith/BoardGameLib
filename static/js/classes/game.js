@@ -54,6 +54,7 @@ Game.prototype = {
 	},
 	
 	setupSocketListeners: function() {
+		var self = this;
 		//update user list when people join or leave chat
 		this.connection.on('updatebuddies', function(data) {
 			if (!$('#gameContent').is(':visible')) {
@@ -63,9 +64,9 @@ Game.prototype = {
 				$('#players').fadeIn('fast');
 			}
 
-			this.numPlayers = Object.keys(data.users).length;
-			this.updateUserList(data.users);
-		}.bind(this));
+			self.numPlayers = Object.keys(data.users).length;
+			self.updateUserList(data.users);
+		});
 		if (!$('#gameContent').is(':visible')) {
 			$('#gameContent').fadeIn('fast');
 		}
@@ -74,30 +75,31 @@ Game.prototype = {
 		}
 		
 		this.connection.on('logout', function(data) {
-			this.numPlayers = Object.keys(data.users).length;
-			this.updateUserList(data.users);
-		}.bind(this));
+			self.numPlayers = Object.keys(data.users).length;
+			self.updateUserList(data.users);
+		});
 		this.updateUserList({username: username});
 	},
 
 	waitForPlayers: function() {
+		var self = this;
 		$('#readyButton').fadeIn('fast');
 		$('#readyButton').click(function() {
-			this.connection.emit('ready', {user: username, game: uniqueKey});
+			self.connection.emit('ready', {user: username, game: uniqueKey});
 			var btn = $('#readyButton');
 			btn.attr('disabled', 'disabled');
 			btn.html('Ready!');
 			btn.addClass('ready-waiting');
-		}.bind(this));
+		});
 		this.connection.on('startGame', function(data) {
-			this.currentPlayer = data.currentPlayer;
-			console.log('player ' + this.currentPlayer + ' starting game');
+			self.currentPlayer = data.currentPlayer;
+			Util.log('player ' + self.currentPlayer + ' starting game');
 			$('#readyButton').hide();
 			//instantiate game from game specific js
-			var catan = new CatanGame(this);
+			var catan = new CatanGame(self);
 			catan.startGame();
 
-		}.bind(this));
+		});
 	}
 };
 

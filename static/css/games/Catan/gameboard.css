@@ -26,14 +26,6 @@ svg {
 	stroke-width:5;
 	stroke:#444444;
 }
-
-.grain { fill:yellow; background-color:yellow; fill:url(#grainPattern) !important}
-.sheep {fill:rgb(142,233,138) !important; background-color:rgb(142,233,138) ; fill:url(#sheepPattern) !important}
-.wood {fill:green !important; background-color:green; fill:url(#woodPattern) !important}
-.ore {fill:gray !important; background-color:gray; fill:url(#orePattern) !important}
-.brick {fill:rgb(255, 143, 68) !important; background-color:rgb(255, 143, 68); fill:url(#brickPattern) !important}
-.water {fill:blue !important; background-color:blue; fill:url(#waterPattern)}
-.desert {fill:rgb(247,252,194) !important; background-color:yellow; fill:url(#desertPattern) !important}
 	
 
 /*.tile:hover {

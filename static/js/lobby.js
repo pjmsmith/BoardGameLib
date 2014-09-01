@@ -42,7 +42,7 @@ Lobby.prototype = {
 						playerName.empty();
 						//join lobby as player
 						if (!uniqueKey) {
-							$.get( gameName + "/generateKey", function(data) {
+							$.get( gameName + '/generateKey', function(data) {
 								uniqueKey = data;
 								window.history.pushState({}, document.title, window.location.href + '/lobby/' + uniqueKey); 
 								socket.emit('login', {user: username, game: uniqueKey});
@@ -73,31 +73,32 @@ Lobby.prototype = {
 	},
 	
 	setupSocketListeners: function() {
+		var self = this;
 		socket.on('loginSuccess', function(data) {
-			this.clearError();
+			self.clearError();
 			$('#loginContainer').hide();
 			$('#gameTitle').switchClass('title', 'title-small', 500);
 
 			var playerNumber = data.playerNumber;
-			this.createNewGame({
+			self.createNewGame({
 				 title: gameName
 				,username: username
 				,playerNumber: playerNumber
 				,uniqueKey: uniqueKey
 				,connection: socket
 			});
-		}.bind(this));
+		});
 		socket.on('loginError', function(data) {
 			if (data.error) {
-				this.displayError();
+				self.displayError();
 			}
 			$('#ready-button').fadeOut('fast');
-		}.bind(this));
+		});
 	},
 
 	createNewGame: function(options) {
 		var currentGame = new Game(options);
-		console.log(currentGame.title);
+		Util.log('Loading game: ' + currentGame.title);
 		currentGame.setupSocketListeners();
 		currentGame.waitForPlayers();
 	}

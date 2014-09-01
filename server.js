@@ -23,7 +23,7 @@ server.configure(function(){
     server.set('view options', { layout: false });
     server.use(connect.bodyParser());
     server.use(express.cookieParser());
-    server.use(express.session({ secret: "j9wf349fioajf9q4jfajefw98wefj"}));
+    server.use(express.session({ secret: 'j9wf349fioajf9q4jfajefw98wefj'}));
     server.use(connect.static(__dirname + '/static'));
     server.use(server.router);
 });
@@ -78,7 +78,7 @@ io.sockets.on('connection', function(socket){
 
   var loginUser = function(data) {
 
-    var userSession = data.user.replace(/(<([^>]+)>)/ig,"");;
+    var userSession = data.user.replace(/(<([^>]+)>)/ig,'');;
     var game = data.game;
     //add to global user list
     userList[socket.id] = {
