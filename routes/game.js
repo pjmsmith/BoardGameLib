@@ -45,6 +45,10 @@ module.exports = function(server) {
     res.send(uniqueKey);
   });
 
+  server.get('/:game/lobby', function(req, res){
+  	res.redirect('/' + req.params.game);
+  });
+
   server.get('/:game/lobby/:uniqueKey', function(req,res){
     var uniqueKey = req.params.uniqueKey;
     var games = global.games;

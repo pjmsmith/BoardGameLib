@@ -34,7 +34,7 @@ Game.prototype.updateUserList = function(users) {
 	$('#playerList').empty();
 	for (var userId in users) {
 		var userClass = '';
-		var playerClass = 'class="player' + (Object.keys(users).indexOf(userId)+1);
+		var playerClass = 'class="player' + (Object.keys(users).indexOf(userId) + 1);
 		if (userId === this.username) {
 			playerClass = playerClass + ' user-self" title="This is you"';
 		}
@@ -55,7 +55,7 @@ Game.prototype.setupSocketListeners = function() {
 		if (!$('#players').is(':visible')) {
 			$('#players').fadeIn('fast');
 		}
-		
+
 		this.numPlayers = Object.keys(data.users).length;
 		this.updateUserList(data.users);
 	}.bind(this));

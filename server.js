@@ -78,7 +78,7 @@ io.sockets.on('connection', function(socket){
 
   var loginUser = function(data) {
 
-    var userSession = data.user;
+    var userSession = data.user.replace(/(<([^>]+)>)/ig,"");;
     var game = data.game;
     //add to global user list
     userList[socket.id] = {
