@@ -11,7 +11,7 @@ var Player = function(options) {
 		  id: null
 		, name: ''
 		, game: ''
-		, number: -1
+		, playerNumber: -1
 	  	, ready: false
 		, hands: {}
 		, pieces: {}

@@ -121,8 +121,8 @@ io.sockets.on('connection', function(socket){
 				} else {
 					log('unique user, join game');
 					//add to game's user list
+					userList[socket.id].playerNumber = playerNumber;
 					games[game].players[playerNumber] = userList[socket.id];
-					games[game].players[playerNumber].playerNumber = playerNumber;
 					games[game].numPlayers++;
 					log('loginUser game: ' + logObject(games[game]));
 					log('login request from ' + socket.nickname);
@@ -186,7 +186,7 @@ io.sockets.on('connection', function(socket){
 			
 			if (startGame) {
 				game.state = GameState.STARTED;
-				io.sockets.in(data.game).emit('startGame', {currentPlayer: 1}); //start with first player 
+				io.sockets.in(data.game).emit('startGame', {currentPlayer: game.getNextPlayer()}); //start with first player 
 			} else {
 				game.state = GameState.WAITING_FOR_PLAYERS;
 				io.sockets.in(data.game).emit('ready', {
@@ -205,10 +205,14 @@ io.sockets.on('connection', function(socket){
 			if (typeof games[usersGame] !== 'undefined') {
 				log('disconnect: ' + logObject(games[usersGame]));
 				log(socket.nickname + ' disconnected');
-				games[usersGame].userList[socket.nickname] = undefined;
-				delete games[usersGame].userList[socket.nickname];
-				socket.leave(usersGame);
-
+				for (var player in games[usersGame].players) {
+					if (games[usersGame].players[player].name === socket.nickname) {
+						games[usersGame].players[player] = undefined;
+						delete games[usersGame].players[player];
+						socket.leave(usersGame);
+					}
+				}
+				
 				if (games[usersGame].userCount > 0) {
 					games[usersGame].userCount--;
 				}
@@ -217,8 +221,8 @@ io.sockets.on('connection', function(socket){
 					delete games[usersGame];
 				} else {
 					var startGame = true;
-					for (var user in games[usersGame].userList) {
-						var user = games[usersGame].userList[user];
+					for (var user in games[usersGame].players) {
+						var user = games[usersGame].players[user];
 						if (typeof user !== 'undefined' && !user.ready) {
 							startGame = false;
 							break;
@@ -226,11 +230,11 @@ io.sockets.on('connection', function(socket){
 					}
 					if (startGame) {
 						games[usersGame].state = GameState.STARTED;
-						io.sockets.in(usersGame).emit('startGame', {currentPlayer: 1});
+						io.sockets.in(usersGame).emit('startGame', {currentPlayer: games[usersGame].getNextPlayer()});
 					}
 					io.sockets.in(usersGame).emit('logout', {
 						leftUser: leftUser,
-						users: games[usersGame].userList
+						users: games[usersGame].players
 					});
 					log(leftUser + ' left game ' + usersGame)
 				}

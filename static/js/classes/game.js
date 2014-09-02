@@ -16,7 +16,6 @@ var Game = function(options) {
 		, uniqueKey: null
 		, connection: null
 		, players: {}
-		, currentPlayer: null
 		, board: null
 		, decks: {
 			//cards: []
@@ -43,7 +42,10 @@ Game.prototype = {
 	constructor: Game,
 
 	getNextPlayer: function() {
-		return (this.activePlayer % this.numPlayers) + 1;
+		while (typeof this.players[this.activePlayer] === 'undefined') {
+			this.activePlayer = (this.activePlayer % this.numPlayers) + 1;
+		}
+		return this.activePlayer;
 	},
 
 	getAvailablePlayerNumber: function() {
@@ -61,10 +63,10 @@ Game.prototype = {
 			var userClass = '';
 			var user = users[userId];
 			var playerClass = 'class="player' + (user.playerNumber);
-			if (userId === this.username) {
+			if (user.name === this.username) {
 				playerClass = playerClass + ' user-self" title="This is you"';
 			}
-			$('#playerList').append('<li id="' + userId + '" ' + playerClass + '">' + 
+			$('#playerList').append('<li id="' + user.name + '" ' + playerClass + '">' + 
 			user.name + '</li>');
 		}
 		if (timeout !== null) {
@@ -114,8 +116,8 @@ Game.prototype = {
 			btn.addClass('ready-waiting');
 		});
 		this.connection.on('startGame', function(data) {
-			self.currentPlayer = data.currentPlayer;
-			Util.log('player ' + self.currentPlayer + ' starting game');
+			self.activePlayer = data.currentPlayer;
+			Util.log('player ' + self.activePlayer + ' starting game');
 			$('#readyButton').hide();
 
 			//instantiate game from game specific js

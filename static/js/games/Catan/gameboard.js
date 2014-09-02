@@ -22,7 +22,9 @@ function CatanGame (game) {
 		self.renderTiles();
 		self.setupListeners();
 		self.showControls();
-		if (self.currentPlayer === self.game.playerNumber) {
+		
+		self.activePlayer = self.game.getNextPlayer();
+		if (self.activePlayer === self.game.playerNumber) {
 			self.startPlayerTurn();
 		} else {
 			$('.player' + self.currentPlayer).addClass('player-turn');
@@ -171,7 +173,6 @@ function CatanGame (game) {
 			}
 		}
 		,'endTurn': function(el, player, args) {
-
 			Util.log('endTurn: next player ' + player);
 			if (self.game.playerNumber === player) {
 				self.startPlayerTurn();
@@ -233,7 +234,7 @@ function CatanGame (game) {
 		self.game.connection.emit('doAction', {
 			  game: self.game.uniqueKey
 			, action: 'endTurn'
-			, playerNumber: ((self.game.playerNumber % self.game.numPlayers) + 1)
+			, playerNumber: (self.game.getNextPlayer())
 			, args: {
 				lastPlayer: self.game.playerNumber}
 			}
