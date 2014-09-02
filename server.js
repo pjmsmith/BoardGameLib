@@ -111,7 +111,8 @@ io.sockets.on('connection', function(socket){
 		if (games[game].state === GameState.WAITING_FOR_PLAYERS) {
 			if (games[game].numPlayers + 1 <= games[game].maxPlayers && games[game].getAvailablePlayerNumber()) {
 				var playerNumber = games[game].getAvailablePlayerNumber();
-				if (typeof games[game].players[playerNumber] !== 'undefined' && games[game].players[playerNumber].id !== socket.id ) {
+
+				if (games[game].getPlayerByName(userSession)) {
 					log('duplicate username');
 					log(logObject(games[game].players));
 					//collision - let's keep names unique so we can easily target specific users
@@ -186,7 +187,8 @@ io.sockets.on('connection', function(socket){
 			
 			if (startGame) {
 				game.state = GameState.STARTED;
-				io.sockets.in(data.game).emit('startGame', {currentPlayer: game.getNextPlayer()}); //start with first player 
+				var nextPlayer = game.getNextPlayer();
+				io.sockets.in(data.game).emit('startGame', {currentPlayer: nextPlayer}); //start with first player 
 			} else {
 				game.state = GameState.WAITING_FOR_PLAYERS;
 				io.sockets.in(data.game).emit('ready', {
@@ -205,10 +207,12 @@ io.sockets.on('connection', function(socket){
 			if (typeof games[usersGame] !== 'undefined') {
 				log('disconnect: ' + logObject(games[usersGame]));
 				log(socket.nickname + ' disconnected');
-				for (var player in games[usersGame].players) {
-					if (games[usersGame].players[player].name === socket.nickname) {
-						games[usersGame].players[player] = undefined;
-						delete games[usersGame].players[player];
+				for (var playerId in games[usersGame].players) {
+					var player = games[usersGame].players[playerId];
+					log('name: ' + socket.nickname + '; ' + 'playername: ' + player.name);
+					if (player.name === socket.nickname) {
+						games[usersGame].players[playerId] = undefined;
+						delete games[usersGame].players[playerId];
 						socket.leave(usersGame);
 					}
 				}
@@ -221,16 +225,20 @@ io.sockets.on('connection', function(socket){
 					delete games[usersGame];
 				} else {
 					var startGame = true;
-					for (var user in games[usersGame].players) {
-						var user = games[usersGame].players[user];
-						if (typeof user !== 'undefined' && !user.ready) {
+					for (var playerId in games[usersGame].players) {
+						var player = games[usersGame].players[playerId];
+						log(logObject(player));
+						if (typeof player !== 'undefined' && !player.ready) {
+							log('player not ready ' + player);
 							startGame = false;
 							break;
 						}
 					}
 					if (startGame) {
+						log('Starting game, everyone is ready');
 						games[usersGame].state = GameState.STARTED;
-						io.sockets.in(usersGame).emit('startGame', {currentPlayer: games[usersGame].getNextPlayer()});
+						var nextPlayer = games[usersGame].getNextPlayer();
+						io.sockets.in(usersGame).emit('startGame', {currentPlayer: nextPlayer});
 					}
 					io.sockets.in(usersGame).emit('logout', {
 						leftUser: leftUser,

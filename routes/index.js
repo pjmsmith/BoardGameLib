@@ -3,13 +3,13 @@ var fs = require('fs'),
 
 var requireFiles = function(directory, app) {
 	fs.readdirSync(directory).forEach(function(filename) {
-		console.log(directory + '/' + filename);
 		if (fs.lstatSync(directory + '/' + filename).isDirectory()) {
 			requireFiles(directory + '/' + filename, app);
 		} else {
 			if (filename === 'index.js' && directory === __dirname) return;
 
 			if (validFileTypes.indexOf(filename.split('.').pop()) === -1) return;
+			console.log(directory + '/' + filename);
 			require(directory + '/' + filename)(app);
 		}
 	});

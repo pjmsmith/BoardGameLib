@@ -25,7 +25,7 @@ var loadFilesOfType = function(directory, type, files) {
 	}
 	var allFiles = fs.readdirSync(directory);
 	for(var i in allFiles){
-		if (!allFiles.hasOwnProperty(i)) {
+		if (!allFiles.hasOwnProperty(i) || typeof validFileTypePaths[allFiles[i].split('.').pop()] === 'undefined') {
 			continue;
 		}
 		var name = directory+'/'+allFiles[i];

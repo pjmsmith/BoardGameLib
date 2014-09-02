@@ -22,7 +22,7 @@ var Game = function(options) {
 			//cards: [] - Resources, DevelopmentCards
 		  }
 		, state: null
-		, activePlayer: null
+		, activePlayer: 0
 		, maxPlayers: 5
 		, minPlayers: 2
 		, numPlayers: 0
@@ -43,6 +43,7 @@ Game.prototype = {
 	constructor: Game,
 
 	getNextPlayer: function() {
+		this.activePlayer = (this.activePlayer % this.numPlayers) + 1;
 		while (typeof this.players[this.activePlayer] === 'undefined') {
 			this.activePlayer = (this.activePlayer % this.numPlayers) + 1;
 		}
@@ -53,6 +54,15 @@ Game.prototype = {
 		for (var i = 1; i <= this.maxPlayers; i++) {
 			if (typeof this.players[i] === 'undefined') {
 				return i;
+			}
+		}
+		return null;
+	},
+
+	getPlayerByName: function(name) {
+		for (var playerId in this.players) {
+			if (this.players[playerId].name === name) {
+				return this.players[playerId];
 			}
 		}
 		return null;
@@ -124,7 +134,7 @@ Game.prototype = {
 			//instantiate game from game specific js
 
 			var catan = new CatanGame(self);
-			catan.startGame();
+			catan.startGame(self.activePlayer);
 
 		});
 	},
