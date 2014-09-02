@@ -23,10 +23,12 @@ function CatanGame (game) {
 		self.showControls();
 
 		self.game.activePlayer = firstPlayer;
+
+		$('.player' + self.game.activePlayer).addClass('player-turn');
 		if (self.game.activePlayer === self.game.playerNumber) {
+			console.log('player ' + self.game.activePlayer + ' starting turn')
 			self.startPlayerTurn();
 		} else {
-			$('.player' + self.game.activePlayer).addClass('player-turn');
 			self.disableBuildControls();
 		}
 	}
@@ -174,6 +176,7 @@ function CatanGame (game) {
 		,'endTurn': function(el, player, args) {
 			Util.log('endTurn: next player ' + player);
 			self.game.activePlayer = player;
+			$('.player' + self.game.activePlayer).addClass('player-turn');
 			if (self.game.playerNumber === player) {
 				self.startPlayerTurn();
 			} else {
@@ -244,20 +247,18 @@ function CatanGame (game) {
 	}
 
 	this.disableBuildControls = function() {
-		$('#purchase_button').attr('disabled','disabled')
-		$('#endTurn_button').attr('disabled','disabled')
+		$('#purchase_button').attr('disabled','disabled');
+		$('#endTurn_button').attr('disabled','disabled');
 	}
 	
 	this.startPlayerTurn = function(){
-		$('#purchase_button').removeAttr('disabled')
-		$('#endTurn_button').removeAttr('disabled')
-		$('.player' + self.game.playerNumber).addClass('player-turn');
-		
+		$('#purchase_button').removeAttr('disabled');
+		$('#endTurn_button').removeAttr('disabled');
 	}
 	
 	this.placeRoadMode = function(){
 		self.hideModals();
-		Util.log('Waiting for player to place road...')
+		Util.log('Waiting for player to place road...');
 		self.disableControls();
 		self.showPurchaseControls();
 		$('#edges .unassigned').css('display','block');
@@ -265,14 +266,14 @@ function CatanGame (game) {
 		self.el.on('edgeClick',function(e,eid,player){
 			
 		if($('#'+eid).attr('class') == 'edge unassigned') {
-			$('#'+eid).attr('class','edge '+'player'+player)
+			$('#'+eid).attr('class','edge '+'player'+player);
 			$('#edges .unassigned').css('display','none');
-			self.el.off('edgeClick')
+			self.el.off('edgeClick');
 			self.enableControls();
 			self.hidePurchaseControls();
 			$('#actions').removeClass('hideActions');
 			
-			self.game.connection.emit('doAction', {game: game.uniqueKey, action: 'placeRoad', playerNumber: game.playerNumber, element: eid})
+			self.game.connection.emit('doAction', {game: game.uniqueKey, action: 'placeRoad', playerNumber: game.playerNumber, element: eid});
 			
 		} else {
 			alert('Location already chosen, select an unassigned spot ')

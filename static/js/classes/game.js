@@ -43,9 +43,9 @@ Game.prototype = {
 	constructor: Game,
 
 	getNextPlayer: function() {
-		this.activePlayer = (this.activePlayer % this.numPlayers) + 1;
+		this.activePlayer = (this.activePlayer % this.maxPlayers) + 1;
 		while (typeof this.players[this.activePlayer] === 'undefined') {
-			this.activePlayer = (this.activePlayer % this.numPlayers) + 1;
+			this.activePlayer = (this.activePlayer % this.maxPlayers) + 1;
 		}
 		return this.activePlayer;
 	},
@@ -76,8 +76,10 @@ Game.prototype = {
 			var playerClass = 'class="player' + (user.playerNumber);
 			if (user.name === this.username) {
 				playerClass = playerClass + ' user-self" title="This is you"';
+			} else {
+				playerClass += '"';
 			}
-			$('#playerList').append('<li id="' + user.name + '" ' + playerClass + '">' + 
+			$('#playerList').append('<li id="' + user.name + '" ' + playerClass + '>' + 
 			user.name + '</li>');
 		}
 		if (timeout !== null) {
@@ -127,12 +129,14 @@ Game.prototype = {
 			btn.addClass('ready-waiting');
 		});
 		this.connection.on('startGame', function(data) {
+			self.players = data.users;
 			self.activePlayer = data.currentPlayer;
+			self.updateUserList(self.players);
+
 			Util.log('player ' + self.activePlayer + ' starting game');
 			$('#readyButton').hide();
 
 			//instantiate game from game specific js
-
 			var catan = new CatanGame(self);
 			catan.startGame(self.activePlayer);
 

@@ -238,13 +238,14 @@ io.sockets.on('connection', function(socket){
 						log('Starting game, everyone is ready');
 						games[usersGame].state = GameState.STARTED;
 						var nextPlayer = games[usersGame].getNextPlayer();
-						io.sockets.in(usersGame).emit('startGame', {currentPlayer: nextPlayer});
+						io.sockets.in(usersGame).emit('startGame', {currentPlayer: nextPlayer, users: games[usersGame].players});
+					} else {
+						io.sockets.in(usersGame).emit('logout', {
+							leftUser: leftUser,
+							users: games[usersGame].players
+						});
+						log(leftUser + ' left game ' + usersGame)
 					}
-					io.sockets.in(usersGame).emit('logout', {
-						leftUser: leftUser,
-						users: games[usersGame].players
-					});
-					log(leftUser + ' left game ' + usersGame)
 				}
 			}
 			userList[socket.id] = undefined;
