@@ -7,10 +7,10 @@
     "connect": "1.8.5",
     "express": "2.5.2",
     "jade": "0.20.0",
+    "jquery": "^2.1.1",
+    "jsdom": "^1.0.0-pre.5",
     "mongoose": "2.4.8",
-    "socket.io": "0.8.7",
-    "jquery": "~2.1.1",
-    "jsdom": "~1.0.0-pre.5"
+    "socket.io": "0.8.7"
   },
   "devDependencies": {
     "vows": "0.5.x",

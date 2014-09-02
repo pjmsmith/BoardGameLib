@@ -17,8 +17,9 @@ var Game = function(options) {
 		, connection: null
 		, players: {}
 		, board: null
+		, pieces: null
 		, decks: {
-			//cards: []
+			//cards: [] - Resources, DevelopmentCards
 		  }
 		, state: null
 		, activePlayer: null

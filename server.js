@@ -213,10 +213,10 @@ io.sockets.on('connection', function(socket){
 					}
 				}
 				
-				if (games[usersGame].userCount > 0) {
-					games[usersGame].userCount--;
+				if (games[usersGame].numPlayers > 0) {
+					games[usersGame].numPlayers--;
 				}
-				if (games[usersGame].userCount <= 0) {
+				if (games[usersGame].numPlayers <= 0) {
 					games[usersGame] = undefined;
 					delete games[usersGame];
 				} else {
