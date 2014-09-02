@@ -19,6 +19,7 @@ module.exports = function(server) {
 		var GameState = global.GameState;
 		var gameResources = getGameResources(req.params.game);
 		var lobbies = [];
+		log(logObject(global.games));
 		for (var game in global.games) {
 			if (global.games[game].state === GameState.WAITING_FOR_PLAYERS) {
 				lobbies.push({'key': game});

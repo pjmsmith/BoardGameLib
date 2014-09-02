@@ -21,6 +21,8 @@ var Player = function(options) {
 	for (var key in this.options) {
 		this[key] = this.options[key];
 	}
+	this.options = undefined;
+	delete this.options;
 };
 Player.prototype = {
 	constructor: Player,

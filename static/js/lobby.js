@@ -45,9 +45,10 @@ Lobby.prototype = {
 						playerName.empty();
 						//join lobby as player
 						if (!uniqueKey) {
-							$.get( gameName + '/generateKey', function(data) {
+							$.get('/' + gameName + '/generateKey', function(data) {
 								uniqueKey = data;
-								window.history.pushState({}, document.title, window.location.href + '/lobby/' + uniqueKey); 
+								var location = window.location.href;
+								window.history.pushState({}, document.title, location + (location.charAt(location.length-1) == '/' ? '' : '/') + 'lobby/' + uniqueKey); 
 								socket.emit('login', {user: username, game: uniqueKey});
 							});
 						} else {

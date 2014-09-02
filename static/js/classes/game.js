@@ -36,6 +36,8 @@ var Game = function(options) {
 	for (var key in this.options) {
 		this[key] = this.options[key];
 	}
+	this.options = undefined;
+	delete this.options;
 };
 Game.prototype = {
 	constructor: Game,
@@ -117,7 +119,7 @@ Game.prototype = {
 			$('#readyButton').hide();
 
 			//instantiate game from game specific js
-			
+
 			var catan = new CatanGame(self);
 			catan.startGame();
 
