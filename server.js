@@ -131,12 +131,12 @@ io.sockets.on('connection', function(socket){
 					//join game - new room
 					socket.join(game);
 
-					io.sockets.in(game).emit('updatebuddies', {
+					io.sockets.in(game).emit('updateplayers', {
 						users: games[game].players,
 						newUser: userSession
 					});
 					socket.emit('loginSuccess', {playerNumber: playerNumber}); 
-					socket.emit('updatebuddies', {
+					socket.emit('updateplayers', {
 						users: games[game].players,
 						newUser: userSession
 					});
@@ -188,7 +188,10 @@ io.sockets.on('connection', function(socket){
 			if (startGame) {
 				game.state = GameState.STARTED;
 				var nextPlayer = game.getNextPlayer();
-				io.sockets.in(data.game).emit('startGame', {currentPlayer: nextPlayer}); //start with first player 
+				io.sockets.in(data.game).emit('startGame', {
+					 currentPlayer: nextPlayer
+					,users: game.players
+				}); //start with first player 
 			} else {
 				game.state = GameState.WAITING_FOR_PLAYERS;
 				io.sockets.in(data.game).emit('ready', {

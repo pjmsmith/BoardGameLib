@@ -90,8 +90,8 @@ Game.prototype = {
 	
 	setupSocketListeners: function() {
 		var self = this;
-		//update user list when people join or leave chat
-		this.connection.on('updatebuddies', function(data) {
+		//update user list when people join or leave game
+		this.connection.on('updateplayers', function(data) {
 			if (!$('#gameContent').is(':visible')) {
 				$('#gameContent').fadeIn('fast');
 			}
