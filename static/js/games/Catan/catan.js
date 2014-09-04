@@ -50,8 +50,6 @@ Game.Catan = function(options) {
 			if (this.activePlayer === this.playerNumber) {
 				console.log('player ' + this.activePlayer + ' starting turn')
 				this.startPlayerTurn();
-			} else {
-				//this.disableBuildControls();
 			}
 		},
 
