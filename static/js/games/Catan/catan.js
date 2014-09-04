@@ -56,7 +56,7 @@ Game.Catan = function(options) {
 		},
 
 		startPlayerTurn: function() {
-
+			this.board.startPlayerTurn();
 		},
 
 		endPlayerTurn: function() {

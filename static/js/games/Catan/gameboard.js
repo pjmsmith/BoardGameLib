@@ -1,3 +1,14 @@
+var GameState = {
+	 WAITING_FOR_PLAYERS: 1
+	,STARTED: 2
+	,FINISHED: 3
+	,MOVING_ROBBER: 4
+	,TRADING: 5
+	,BUILDING: 6
+	,PLAYING_DEV_CARD: 7
+	,IDLE: 8
+};
+
 var GameBoard = function(options) {
 	this.options = {
 		 game: null
@@ -38,17 +49,34 @@ GameBoard.prototype = {
 				$('#'+eid).show();
 			}
 		}
+		,'updatePlayerResources': function(board, el, player, args) {
+			if (typeof args.players[board.game.playerNumber] !== 'undefined') {
+				console.log('Discard ' + args.players[board.game.playerNumber] + ' cards');
+			}
+		}
+		,'showRoll': function(board, el, player, args) {
+			if (!$('#dice').length) {
+				board.element.append('<input type="button" id="dice" />');
+			}
+			$('#dice').fadeIn('fast');
+			setTimeout(function() {
+				$('#dice').fadeOut('slow');
+			}, 3000);
+		}
 		,'endTurn': function(board, el, player, args) {
 			Util.log('endTurn: next player ' + player);
-			this.game.activePlayer = player;
-			$('.player' + this.game.activePlayer).addClass('player-turn');
-			if (this.game.playerNumber === player) {
-				this.startPlayerTurn();
+			board.game.activePlayer = player;
+			$('.player' + board.game.activePlayer).addClass('player-turn');
+			if (board.game.playerNumber === player) {
+				board.startPlayerTurn();
 			} else {
 				//disable build controls
 				$('#purchase_button').attr('disabled','disabled');
 				$('#endTurn_button').attr('disabled','disabled');
-				$('.player' + this.game.playerNumber).removeClass('player-turn');
+				if ($('#dice')) {
+					$('#dice').fadeOut('fast');
+				}
+				$('.player' + board.game.playerNumber).removeClass('player-turn');
 			}
 			if (typeof args !== 'undefined' && typeof args.lastPlayer !== 'undefined') {
 				$('.player' + args.lastPlayer).removeClass('player-turn');
@@ -83,17 +111,17 @@ GameBoard.prototype = {
 				<input id="placeRoad_button" value="Place Road" type="button"/>\
 				<input type="button" id="cancelPurchase_button" value="cancel"/>\
 			</div>');
-
+		var self = this;
 		$('#purchase_button').click(function(){
 			if(!$('#purchase_modal').hasClass('show_modal')) {
 				$('#purchase_modal').addClass('show_modal')
-				this.disableControls();
+				self.disableControls();
 			}
 		});
 		
 		$('#cancelPurchase_button').click(function(){
 			$('#purchase_modal').removeClass('show_modal')
-			this.enableControls();
+			self.enableControls();
 		});
 
 	},
@@ -231,9 +259,82 @@ GameBoard.prototype = {
 		});
 	},
 
-	startPlayerTurn: function(){
-		$('#purchase_button').removeAttr('disabled');
-		$('#endTurn_button').removeAttr('disabled');
+	startPlayerTurn: function() {
+		this.disableBuildControls();
+		$('#actions').addClass('hideActions');
+
+		//roll dice
+		if (!$('#dice').length) {
+			$(this.element).append('<input type="button" id="dice" />');
+		}
+		var dice = $('#dice');
+		dice.removeAttr('disabled');
+		dice.fadeIn('fast');
+		dice.val('Roll');
+		var self = this;
+		dice.click(function() {
+			if (!dice.attr('disabled') && dice.is(':visible')) {
+				dice.val();
+				dice.attr('disabled', 'disabled');
+				var result = 0;
+				var sides = self.game.dice.sides;
+				for (var i = 1; i <= self.game.dice.number; i++) {
+					result += Math.floor(sides * Math.random()) + 1;
+				}
+				dice.val(result);
+				self.game.connection.emit('doAction', {
+					  game: self.game.uniqueKey
+					, action: 'showRoll'
+					, playerNumber: self.game.activePlayer
+					, args: {
+						value: result
+					}
+				});
+				if (self.timeout) {
+					clearTimeout(self.timeout);
+				}
+				self.timeout = setTimeout(function() {
+					dice.fadeOut('slow');
+				}, 3000);
+				
+				if (result === 7) {
+					//force everyone with > 7 resource cards to discard 4 or half
+					var playerNumbers = {};
+					for (var player in self.players) {
+						var numCards = Object.keys(player.cards).length;
+						if (numCards > 7) {
+							playerNumbers[player] = numCards / 2;
+						}
+					}
+					if (Object.keys(playerNumbers).length > 0) {
+						self.game.connection.emit('doAction', {
+							  game: self.game.uniqueKey
+							, action: 'updatePlayerResources'
+							, playerNumber: self.game.activePlayer
+							, args: {
+								players: playerNumbers
+							}
+						});
+					}
+
+					//active player can move the robber
+					self.disableControls();
+					//display message "Click a tile to move the robber."
+
+					self.game.state = GameState.MOVING_ROBBER;
+
+					//temp 
+					self.enableControls();
+				} else {
+					//assign resources
+					self.produceResources(result);
+					self.enableControls();
+					//purchase/build, trade, or play dev card loop
+					self.game.state = GameState.IDLE;
+				}
+			}
+		});
+		
 	},
 	
 	endPlayerTurn: function(){
@@ -252,8 +353,12 @@ GameBoard.prototype = {
 	},
 
 	disableBuildControls: function() {
-		$('#purchase_button').attr('disabled','disabled');
+		$('#showActions_button').attr('disabled','disabled');
 		$('#endTurn_button').attr('disabled','disabled');
+	},
+
+	produceResources: function(value) {
+		Util.log('Producing resources for ' + value);
 	},
 	
 	placeRoadMode: function(){
@@ -299,6 +404,8 @@ GameBoard.prototype = {
 	enableControls: function(){
 		$('#controls').css('display','block');
 		$('#endTurn_button').css('display','block');
+		$('#showActions_button').removeAttr('disabled');
+		$('#endTurn_button').removeAttr('disabled');
 	},
 
 	/* Game Board render functions */

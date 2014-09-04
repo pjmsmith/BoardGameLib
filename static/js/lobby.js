@@ -18,7 +18,7 @@ Lobby.prototype = {
 				errorMsgs += errors[msg] + '<br/>';
 			}
 			$('#error-msg').html(errorMsgs);
-			if (!$('#error').is('visible')) {
+			if (!$('#error').is(':visible')) {
 				$('#error').slideDown('fast');
 			}
 		}

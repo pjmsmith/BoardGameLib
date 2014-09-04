@@ -142,3 +142,25 @@ text {
 	left:0;
 	width:100%;
 }
+
+#dice {
+	background-color: white;
+	height: 80px;
+	width: 80px;
+	margin: -40px;
+	top: 50%;
+	left: 50%;
+	position: fixed;
+	z-index: 10;
+	line-height:80px;
+	border-radius: 5px;
+	border: 2px solid black;
+	text-transform: uppercase;
+	font-family: Helvetica;
+	font-size: 1.5em;
+	cursor: pointer;
+}
+
+#dice:disabled {
+	opacity: 1;
+}
