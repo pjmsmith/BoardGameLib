@@ -87,9 +87,9 @@ Lobby.prototype = {
 			$('#gameTitle').switchClass('title', 'title-small', 500);
 
 			var playerNumber = data.playerNumber;
-			self.createNewGame({
+			self.createNewGame(gameName, {
 				 title: gameName
-				,element: this.element
+				,element: self.element
 				,username: username
 				,playerNumber: playerNumber
 				,uniqueKey: uniqueKey
@@ -104,10 +104,12 @@ Lobby.prototype = {
 		});
 	},
 
-	createNewGame: function(options) {
-		var currentGame = new Game(options);
-		Util.log('Loading game: ' + currentGame.title);
-		currentGame.setupSocketListeners();
-		currentGame.waitForPlayers();
+	createNewGame: function(gameName, options) {
+		if (typeof Game[gameName] !== 'undefined') {
+			var currentGame = new Game[gameName](options);
+			Util.log('Loading game: ' + currentGame.title);
+			currentGame.setupSocketListeners();
+			currentGame.waitForPlayers();
+		}
 	}
 };

@@ -10,15 +10,15 @@ block gameSpecific
 		link(rel='stylesheet', href='#{cssFile}')
 
 block content
-	#game-window(style="width:100%;height:100%;position:fixed;")
-		#game-content
+	#gameWindow(style="width:100%;height:100%;position:fixed;")
+		#gameContent
 			#gameTitle.title #{title}
 
 			#error(style="display:none")
 				#error-box
 					#error-msg
 
-			#game-choices
+			#gameChoices
 				if lobbies
 					span.choice Start a new lobby or join an existing one:
 					br
@@ -48,6 +48,6 @@ block content
 		//setup socket connection
 		var socket = io.connect();
 		$(document).ready(function() {
-			var lobby = new Lobby(uniqueKey, $('gameBoard'));
+			var lobby = new Lobby(uniqueKey, $('#gameBoard'));
 			lobby.initialize();
 		});

@@ -27,4 +27,3 @@ game
 		sides: int
 		roll()
 	}
-

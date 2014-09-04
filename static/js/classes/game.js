@@ -42,6 +42,7 @@ var Game = function(options) {
 Game.prototype = {
 	constructor: Game,
 
+	/* Game Utility Functions */
 	getNextPlayer: function() {
 		this.activePlayer = (this.activePlayer % this.maxPlayers) + 1;
 		while (typeof this.players[this.activePlayer] === 'undefined') {
@@ -68,6 +69,7 @@ Game.prototype = {
 		return null;
 	},
 
+	//TODO: Create a player list widget that this function can use so it isn't reconstructing it here
 	updateUserList: function(users) {
 		$('#playerList').empty();
 		for (var userId in users) {
@@ -92,8 +94,8 @@ Game.prototype = {
 		var self = this;
 		//update user list when people join or leave game
 		this.connection.on('updateplayers', function(data) {
-			if (!$('#gameContent').is(':visible')) {
-				$('#gameContent').fadeIn('fast');
+			if (!$(self.element).is(':visible')) {
+				$(self.element).fadeIn('fast');
 			}
 			if (!$('#players').is(':visible')) {
 				$('#players').fadeIn('fast');
@@ -103,8 +105,8 @@ Game.prototype = {
 			self.players = data.users;
 			self.updateUserList(data.users);
 		});
-		if (!$('#gameContent').is(':visible')) {
-			$('#gameContent').fadeIn('fast');
+		if (!$(self.element).is(':visible')) {
+			$(self.element).fadeIn('fast');
 		}
 		if (!$('#players').is(':visible')) {
 			$('#players').fadeIn('fast');
@@ -137,14 +139,26 @@ Game.prototype = {
 			$('#readyButton').hide();
 
 			//instantiate game from game specific js
-			var catan = new CatanGame(self);
-			catan.startGame(self.activePlayer);
+			self.initialize();
+			self.startGame(self.activePlayer);
 
 		});
 	},
 
-	render: function() {
+	initialize: function() {
+		//Child class must implement
+	},
 
+	startGame: function(firstPlayer) {
+		//Child class must implement
+	},
+
+	startPlayerTurn: function() {
+		//Child class must implement
+	},
+
+	endPlayerTurn: function() {
+		//Child class must implement
 	}
 };
 
