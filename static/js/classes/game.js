@@ -10,7 +10,6 @@ if (typeof require !== 'undefined') {
 var Game = function(options) {
 	this.options = {
 		  title: ''
-		, lobby: null
 		, element: null
 		, username: ''
 		, playerNumber: 0
@@ -44,13 +43,10 @@ Game.prototype = {
 	constructor: Game,
 
 	/* Game Utility Functions */
-	getNextPlayer: function(interval) {
-		if (typeof interval === 'undefined') {
-			interval = 1;
-		}
-		this.activePlayer = (this.activePlayer % this.maxPlayers) + interval;
+	getNextPlayer: function() {
+		this.activePlayer = (this.activePlayer % this.maxPlayers) + 1;
 		while (typeof this.players[this.activePlayer] === 'undefined') {
-			this.activePlayer = (this.activePlayer % this.maxPlayers) + interval;
+			this.activePlayer = (this.activePlayer % this.maxPlayers) + 1;
 		}
 		return this.activePlayer;
 	},
@@ -71,22 +67,6 @@ Game.prototype = {
 			}
 		}
 		return null;
-	},
-
-	getFirstPlayer: function() {
-		var firstPlayer = null;
-		if (Object.keys(this.players).length > 0) {
-			firstPlayer = this.players[Object.keys(this.players)[0]].playerNumber;
-		}
-		return firstPlayer;
-	},
-
-	getLastPlayer: function() {
-		var lastPlayer = null;
-		if (Object.keys(this.players).length > 0) {
-			lastPlayer = this.players[Object.keys(this.players)[Object.keys(this.players).length-1]].playerNumber;
-		}
-		return lastPlayer;
 	},
 
 	//TODO: Create a player list widget that this function can use so it isn't reconstructing it here
@@ -143,10 +123,9 @@ Game.prototype = {
 	waitForPlayers: function() {
 		var self = this;
 		$('#readyButton').fadeIn('fast');
-		var btn = $('#readyButton');
-		btn.removeAttr('disabled');
 		$('#readyButton').click(function() {
 			self.connection.emit('ready', {user: {playerNumber: self.playerNumber}, game: uniqueKey});
+			var btn = $('#readyButton');
 			btn.attr('disabled', 'disabled');
 			btn.html('Ready!');
 			btn.addClass('ready-waiting');

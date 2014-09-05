@@ -1,4 +1,3 @@
-
 var GameBoard = function(options) {
 	this.options = {
 		 game: null
@@ -39,39 +38,17 @@ GameBoard.prototype = {
 				$('#'+eid).show();
 			}
 		}
-		,'updatePlayerResources': function(board, el, player, args) {
-			if (typeof args.players[board.game.playerNumber] !== 'undefined') {
-				console.log('Discard ' + args.players[board.game.playerNumber] + ' cards');
-			}
-		}
-		,'showRoll': function(board, el, player, args) {
-			if (!$('#dice').length) {
-				board.element.append('<input type="button" id="dice" />');
-			}
-			$('#dice').val(args.value);
-			$('#dice').fadeIn('fast');
-			if (board.timeout) {
-				clearTimeout(board.timeout);
-			}
-			board.timeout = setTimeout(function() {
-				$('#dice').fadeOut('slow');
-			}, 3000);
-		}
 		,'endTurn': function(board, el, player, args) {
 			Util.log('endTurn: next player ' + player);
-			board.game.activePlayer = player;
-			board.game.state = args.state;
-			board.interval = args.interval;
-			$('.player' + board.game.activePlayer).addClass('player-turn');
-			if (board.game.playerNumber === player) {
-				board.startPlayerTurn();
+			this.game.activePlayer = player;
+			$('.player' + this.game.activePlayer).addClass('player-turn');
+			if (this.game.playerNumber === player) {
+				this.startPlayerTurn();
 			} else {
 				//disable build controls
-				board.disableBuildControls();
-				if ($('#dice')) {
-					$('#dice').fadeOut('fast');
-				}
-				$('.player' + board.game.playerNumber).removeClass('player-turn');
+				$('#purchase_button').attr('disabled','disabled');
+				$('#endTurn_button').attr('disabled','disabled');
+				$('.player' + this.game.playerNumber).removeClass('player-turn');
 			}
 			if (typeof args !== 'undefined' && typeof args.lastPlayer !== 'undefined') {
 				$('.player' + args.lastPlayer).removeClass('player-turn');
@@ -106,17 +83,17 @@ GameBoard.prototype = {
 				<input id="placeRoad_button" value="Place Road" type="button"/>\
 				<input type="button" id="cancelPurchase_button" value="cancel"/>\
 			</div>');
-		var self = this;
+
 		$('#purchase_button').click(function(){
 			if(!$('#purchase_modal').hasClass('show_modal')) {
 				$('#purchase_modal').addClass('show_modal')
-				self.disableControls();
+				this.disableControls();
 			}
 		});
 		
 		$('#cancelPurchase_button').click(function(){
 			$('#purchase_modal').removeClass('show_modal')
-			self.enableControls();
+			this.enableControls();
 		});
 
 	},
@@ -226,190 +203,81 @@ GameBoard.prototype = {
 		
 	placeSettlement: function() {
 		this.hideModals();
-		if (this.game.state === GameState.IDLE) {
-			Util.log('Waiting for player to place settlement...')
-			this.disableControls();
+		
+		Util.log('Waiting for player to place settlement...')
+		this.disableControls();
+		
+		this.showPurchaseControls();
+		
+		$('#vertices .unassigned').css('display','block');
+		var self = this;
+		this.element.on('vertexClick',function(e,vid,player){
 			
-			this.showPurchaseControls();
-			
-			$('#vertices .unassigned').css('display','block');
-			var self = this;
-			this.element.on('vertexClick',function(e,vid,player){
-				
-				if($('#'+vid).attr('class') == 'vertex unassigned')
-				{
-					$('#'+vid).attr('class','vertex ' + 'player' + player);
-					$('#vertices .unassigned').css('display','none');
-					self.element.off('vertexClick')
-					self.enableControls();
-					self.hidePurchaseControls();
-					$('#actions').removeClass('hideActions');
+			if($('#'+vid).attr('class') == 'vertex unassigned')
+			{
+				$('#'+vid).attr('class','vertex ' + 'player' + player);
+				$('#vertices .unassigned').css('display','none');
+				self.element.off('vertexClick')
+				self.enableControls();
+				self.hidePurchaseControls();
+				$('#actions').removeClass('hideActions');
 
-					self.game.connection.emit('doAction', {game: self.game.uniqueKey, action: 'placeSettlement', playerNumber: self.game.playerNumber, element: vid})
-				
-				} else {
-					alert('Location already chosen, select an unassigned spot ')
-				}
-				
-			});
-		}
+				self.game.connection.emit('doAction', {game: self.game.uniqueKey, action: 'placeSettlement', playerNumber: self.game.playerNumber, element: vid})
+			
+			} else {
+				alert('Location already chosen, select an unassigned spot ')
+			}
+			
+		});
 	},
 
-	startPlayerTurn: function() {
-		this.disableBuildControls();
-		if (this.timeout) {
-			clearTimeout(this.timeout);
-		}
-		$('#actions').addClass('hideActions');
-		Util.log(this.game.state);
-		if (this.game.state !== GameState.FIRST_ROUND) {
-			//roll dice
-			if (!$('#dice').length) {
-				$(this.element).append('<input type="button" id="dice" />');
-			}
-			var dice = $('#dice');
-			dice.removeAttr('disabled');
-			dice.fadeIn('fast');
-			dice.val('Roll');
-			var self = this;
-			dice.click(function() {
-				if (!dice.attr('disabled') && dice.is(':visible')) {
-					dice.val();
-					dice.attr('disabled', 'disabled');
-					var result = 0;
-					var sides = self.game.dice.sides;
-					for (var i = 1; i <= self.game.dice.number; i++) {
-						result += Math.floor(sides * Math.random()) + 1;
-					}
-					dice.val(result);
-					self.game.connection.emit('doAction', {
-						  game: self.game.uniqueKey
-						, action: 'showRoll'
-						, playerNumber: self.game.activePlayer
-						, args: {
-							value: result
-						}
-					});
-					if (self.timeout) {
-						clearTimeout(self.timeout);
-					}
-					self.timeout = setTimeout(function() {
-						dice.fadeOut('slow');
-					}, 3000);
-					
-					if (result === 7) {
-						//force everyone with > 7 resource cards to discard 4 or half
-						var playerNumbers = {};
-						for (var player in self.players) {
-							var numCards = Object.keys(player.cards).length;
-							if (numCards > 7) {
-								playerNumbers[player] = numCards / 2;
-							}
-						}
-						if (Object.keys(playerNumbers).length > 0) {
-							self.game.connection.emit('doAction', {
-								  game: self.game.uniqueKey
-								, action: 'updatePlayerResources'
-								, playerNumber: self.game.activePlayer
-								, args: {
-									players: playerNumbers
-								}
-							});
-						}
-
-						//active player can move the robber
-						self.disableControls();
-						//display message "Click a tile to move the robber."
-
-						self.game.state = GameState.MOVING_ROBBER;
-
-						//temp 
-						self.enableControls();
-					} else {
-						//assign resources
-						self.produceResources(result);
-						self.enableControls();
-						//purchase/build, trade, or play dev card loop
-						self.game.state = GameState.IDLE;
-					}
-				}
-			});
-		} else {
-			//First round, take turns placing 1 settlement and 1 road in snake order (1, 2, 3, 3, 2, 1)
-			Util.log('Placing initial settlements');
-			this.enableControls();
-		}
-		
+	startPlayerTurn: function(){
+		$('#purchase_button').removeAttr('disabled');
+		$('#endTurn_button').removeAttr('disabled');
 	},
 	
-	endPlayerTurn: function() {
+	endPlayerTurn: function(){
 		this.disableBuildControls();
 		$('.player' + this.game.playerNumber).removeClass('player-turn');
-		if (this.game.state === GameState.FIRST_ROUND) {
-			if (this.interval !== -1 && this.game.activePlayer === this.game.getLastPlayer()) {
-				this.interval = -1;
-				Util.log('Moving turn in reverse order ' + this.game.activePlayer);
-			} else {
-				if (this.interval === -1 && this.game.activePlayer === this.game.getFirstPlayer()) {
-					this.game.state = GameState.IDLE;
-					this.interval = 1;
-				} else {
-					this.game.activePlayer = this.game.getNextPlayer(this.interval);
-				}
-			}
-		} else {
-			this.game.state = GameState.IDLE;
-			this.game.activePlayer = this.game.getNextPlayer();
-		}
-		
+		this.game.activePlayer = this.game.getNextPlayer();
 		this.game.connection.emit('doAction', {
 			  game: this.game.uniqueKey
 			, action: 'endTurn'
 			, playerNumber: this.game.activePlayer
 			, args: {
-					 lastPlayer: this.game.playerNumber
-					,interval: this.interval
-					,state: this.game.state
-				}
+				lastPlayer: this.game.playerNumber}
 			}
 		);
 		
 	},
 
 	disableBuildControls: function() {
-		$('#showActions_button').attr('disabled','disabled');
+		$('#purchase_button').attr('disabled','disabled');
 		$('#endTurn_button').attr('disabled','disabled');
-		$('#actions').addClass('hideActions');
-	},
-
-	produceResources: function(value) {
-		Util.log('Producing resources for ' + value);
 	},
 	
 	placeRoadMode: function(){
 		this.hideModals();
-		if (this.game.state === GameState.IDLE) {
-			Util.log('Waiting for player to place road...');
-			this.disableControls();
-			this.showPurchaseControls();
-			$('#edges .unassigned').css('display','block');
-			var self = this;	
-			this.element.on('edgeClick',function(e,eid,player){
-				if($('#'+eid).attr('class') == 'edge unassigned') {
-					$('#'+eid).attr('class','edge '+'player'+player);
-					$('#edges .unassigned').css('display','none');
-					self.element.off('edgeClick');
-					self.enableControls();
-					self.hidePurchaseControls();
-					$('#actions').removeClass('hideActions');
-					
-					self.game.connection.emit('doAction', {game: self.game.uniqueKey, action: 'placeRoad', playerNumber: self.game.playerNumber, element: eid});
-					
-				} else {
-					alert('Location already chosen, select an unassigned spot ')
-				}
-			});
-		}
+		Util.log('Waiting for player to place road...');
+		this.disableControls();
+		this.showPurchaseControls();
+		$('#edges .unassigned').css('display','block');
+		var self = this;	
+		this.element.on('edgeClick',function(e,eid,player){
+			if($('#'+eid).attr('class') == 'edge unassigned') {
+				$('#'+eid).attr('class','edge '+'player'+player);
+				$('#edges .unassigned').css('display','none');
+				self.element.off('edgeClick');
+				self.enableControls();
+				self.hidePurchaseControls();
+				$('#actions').removeClass('hideActions');
+				
+				self.game.connection.emit('doAction', {game: self.game.uniqueKey, action: 'placeRoad', playerNumber: self.game.playerNumber, element: eid});
+				
+			} else {
+				alert('Location already chosen, select an unassigned spot ')
+			}
+		});
 	},
 	
 	cancelAction: function(){
@@ -431,8 +299,6 @@ GameBoard.prototype = {
 	enableControls: function(){
 		$('#controls').css('display','block');
 		$('#endTurn_button').css('display','block');
-		$('#showActions_button').removeAttr('disabled');
-		$('#endTurn_button').removeAttr('disabled');
 	},
 
 	/* Game Board render functions */
