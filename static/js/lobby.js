@@ -89,6 +89,7 @@ Lobby.prototype = {
 			var playerNumber = data.playerNumber;
 			self.createNewGame(gameName, {
 				 title: gameName
+				,lobby: self
 				,element: self.element
 				,username: username
 				,playerNumber: playerNumber

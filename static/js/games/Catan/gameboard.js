@@ -1,13 +1,3 @@
-var GameState = {
-	 WAITING_FOR_PLAYERS: 1
-	,STARTED: 2
-	,FINISHED: 3
-	,MOVING_ROBBER: 4
-	,TRADING: 5
-	,BUILDING: 6
-	,PLAYING_DEV_CARD: 7
-	,IDLE: 8
-};
 
 var GameBoard = function(options) {
 	this.options = {
@@ -58,22 +48,26 @@ GameBoard.prototype = {
 			if (!$('#dice').length) {
 				board.element.append('<input type="button" id="dice" />');
 			}
+			$('#dice').val(args.value);
 			$('#dice').fadeIn('fast');
-			setTimeout(function() {
+			if (board.timeout) {
+				clearTimeout(board.timeout);
+			}
+			board.timeout = setTimeout(function() {
 				$('#dice').fadeOut('slow');
 			}, 3000);
 		}
 		,'endTurn': function(board, el, player, args) {
 			Util.log('endTurn: next player ' + player);
 			board.game.activePlayer = player;
+			board.game.state = args.state;
+			board.interval = args.interval;
 			$('.player' + board.game.activePlayer).addClass('player-turn');
 			if (board.game.playerNumber === player) {
 				board.startPlayerTurn();
 			} else {
 				//disable build controls
-				$('#purchase_button').attr('disabled','disabled');
-				$('#endTurn_button').attr('disabled','disabled');
-				$('#actions').addClass('hideActions');
+				board.disableBuildControls();
 				if ($('#dice')) {
 					$('#dice').fadeOut('fast');
 				}
@@ -263,92 +257,120 @@ GameBoard.prototype = {
 
 	startPlayerTurn: function() {
 		this.disableBuildControls();
-		$('#actions').addClass('hideActions');
-
-		//roll dice
-		if (!$('#dice').length) {
-			$(this.element).append('<input type="button" id="dice" />');
+		if (this.timeout) {
+			clearTimeout(this.timeout);
 		}
-		var dice = $('#dice');
-		dice.removeAttr('disabled');
-		dice.fadeIn('fast');
-		dice.val('Roll');
-		var self = this;
-		dice.click(function() {
-			if (!dice.attr('disabled') && dice.is(':visible')) {
-				dice.val();
-				dice.attr('disabled', 'disabled');
-				var result = 0;
-				var sides = self.game.dice.sides;
-				for (var i = 1; i <= self.game.dice.number; i++) {
-					result += Math.floor(sides * Math.random()) + 1;
-				}
-				dice.val(result);
-				self.game.connection.emit('doAction', {
-					  game: self.game.uniqueKey
-					, action: 'showRoll'
-					, playerNumber: self.game.activePlayer
-					, args: {
-						value: result
-					}
-				});
-				if (self.timeout) {
-					clearTimeout(self.timeout);
-				}
-				self.timeout = setTimeout(function() {
-					dice.fadeOut('slow');
-				}, 3000);
-				
-				if (result === 7) {
-					//force everyone with > 7 resource cards to discard 4 or half
-					var playerNumbers = {};
-					for (var player in self.players) {
-						var numCards = Object.keys(player.cards).length;
-						if (numCards > 7) {
-							playerNumbers[player] = numCards / 2;
-						}
-					}
-					if (Object.keys(playerNumbers).length > 0) {
-						self.game.connection.emit('doAction', {
-							  game: self.game.uniqueKey
-							, action: 'updatePlayerResources'
-							, playerNumber: self.game.activePlayer
-							, args: {
-								players: playerNumbers
-							}
-						});
-					}
-
-					//active player can move the robber
-					self.disableControls();
-					//display message "Click a tile to move the robber."
-
-					self.game.state = GameState.MOVING_ROBBER;
-
-					//temp 
-					self.enableControls();
-				} else {
-					//assign resources
-					self.produceResources(result);
-					self.enableControls();
-					//purchase/build, trade, or play dev card loop
-					self.game.state = GameState.IDLE;
-				}
+		$('#actions').addClass('hideActions');
+		Util.log(this.game.state);
+		if (this.game.state !== GameState.FIRST_ROUND) {
+			//roll dice
+			if (!$('#dice').length) {
+				$(this.element).append('<input type="button" id="dice" />');
 			}
-		});
+			var dice = $('#dice');
+			dice.removeAttr('disabled');
+			dice.fadeIn('fast');
+			dice.val('Roll');
+			var self = this;
+			dice.click(function() {
+				if (!dice.attr('disabled') && dice.is(':visible')) {
+					dice.val();
+					dice.attr('disabled', 'disabled');
+					var result = 0;
+					var sides = self.game.dice.sides;
+					for (var i = 1; i <= self.game.dice.number; i++) {
+						result += Math.floor(sides * Math.random()) + 1;
+					}
+					dice.val(result);
+					self.game.connection.emit('doAction', {
+						  game: self.game.uniqueKey
+						, action: 'showRoll'
+						, playerNumber: self.game.activePlayer
+						, args: {
+							value: result
+						}
+					});
+					if (self.timeout) {
+						clearTimeout(self.timeout);
+					}
+					self.timeout = setTimeout(function() {
+						dice.fadeOut('slow');
+					}, 3000);
+					
+					if (result === 7) {
+						//force everyone with > 7 resource cards to discard 4 or half
+						var playerNumbers = {};
+						for (var player in self.players) {
+							var numCards = Object.keys(player.cards).length;
+							if (numCards > 7) {
+								playerNumbers[player] = numCards / 2;
+							}
+						}
+						if (Object.keys(playerNumbers).length > 0) {
+							self.game.connection.emit('doAction', {
+								  game: self.game.uniqueKey
+								, action: 'updatePlayerResources'
+								, playerNumber: self.game.activePlayer
+								, args: {
+									players: playerNumbers
+								}
+							});
+						}
+
+						//active player can move the robber
+						self.disableControls();
+						//display message "Click a tile to move the robber."
+
+						self.game.state = GameState.MOVING_ROBBER;
+
+						//temp 
+						self.enableControls();
+					} else {
+						//assign resources
+						self.produceResources(result);
+						self.enableControls();
+						//purchase/build, trade, or play dev card loop
+						self.game.state = GameState.IDLE;
+					}
+				}
+			});
+		} else {
+			//First round, take turns placing 1 settlement and 1 road in snake order (1, 2, 3, 3, 2, 1)
+			Util.log('Placing initial settlements');
+			this.enableControls();
+		}
 		
 	},
 	
-	endPlayerTurn: function(){
+	endPlayerTurn: function() {
 		this.disableBuildControls();
 		$('.player' + this.game.playerNumber).removeClass('player-turn');
-		this.game.activePlayer = this.game.getNextPlayer();
+		if (this.game.state === GameState.FIRST_ROUND) {
+			if (this.interval !== -1 && this.game.activePlayer === this.game.getLastPlayer()) {
+				this.interval = -1;
+				Util.log('Moving turn in reverse order ' + this.game.activePlayer);
+			} else {
+				if (this.interval === -1 && this.game.activePlayer === this.game.getFirstPlayer()) {
+					this.game.state = GameState.IDLE;
+					this.interval = 1;
+				} else {
+					this.game.activePlayer = this.game.getNextPlayer(this.interval);
+				}
+			}
+		} else {
+			this.game.state = GameState.IDLE;
+			this.game.activePlayer = this.game.getNextPlayer();
+		}
+		
 		this.game.connection.emit('doAction', {
 			  game: this.game.uniqueKey
 			, action: 'endTurn'
 			, playerNumber: this.game.activePlayer
 			, args: {
-				lastPlayer: this.game.playerNumber}
+					 lastPlayer: this.game.playerNumber
+					,interval: this.interval
+					,state: this.game.state
+				}
 			}
 		);
 		
@@ -357,6 +379,7 @@ GameBoard.prototype = {
 	disableBuildControls: function() {
 		$('#showActions_button').attr('disabled','disabled');
 		$('#endTurn_button').attr('disabled','disabled');
+		$('#actions').addClass('hideActions');
 	},
 
 	produceResources: function(value) {
