@@ -122,19 +122,32 @@ Util.Color = {
 	}
 };
 
+Util.shuffle = function(arr) {
+	var currentIndex = arr.length, temp, randomIndex;
+	while (0 !== currentIndex) {
+		randomIndex = Math.floor(Math.random() * currentIndex);
+		currentIndex -=1;
+		temp = arr[currentIndex];
+		arr[currentIndex] = arr[randomIndex];
+		arr[randomIndex] = temp;
+	}
+	return arr;
+};
+
 Util.logObject = function logObject(o) {
 	return JSON.stringify(o, null, 2);
-}
+};
 
 Util.log = function(msg) {
 	if (debug) {
 		console.log('-- Debug -- ' + msg);
 	} 
-}
+};
 
 if (typeof exports !== 'undefined') {
 	exports.Color = Util.Color;
 	exports.log = Util.log;
 	exports.logObject = Util.logObject;
+	exports.shuffle = Util.shuffle;
 	exports.debug = debug;
 }

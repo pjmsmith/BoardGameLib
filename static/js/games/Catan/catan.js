@@ -1,4 +1,6 @@
 var Game = Game || {};
+
+/* Game Configuration and Constants */
 var GameState = {
 	 WAITING_FOR_PLAYERS: 1
 	,STARTED: 2
@@ -10,6 +12,36 @@ var GameState = {
 	,IDLE: 8
 	,FIRST_ROUND: 9
 };
+var DeckType = {
+	 RESOURCE: 1
+	,DEVELOPMENT: 2
+};
+var CardType = {
+	 KNIGHT: 1
+	,VICTORY_POINT: 2
+	,MONOPOLY: 3
+	,ROAD_BUILDING: 4
+	,YEAR_OF_PLENTY: 5
+};
+var ResourceType = {
+	 SHEEP: 1
+	,WOOD: 2
+	,BRICK: 3
+	,WHEAT: 4
+	,ORE: 5
+};
+var CardLimits = {};
+CardLimits[CardType.KNIGHT] = 14;
+CardLimits[CardType.VICTORY_POINT] = 5;
+CardLimits[CardType.MONOPOLY] = 2;
+CardLimits[CardType.ROAD_BUILDING] = 2;
+CardLimits[CardType.YEAR_OF_PLENTY] = 2;
+
+var RESOURCE_LIMIT = 19;
+
+
+
+
 Game.Catan = function(options) {
 	//Reference for available Game options
 	/*this.options = {
@@ -46,8 +78,9 @@ Game.Catan = function(options) {
 			}
 			if ($(this.element)) {
 				//set up cards
-
-				//
+				for (var type in DeckType) {
+					this.populateDeckByType(DeckType[type]);
+				}
 
 				this.board = new GameBoard({
 					 element: this.element
@@ -60,7 +93,7 @@ Game.Catan = function(options) {
 			}
 		},
 
-		startGame: function(firstPlayer){
+		startGame: function(firstPlayer) {
 			this.activePlayer = firstPlayer;
 			if (this.state === GameState.STARTED) {
 				this.state = GameState.FIRST_ROUND;
@@ -80,6 +113,50 @@ Game.Catan = function(options) {
 
 		endPlayerTurn: function() {
 
+		},
+
+		/* Game specific utility functions */
+
+		populateDeckByType: function(type) {
+			switch (type) {
+				case DeckType.RESOURCE:
+					this.decks[type] = this.getResourceCards();
+					break;
+				case DeckType.DEVELOPMENT:
+					this.decks[type] = this.getDevelopmentCards(true);
+					break;
+				default:
+					console.log('Unknown deck type');
+					break;
+			}
+		},
+
+		getResourceCards: function() {
+			if (typeof this.decks[DeckType.RESOURCE] === 'undefined') {
+				var resourceCards = {};
+				for (var type in ResourceType) {
+					resourceCards[ResourceType[type]] = RESOURCE_LIMIT;
+				}
+				this.decks[DeckType.RESOURCE] = resourceCards
+			}
+			return this.decks[DeckType.RESOURCE];
+		},
+
+		getDevelopmentCards: function(shuffle) {
+			if (typeof this.decks[DeckType.DEVELOPMENT] === 'undefined') {
+				var devCards = [];
+				for (var type in CardType) {
+					for (var i = 0; i < CardLimits[CardType[type]]; i++) {
+						devCards.push(CardType[type]);
+					}
+				}
+
+				this.decks[DeckType.DEVELOPMENT] = devCards;
+			}
+			if (shuffle) {
+				this.decks[DeckType.DEVELOPMENT] = Util.shuffle(this.decks[DeckType.DEVELOPMENT]);
+			}
+			return this.decks[DeckType.DEVELOPMENT]
 		}
 	});
 };

@@ -41,8 +41,12 @@ GameBoard.prototype = {
 		}
 		,'updatePlayerResources': function(board, el, player, args) {
 			if (typeof args.players[board.game.playerNumber] !== 'undefined') {
-				console.log('Discard ' + args.players[board.game.playerNumber] + ' cards');
+				Util.log('Discard ' + args.players[board.game.playerNumber] + ' cards');
 			}
+		}
+		,'updateDeck': function(board, el, player, args) {
+			board.game.decks[args.deckType] = args.deck;
+			Util.log('Updating deck to match player ' + player);
 		}
 		,'showRoll': function(board, el, player, args) {
 			if (!$('#dice').length) {
@@ -257,6 +261,18 @@ GameBoard.prototype = {
 
 	startPlayerTurn: function() {
 		this.disableBuildControls();
+
+		//ensure everyone has the same deck of development cards in the same order; might be better to add a sync function on the server instead
+		this.game.connection.emit('doAction', {
+		  	  game: this.game.uniqueKey
+			, action: 'updateDeck'
+			, playerNumber: this.game.activePlayer
+			, args: {
+					 deckType: DeckType.DEVELOPMENT
+					,deck: this.game.getDevelopmentCards()
+				}
+		});
+
 		if (this.timeout) {
 			clearTimeout(this.timeout);
 		}
@@ -329,6 +345,7 @@ GameBoard.prototype = {
 						//assign resources
 						self.produceResources(result);
 						self.enableControls();
+
 						//purchase/build, trade, or play dev card loop
 						self.game.state = GameState.IDLE;
 					}
