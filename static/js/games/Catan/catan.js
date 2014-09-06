@@ -39,8 +39,16 @@ CardLimits[CardType.YEAR_OF_PLENTY] = 2;
 
 var RESOURCE_LIMIT = 19;
 
+var PieceType = {
+	 ROAD: 1
+	,SETTLEMENT: 2
+	,CITY: 3
+};
 
-
+var PieceLimits = {};
+PieceLimits[PieceType.ROAD] = 15;
+PieceLimits[PieceType.SETTLEMENT] = 5;
+PieceLimits[PieceType.CITY] = 4;
 
 Game.Catan = function(options) {
 	//Reference for available Game options
@@ -82,6 +90,9 @@ Game.Catan = function(options) {
 					this.populateDeckByType(DeckType[type]);
 				}
 
+				//set up pieces
+				this.players[this.playerNumber].pieces = this.getPieces(this.playerNumber);
+
 				this.board = new GameBoard({
 					 element: this.element
 					,game: this
@@ -108,6 +119,10 @@ Game.Catan = function(options) {
 		},
 
 		startPlayerTurn: function() {
+			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.SHEEP);
+			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.WOOD);
+			this.players[this.playerNumber].addCard(DeckType.DEVELOPMENT, CardType.KNIGHT);
+			this.players[this.playerNumber].displayHand(DeckType.RESOURCE);
 			this.board.startPlayerTurn();
 		},
 
@@ -129,6 +144,21 @@ Game.Catan = function(options) {
 					console.log('Unknown deck type');
 					break;
 			}
+		},
+
+		getPieces: function(player) {
+			var pieces = {};
+			if (typeof this.players[player] !== 'undefined') {
+				if (this.players[player].pieces === 'undefined') {
+					for (var type in PieceType) {
+						pieces[PieceType[type]] = PieceLimits[type];
+					}
+					this.players[player].pieces = pieces;
+				}
+				
+				pieces = this.players[player].pieces;
+			} 
+			return pieces;
 		},
 
 		getResourceCards: function() {

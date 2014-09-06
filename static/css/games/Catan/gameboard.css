@@ -10,27 +10,22 @@ svg {
 }
 
 #controls input[type="button"], #startgame_button, #cancelAction_button, #endTurn_button {
-	font-size:3em;
-	background-color:gray;
+	font-size: 3em;
+	background-color: gray;
 	margin-left:10px; margin-right:20px;
 }
 
 #endTurn_button {
-	position:absolute;
-	top:0;
-	left:0;
+	position: absolute;
+	top: 0;
+	left: 0;
 }
 
 .tile {
-	fill:white !important;
-	stroke-width:5;
-	stroke:#444444;
+	fill: white !important;
+	stroke-width: 5;
+	stroke: #444444;
 }
-	
-
-/*.tile:hover {
-	fill:gray !important;
-}*/
 
 .vertex {
 	stroke:black;
@@ -165,4 +160,86 @@ text {
 
 #dice:disabled {
 	opacity: 1;
+}
+/* deck types: 1 = resource, 2 = dev cards */
+/*
+var CardType = {
+	 KNIGHT: 1
+	,VICTORY_POINT: 2
+	,MONOPOLY: 3
+	,ROAD_BUILDING: 4
+	,YEAR_OF_PLENTY: 5
+};
+var ResourceType = {
+	 SHEEP: 1
+	,WOOD: 2
+	,BRICK: 3
+	,WHEAT: 4
+	,ORE: 5
+};*/
+.hand {
+	margin: 0 auto;
+	top: 50%;
+	left: 50%;
+	height: 150px;
+	min-width: 50px;
+	width: auto;
+	background-color: rgba(252, 252, 252, 0.5);
+	padding: 10px 20px;
+	border: 1px solid black;
+	position: absolute;
+	margin-top: -75px;
+}
+
+.card {
+	width: 50px;
+	height: 100px;
+	top: 50%;
+	margin-top: -50px;
+	border-radius: 5px;
+	background-color: white;
+	border: 1px solid black;
+	box-shadow: -5px 5px 10px black;
+	display: inline-block;
+	position: relative;
+}
+
+.card-1-1 {
+	background: url('/images/games/Catan/sheep.jpg');
+}
+
+.card-1-2 {
+	background: url('/images/games/Catan/wood.jpg');
+}
+
+.card-1-3 {
+	background: url('/images/games/Catan/brick.jpg');
+}
+
+.card-1-4 {
+	background: url('/images/games/Catan/wheat.jpg');
+}
+
+.card-1-5 {
+	background: url('/images/games/Catan/ore.jpg');
+}
+
+.card-2-1 {
+	background: url('/images/games/Catan/knight.jpg');
+}
+
+.card-2-2 {
+	background: url('/images/games/Catan/victorypoint.jpg');
+}
+
+.card-2-3 {
+	background: url('/images/games/Catan/monopoly.jpg');
+}
+
+.card-2-4 {
+	background: url('/images/games/Catan/roadbuilding.jpg');
+}
+
+.card-2-5 {
+	background: url('/images/games/Catan/yearofplenty.jpg');s
 }

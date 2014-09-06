@@ -83,6 +83,11 @@ textarea {
 	resize: vertical;
 }
 
+input, textarea {
+	-webkit-appearance: none;
+	-webkit-border-radius: 0;
+}
+
 /* ==========================================================================
    Browse Happy prompt
    ========================================================================== */

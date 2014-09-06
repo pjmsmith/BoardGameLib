@@ -12,9 +12,9 @@ var Player = function(options) {
 		, name: ''
 		, game: ''
 		, playerNumber: -1
-	  	, ready: false
-		, hands: {}
-		, pieces: {}
+		, ready: false
+		, hands: {} //hand type: array
+		, pieces: {} //piece type: count
 		, state: null
 	};
 	this.options = $.extend(this.options, options);
@@ -32,11 +32,46 @@ Player.prototype = {
 	},
 
 	displayHand: function(type) {
-
+		if ($(this.game.element).length) {
+			if (!$('#hand' + type).length) {
+				this.game.element.append('<div id="hand' + type + '" class="hand"></div>');
+			}
+			var hand = $('#hand' + type);
+			hand.html();
+			if (typeof this.hands[type] !== 'undefined') {
+				for (var i = 0; i < this.hands[type].length; i++) {
+					hand.append('<div class="card card-' + type + '-' + this.hands[type][i] + '" style="margin-left: ' + (i * 10 ) + 'px"></div>');
+					hand.css({'margin-left': '-' + (hand.outerWidth()/2) + 'px'})
+				}
+			}
+		}
 	},
 
 	hideHand: function(type) {
+		if (!$('#hand' + type)) {
+			this.game.element.append('<div id="hand' + type + '"></div>');
+		}
+		$('#hand' + type).fadeOut('fast');
+	},
 
+	addCard: function(hand, card) {
+		if (typeof this.hands[hand] === 'undefined') {
+			this.hands[hand] = [];
+		}
+		this.hands[hand].push(card);
+	},
+
+	removeCard: function(hand, card) {
+		if (typeof this.hands[hand] !== 'undefined') {
+			var index = this.hands[hand].indexOf(card);
+			if (index > -1) {
+				this.hands[hand](index, 1);
+			} else {
+				Util.log('Card does not exist!');
+			}
+		} else {
+			Util.log('Hand does not exist!');
+		}
 	},
 
 	addPiece: function(type) {

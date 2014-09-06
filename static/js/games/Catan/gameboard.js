@@ -104,11 +104,8 @@ GameBoard.prototype = {
 				<input id="placeCity_button" value="Settlement" type="button">\
 				<input id="upgradeSettle_button" value="City" type="button">\
 				<input id="buyDevCard_button" value="Dev. Card" type="button">\
-			</div>\
-			<div id="purchase_modal" class="">\
-				<input id="placeCity_button" value="Place City" type="button"/>\
-				<input id="placeRoad_button" value="Place Road" type="button"/>\
-				<input type="button" id="cancelPurchase_button" value="cancel"/>\
+				<input id="showResources" value="Resources" type="button"/>\
+				<input id="showDevCards" value="Dev Cards" type="button"/>\
 			</div>');
 		var self = this;
 		$('#purchase_button').click(function(){

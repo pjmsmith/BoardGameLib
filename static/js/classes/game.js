@@ -143,19 +143,18 @@ Game.prototype = {
 	waitForPlayers: function() {
 		var self = this;
 		$('#readyButton').fadeIn('fast');
-		var btn = $('#readyButton');
-		btn.removeAttr('disabled');
 		$('#readyButton').click(function() {
 			self.connection.emit('ready', {user: {playerNumber: self.playerNumber}, game: uniqueKey});
+			var btn = $('#readyButton');
 			btn.attr('disabled', 'disabled');
 			btn.html('Ready!');
 			btn.addClass('ready-waiting');
 		});
 		this.connection.on('startGame', function(data) {
 			self.players = data.users;
+			self.initializePlayers();
 			self.activePlayer = data.currentPlayer;
 			self.updateUserList(self.players);
-
 			Util.log('player ' + self.activePlayer + ' starting game');
 			$('#readyButton').hide();
 
@@ -164,6 +163,13 @@ Game.prototype = {
 			self.startGame(self.activePlayer);
 
 		});
+	},
+
+	initializePlayers: function() {
+		for (var player in this.players) {
+			this.players[player].game = this;
+			this.players[player] = new Player(this.players[player]);
+		}
 	},
 
 	initialize: function() {
