@@ -417,7 +417,7 @@ GameBoard.prototype = {
 	},
 		
 	placeSettlement: function(isFree) {
-		//1 brick, 1 wood, 1 wheat, 1 sheep
+		//1 brick, 1 wood, 1 GRAIN, 1 sheep
 		if (this.game.activePlayer === this.game.playerNumber) {
 			var player = this.game.players[this.game.playerNumber];
 			if (player.settlementPlaced || (!isFree && !this.canAfford(player, 'settlement'))) {
@@ -510,15 +510,15 @@ GameBoard.prototype = {
 	},
 
 	placeCity: function() {
-		//2 wheat, 3 ore
+		//2 GRAIN, 3 ore
 		if (this.game.activePlayer === this.game.playerNumber) {
 			var player = this.game.players[this.game.playerNumber];
 			if (!this.canAfford(player, 'city')) {
 				return;
 			}
 
-			player.removeCard(DeckType.RESOURCE, ResourceType.WHEAT);
-			player.removeCard(DeckType.RESOURCE, ResourceType.WHEAT);
+			player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
+			player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
 			player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
 			player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
 			player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
@@ -526,7 +526,7 @@ GameBoard.prototype = {
 	},
 
 	purchaseDevelopmentCard: function() {
-		//1 sheep, 1 ore, 1 wheat
+		//1 sheep, 1 ore, 1 GRAIN
 		if (this.game.activePlayer === this.game.playerNumber) {
 			var player = this.game.players[this.game.playerNumber];
 			if (!this.canAfford(player, 'devCard')) {
@@ -540,7 +540,7 @@ GameBoard.prototype = {
 
 			player.removeCard(DeckType.RESOURCE, ResourceType.SHEEP);
 			player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
-			player.removeCard(DeckType.RESOURCE, ResourceType.WHEAT);
+			player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
 
 			player.addCard(DeckType.DEVELOPMENT, card);
 			player.displayHand(DeckType.DEVELOPMENT);
@@ -559,7 +559,10 @@ GameBoard.prototype = {
 		var resources = {};
 		if (typeof player.getHand(DeckType.RESOURCE) !== 'undefined') {
 			for (var i = 0; i < player.getHand(DeckType.RESOURCE).length; i++) {
-				var resource = player.getHand(DeckType.RESOURCE);
+				var resource = player.getHand(DeckType.RESOURCE)[i];
+				if (typeof resources[resource] === 'undefined') {
+					resources[resource] = 0;
+				}
 				resources[resource] += 1;
 			}
 
@@ -567,7 +570,7 @@ GameBoard.prototype = {
 				case 'devCard':
 					return (resources[ResourceType.SHEEP] >= 1 
 						 && resources[ResourceType.ORE] >= 1
-						 && resources[ResourceType.WHEAT] >= 1);
+						 && resources[ResourceType.GRAIN] >= 1);
 				case 'road':
 					return (resources[ResourceType.BRICK] >= 1 
 						 && resources[ResourceType.WOOD] >= 1);
@@ -575,16 +578,26 @@ GameBoard.prototype = {
 					return (resources[ResourceType.SHEEP] >= 1 
 						 && resources[ResourceType.WOOD] >= 1
 						 && resources[ResourceType.BRICK] >= 1
-						 && resources[ResourceType.WHEAT] >= 1);
+						 && resources[ResourceType.GRAIN] >= 1);
 				case 'city':
 					return (resources[ResourceType.ORE] >= 3
-						 && resources[ResourceType.WHEAT] >= 2);
+						 && resources[ResourceType.GRAIN] >= 2);
 
 				default:
 					break;
 			}
 		}
 		return false;
+	},
+
+	addResourceCard: function(player, type) {
+		var resources = this.game.decks[DeckType.RESOURCE];
+		if (resources[type] > 0) {
+			player.addCard(DeckType.RESOURCE, type);
+			resources[type]--;
+		} else {
+			Util.log('Ran out of ' + type + ' cards');
+		}
 	},
 
 	startPlayerTurn: function() {
@@ -595,7 +608,10 @@ GameBoard.prototype = {
 		}
 		$('#actions').addClass('hideActions');
 		Util.log(this.game.state);
+		var player = this.game.players[this.game.activePlayer];
 		if (this.game.state !== GameState.FIRST_ROUND) {
+			player.roadPlaced = false;
+			player.settlmentPlaced = false;
 			//roll dice
 			if (!$('#dice').length) {
 				$(this.element).append('<input type="button" id="dice" />');
@@ -671,7 +687,6 @@ GameBoard.prototype = {
 		} else {
 			//First round, take turns placing 1 settlement and 1 road in snake order (1, 2, 3, 3, 2, 1)
 			Util.log('Placing initial settlements');
-			var player = this.game.players[this.game.activePlayer];
 			player.roadPlaced = false;
 			player.settlementPlaced = false;
 
@@ -697,6 +712,9 @@ GameBoard.prototype = {
 			}
 		} else {
 			this.game.state = GameState.IDLE;
+			//add starting resources
+
+
 			this.game.activePlayer = this.game.getNextPlayer();
 		}
 		//ensure everyone has the same deck of development cards in the same order; might be better to add a sync function on the server instead
@@ -732,6 +750,29 @@ GameBoard.prototype = {
 
 	produceResources: function(value) {
 		Util.log('Producing resources for ' + value);
+		var receivedResource = false;
+		var settlements = this.getSettlements(this.game.playerNumber);
+		if (settlements) {
+			var player = this.game.players[this.game.playerNumber];
+			for (var i = 0; i < settlements.length; i++) {
+				 var settlement = settlements[i];
+				 var neighbors = this.getNeighbors($(settlement));
+				 if (neighbors) {
+				 	for (var j = 0; j < neighbors.length; j++) {
+				 		var tile = $('#' + neighbors[j]);
+				 		var tileValue = tile.attr('value');
+				 		if (tileValue && parseInt(tileValue) === value) {
+							this.addResourceCard(player, this.getTileType(tile));
+							receivedResource = true;
+				 		}
+				 	}
+				}
+			}
+
+			if (receivedResource) {
+				player.displayHand(DeckType.RESOURCE, true);
+			}
+		}
 	},
 	
 	cancelAction: function() {
@@ -860,19 +901,23 @@ GameBoard.prototype = {
 			
 				for(var v in tileVerts) {
 					var xY = tileVerts[v].split(',');
-					
-					var duplicateVertex = false
+					var duplicateVertex = false;
+					var existingVertex = null;
 					$('.vertex').each(function() {
 						if($(this).attr('cx') == Math.round(parseFloat(xY[0])) && $(this).attr('cy') == Math.round(parseFloat(xY[1]))) {
 							duplicateVertex = true;
+							existingVertex = this;
 							return false;
+
 						}
 					});
-					
+					var existingNeighbors =  (existingVertex && $(existingVertex).length && $(existingVertex).attr('neighbors')) ? $(existingVertex).attr('neighbors') + ' ' : '';	
 					if(!duplicateVertex) {
 						vertCount++;
 						$('#vertices').append('<circle id="v'+vertCount+'" class="vertex unassigned" cx="'+Math.round(parseFloat(xY[0]))+'" cy="'+Math.round(parseFloat(xY[1]))+'" r="15"/>');
+						existingVertex = $('#v' + vertCount);
 					}
+					$(existingVertex).attr('neighbors', existingNeighbors + tid);
 				}
 			}
 		});
@@ -880,7 +925,35 @@ GameBoard.prototype = {
 		$(this).html($(this).html()); //hack to allow jquery to render SVG elements
 		Util.log('finished making '+vertCount +' vertices');
 	},
+
+	getSettlements: function(playerNumber) {
+		return $('#vertices .player' + playerNumber);
+	},
 	
+	getNeighbors: function(vertex) {
+		var neighbors = null;
+		if ($(vertex).length) {
+			neighbors = $(vertex).attr('neighbors');
+			if (neighbors.length) {
+				neighbors = neighbors.split(' ');
+			}
+		}
+		return neighbors;
+	},
+
+	getTileType: function(tile) {
+		var type = null;
+		if (tile && tile.length) {
+			type = tile.attr('class');
+			if (type.length) {
+				type = type.split('tile')[0].trim();
+			}
+			type = type.toUpperCase();
+			type = ResourceType[type];
+		}
+		return type;
+	},
+
 	edgeClicked: function(edgeThis) {
 		Util.log($(edgeThis).attr('id'));
 	
