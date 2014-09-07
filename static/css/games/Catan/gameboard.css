@@ -156,6 +156,7 @@ text {
 	cursor: pointer;
 	box-shadow: 0px 10px 5px #888 inset, 0px -2px 5px #000 inset;
 	-webkit-box-shadow: 0px 10px 5px #888 inset, 0px -2px 5px #000 inset;
+	z-index: 20;
 }
 
 #dice:disabled {

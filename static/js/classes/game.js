@@ -143,10 +143,10 @@ Game.prototype = {
 	waitForPlayers: function() {
 		var self = this;
 		$('#readyButton').fadeIn('fast');
+		var btn = $('#readyButton');
+		btn.removeAttr('disabled');
 		$('#readyButton').click(function() {
 			self.connection.emit('ready', {user: {playerNumber: self.playerNumber}, game: uniqueKey});
-			var btn = $('#readyButton');
-			btn.attr('disabled', 'disabled');
 			btn.html('Ready!');
 			btn.addClass('ready-waiting');
 		});
