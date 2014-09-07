@@ -27,7 +27,7 @@ var ResourceType = {
 	 SHEEP: 1
 	,WOOD: 2
 	,BRICK: 3
-	,WHEAT: 4
+	,GRAIN: 4
 	,ORE: 5
 };
 var CardLimits = {};

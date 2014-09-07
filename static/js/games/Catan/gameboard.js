@@ -417,7 +417,7 @@ GameBoard.prototype = {
 	},
 		
 	placeSettlement: function(isFree) {
-		//1 brick, 1 wood, 1 GRAIN, 1 sheep
+		//1 brick, 1 wood, 1 grain, 1 sheep
 		if (this.game.activePlayer === this.game.playerNumber) {
 			var player = this.game.players[this.game.playerNumber];
 			if (player.settlementPlaced || (!isFree && !this.canAfford(player, 'settlement'))) {
@@ -450,6 +450,8 @@ GameBoard.prototype = {
 					if (!isFree) {
 						player.removeCard(DeckType.RESOURCE, ResourceType.BRICK);
 						player.removeCard(DeckType.RESOURCE, ResourceType.WOOD);
+						player.removeCard(DeckType.RESOURCE, ResourceType.SHEEP);
+						player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
 					} else {
 						player.settlementPlaced = true;
 						if (player.roadPlaced) {
@@ -611,7 +613,7 @@ GameBoard.prototype = {
 		var player = this.game.players[this.game.activePlayer];
 		if (this.game.state !== GameState.FIRST_ROUND) {
 			player.roadPlaced = false;
-			player.settlmentPlaced = false;
+			player.settlementPlaced = false;
 			//roll dice
 			if (!$('#dice').length) {
 				$(this.element).append('<input type="button" id="dice" />');
@@ -622,6 +624,10 @@ GameBoard.prototype = {
 			dice.val('Roll');
 			var self = this;
 			dice.click(function() {
+				var player = self.game.players[self.game.activePlayer];
+				if (player.handDisplayed) {
+					player.hideHand(player.handDisplayed);
+				}
 				if (!dice.attr('disabled') && dice.is(':visible')) {
 					dice.val();
 					dice.attr('disabled', 'disabled');
@@ -649,9 +655,11 @@ GameBoard.prototype = {
 					if (result === 7) {
 						//force everyone with > 7 resource cards to discard 4 or half
 						var playerNumbers = {};
-						for (var player in self.players) {
-							var numCards = Object.keys(player.cards).length;
+						for (var player in self.game.players) {
+							var deck = self.game.players[player].getHand(DeckType.RESOURCE);
+							var numCards = (deck) ? deck.length : 0;
 							if (numCards > 7) {
+								Util.log('Player' + player + ' has more than 7 cards');
 								playerNumbers[player] = numCards / 2;
 							}
 						}
