@@ -15,13 +15,13 @@ var GameBoard = function(options) {
 GameBoard.prototype = {
 	/* Board Definition and Set-Up */
 	tileClasses: '<style>\
-					  .grain { fill:yellow; background-color:yellow; fill:url(#grainPattern) !important}\
-					  .sheep {fill:rgb(142,233,138) !important; background-color:rgb(142,233,138) ; fill:url(#sheepPattern) !important}\
-					  .wood {fill:green !important; background-color:green; fill:url(#woodPattern) !important}\
-					  .ore {fill:gray !important; background-color:gray; fill:url(#orePattern) !important}\
-					  .brick {fill:rgb(255, 143, 68) !important; background-color:rgb(255, 143, 68); fill:url(#brickPattern) !important}\
-					  .water {fill:blue !important; background-color:blue; fill:url(#waterPattern)}\
-					  .desert {fill:rgb(247,252,194) !important; background-color:yellow; fill:url(#desertPattern) !important}\
+					  .grain {fill:yellow; background-color:yellow; fill:url(#grainPattern) !important;}\
+					  .sheep {fill:rgb(142,233,138) !important; background-color:rgb(142,233,138); fill:url(#sheepPattern) !important;}\
+					  .wood {fill:green !important; background-color:green; fill:url(#woodPattern) !important;}\
+					  .ore {fill:gray !important; background-color:gray; fill:url(#orePattern) !important;}\
+					  .brick {fill:rgb(255, 143, 68) !important; background-color:rgb(255, 143, 68); fill:url(#brickPattern) !important;}\
+					  .water {fill:blue !important; background-color:blue; fill:url(#waterPattern);}\
+					  .desert {fill:rgb(247,252,194) !important; background-color:yellow; fill:url(#desertPattern) !important;}\
 					</style>',
 
 	gameboard: '\
@@ -82,6 +82,7 @@ GameBoard.prototype = {
 			</g>\
 		</svg>',
 
+	randomBoard: true,
 	hiddenTiles: ['h0', 'h4', 'h9', 'h19', 'h20', 'h24'],
 	tileLimits: {
 		 'grain': 4
@@ -103,7 +104,6 @@ GameBoard.prototype = {
 		,11: 2
 		,12: 1
 	},
-
 	
 	actions: {
 		 'placeSettlement': function(board, vid, player) {
@@ -120,6 +120,28 @@ GameBoard.prototype = {
 				$('#'+eid).attr('class','edge '+ 'player'+player)
 				$('#edges .unassigned').css('display','none');
 				$('#'+eid).show();
+			}
+		}
+		,'syncBoard': function(board, el, player, args) {
+			if (board.game.playerNumber !== player) {
+				Util.log('Syncing game board tiles');
+				var tileList = args.tiles;
+				var numberList = args.values;
+				var i = 0;
+				$('#hexes > polygon').each(function() {
+					var hexId = $(this).attr('id');
+					if (board.hiddenTiles.indexOf(hexId) < 0) {
+						var tileClass = tileList[i];
+						$(this).attr('class',  tileClass + ' tile');
+						if (tileClass !== 'desert') {
+							$(this).attr('value', numberList[i]);
+						} else {
+							$(this).attr('value', 7);
+						}
+						i++;
+					}
+				});
+				board.renderTiles();
 			}
 		}
 		,'updatePlayerResources': function(board, el, player, args) {
@@ -168,18 +190,17 @@ GameBoard.prototype = {
 	},
 
 	render: function() {
-		this.renderBoard();
+		this.renderBoard(this.randomBoard);
 		this.renderActions();
 		this.setupListeners();
 	 	this.showControls();
 	},
 
 	renderBoard: function(isRandom) {
-		$(this.element).html(this.tileClasses);
-		$(this.element).append(this.gameboard);
+		$(this.element).html(this.tileClasses + this.gameboard);
 
-		if (isRandom) {
-		//shuffle tiles
+		if (isRandom && this.game.activePlayer === this.game.playerNumber) {
+			//shuffle tiles
 			var tileList = [];
 			for (var tile in this.tileLimits) {
 				for (var i = 0; i < this.tileLimits[tile]; i++) {
@@ -198,22 +219,31 @@ GameBoard.prototype = {
 			numberList = Util.shuffle(numberList);
 
 			var self = this;
+			var i = 0;
 			$('#hexes > polygon').each(function() {
 				var hexId = $(this).attr('id');
 				if (self.hiddenTiles.indexOf(hexId) < 0) {
-					var tileClass = tileList.pop();
-					$(this).attr('class', 'tile ' + tileClass);
+					var tileClass = tileList[i];
+					$(this).attr('class', tileClass + ' tile');
 					if (tileClass !== 'desert') {
-						$(this).attr('value', numberList.pop());
+						$(this).attr('value', numberList[i]);
+					} else {
+						$(this).attr('value', 7);
 					}
+					i++;
 				}
 			});
-			//synchronize
-			if (this.activePlayer === this.playerNumber) {
-				/*this.game.connection.emit('doAction', {
 
-				});*/
-			}
+			//synchronize
+			this.game.connection.emit('doAction', {
+					  game: self.game.uniqueKey
+				, action: 'syncBoard'
+				, playerNumber: self.game.activePlayer
+				, args: {
+					 tiles: tileList
+					,values: numberList
+				}
+			});
 		}
 
 		this.createVertices(); 
@@ -612,7 +642,12 @@ GameBoard.prototype = {
 				}
 				
 				// Render off screen to get width and use it to center text
-				$('#tiles').append('<text id="t' + tileCount + '" x="-1000" y="1000" fill="' + textColor + '">' + tileContents + '</text>');
+				if (!$('#t' + tileCount).length) {
+					$('#tiles').append('<text id="t' + tileCount + '" x="-1000" y="1000" fill="' + textColor + '">' + tileContents + '</text>');
+				} else {
+					$('#t' + tileCount).html(tileContents);
+					$('#t' + tileCount).attr('fill', textColor);
+				}
 				self.element.html(self.element.html()); //hack to allow jquery to render elements
 				
 				var textDimensions = document.getElementById('t' + tileCount).getBoundingClientRect();
