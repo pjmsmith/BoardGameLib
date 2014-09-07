@@ -489,13 +489,14 @@ GameBoard.prototype = {
 			}
 			var player = this.game.players[this.game.playerNumber];
 			var devCardDeck = this.game.decks[DeckType.DEVELOPMENT];
-			player.addCard(DeckType.DEVELOPMENT, devCardDeck.pop());
+			var card = devCardDeck.pop();
+			player.addCard(DeckType.DEVELOPMENT, card);
 			player.displayHand(DeckType.DEVELOPMENT);
 			
 			this.timeout = setTimeout(function() {
 				player.hideHand(DeckType.DEVELOPMENT);
 			}, 2000);
-			Util.log(devCardDeck.length);
+			Util.log(devCardDeck.length + ' dev cards left');
 			if (this.game.decks[DeckType.DEVELOPMENT].length <= 0) {
 				$('#buyDevCard_button').attr('disabled', 'disabled');
 			}
@@ -504,17 +505,6 @@ GameBoard.prototype = {
 
 	startPlayerTurn: function() {
 		this.disableBuildControls();
-
-		//ensure everyone has the same deck of development cards in the same order; might be better to add a sync function on the server instead
-		this.game.connection.emit('doAction', {
-		  	  game: this.game.uniqueKey
-			, action: 'updateDeck'
-			, playerNumber: this.game.activePlayer
-			, args: {
-					 deckType: DeckType.DEVELOPMENT
-					,deck: this.game.getDevelopmentCards()
-				}
-		});
 
 		if (this.timeout) {
 			clearTimeout(this.timeout);
@@ -621,7 +611,17 @@ GameBoard.prototype = {
 			this.game.state = GameState.IDLE;
 			this.game.activePlayer = this.game.getNextPlayer();
 		}
-		
+		//ensure everyone has the same deck of development cards in the same order; might be better to add a sync function on the server instead
+		this.game.connection.emit('doAction', {
+		  	  game: this.game.uniqueKey
+			, action: 'updateDeck'
+			, playerNumber: this.game.activePlayer
+			, args: {
+					 deckType: DeckType.DEVELOPMENT
+					,deck: this.game.getDevelopmentCards()
+				}
+		});
+
 		this.game.connection.emit('doAction', {
 			  game: this.game.uniqueKey
 			, action: 'endTurn'
