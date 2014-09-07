@@ -272,17 +272,17 @@ GameBoard.prototype = {
 
 		var self = this;
 		$('#placeCity_button').click(function() {
-			self.placeSettlement();
+			self.placeSettlement(self.game.state === GameState.FIRST_ROUND);
 		});
 		$('#placeCity_button').fastButton(function() {
-			self.placeSettlement();
+			self.placeSettlement(self.game.state === GameState.FIRST_ROUND);
 		});
 	
 		$('#placeRoad_button').click(function() {
-			self.placeRoadMode();
+			self.placeRoadMode(self.game.state === GameState.FIRST_ROUND);
 		});
 		$('#placeRoad_button').fastButton(function() {
-			self.placeRoadMode();
+			self.placeRoadMode(self.game.state === GameState.FIRST_ROUND);
 		});
 		
 		$('#upgradeSettle_button').click(function() {
@@ -420,7 +420,7 @@ GameBoard.prototype = {
 		//1 brick, 1 wood, 1 wheat, 1 sheep
 		if (this.game.activePlayer === this.game.playerNumber) {
 			var player = this.game.players[this.game.playerNumber];
-			if (!this.canAfford(player, 'settlement')) {
+			if (player.settlementPlaced || (!isFree && !this.canAfford(player, 'settlement'))) {
 				return;
 			}
 			this.hideModals();
@@ -446,9 +446,15 @@ GameBoard.prototype = {
 						, playerNumber: self.game.playerNumber
 						, element: vid
 					});
+					var player = self.game.players[self.game.playerNumber];
 					if (!isFree) {
 						player.removeCard(DeckType.RESOURCE, ResourceType.BRICK);
 						player.removeCard(DeckType.RESOURCE, ResourceType.WOOD);
+					} else {
+						player.settlementPlaced = true;
+						if (player.roadPlaced) {
+							self.endPlayerTurn();
+						}
 					}
 				} else {
 					alert('Location already chosen, select an unassigned spot ');
@@ -461,18 +467,19 @@ GameBoard.prototype = {
 		//1 brick, 1 wood
 		if (this.game.activePlayer === this.game.playerNumber) {
 			var player = this.game.players[this.game.playerNumber];
-			if (!this.canAfford(player, 'road')) {
+
+			if (player.roadPlaced || (!isFree && !this.canAfford(player, 'road'))) {
 				return;
 			}
 			this.hideModals();
 			Util.log('Waiting for player to place road...');
 			this.disableControls();
 			this.showPurchaseControls();
-			$('#edges .unassigned').css('display','block');
+			$('#edges .unassigned').css('display', 'block');
 			var self = this;	
-			this.element.on('edgeClick',function(e,eid,player){
-				if($('#'+eid).attr('class') == 'edge unassigned') {
-					$('#'+eid).attr('class','edge '+'player'+player);
+			this.element.on('edgeClick', function(e, eid, player) {
+				if($('#' + eid).attr('class') == 'edge unassigned') {
+					$('#' + eid).attr('class','edge ' + 'player' + player);
 					$('#edges .unassigned').css('display','none');
 					self.element.off('edgeClick');
 					self.enableControls();
@@ -485,9 +492,15 @@ GameBoard.prototype = {
 						,playerNumber: self.game.playerNumber
 						,element: eid
 					});
+					var player = self.game.players[self.game.playerNumber];
 					if (!isFree) {
 						player.removeCard(DeckType.RESOURCE, ResourceType.BRICK);
 						player.removeCard(DeckType.RESOURCE, ResourceType.WOOD);
+					} else {
+						player.roadPlaced = true;
+						if (player.settlementPlaced) { 
+							self.endPlayerTurn();
+						}
 					}
 				} else {
 					alert('Location already chosen, select an unassigned spot ')
@@ -658,6 +671,10 @@ GameBoard.prototype = {
 		} else {
 			//First round, take turns placing 1 settlement and 1 road in snake order (1, 2, 3, 3, 2, 1)
 			Util.log('Placing initial settlements');
+			var player = this.game.players[this.game.activePlayer];
+			player.roadPlaced = false;
+			player.settlementPlaced = false;
+
 			this.enableControls();
 		}
 		
