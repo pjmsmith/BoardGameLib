@@ -15,6 +15,7 @@ var Player = function(options) {
 		, ready: false
 		, hands: {} //hand type: array
 		, pieces: {} //piece type: count
+		, score: 0
 		, state: null
 	};
 	this.options = $.extend(this.options, options);

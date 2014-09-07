@@ -13,14 +13,97 @@ var GameBoard = function(options) {
 	delete this.options;
 };
 GameBoard.prototype = {
-	gameboard: '<style>.grain { fill:yellow; background-color:yellow; fill:url(#grainPattern) !important}\
+	/* Board Definition and Set-Up */
+	tileClasses: '<style>\
+					  .grain { fill:yellow; background-color:yellow; fill:url(#grainPattern) !important}\
 					  .sheep {fill:rgb(142,233,138) !important; background-color:rgb(142,233,138) ; fill:url(#sheepPattern) !important}\
 					  .wood {fill:green !important; background-color:green; fill:url(#woodPattern) !important}\
 					  .ore {fill:gray !important; background-color:gray; fill:url(#orePattern) !important}\
 					  .brick {fill:rgb(255, 143, 68) !important; background-color:rgb(255, 143, 68); fill:url(#brickPattern) !important}\
 					  .water {fill:blue !important; background-color:blue; fill:url(#waterPattern)}\
-					  .desert {fill:rgb(247,252,194) !important; background-color:yellow; fill:url(#desertPattern) !important}</style>\
-					  <svg width="80%" height="80%" viewBox="0 0 576 686.892119797275" xmlns="http://www.w3.org/2000/svg" version="1.1"> <defs xmlns="http://www.w3.org/2000/svg"> <pattern id="desertPattern" patternUnits="objectBoundingBox" width="1" height="1"><image xlink:href="/images/games/Catan/desert.jpg" x="0" y="0" width="150" height="150"/> </pattern> <pattern id="grainPattern" patternUnits="objectBoundingBox" width="1" height="1"><image xlink:href="/images/games/Catan/grain.jpg" x="0" y="0" width="325" height="325"/> </pattern> <pattern id="orePattern" patternUnits="objectBoundingBox" width="1" height="1"><image xlink:href="/images/games/Catan/ore.jpg" x="0" y="0" width="150" height="150"/> </pattern> <pattern id="woodPattern" patternUnits="objectBoundingBox" width="1" height="1"><image xlink:href="/images/games/Catan/wood.jpg" x="0" y="0" width="300" height="300"/> </pattern> <pattern id="sheepPattern" patternUnits="objectBoundingBox" width="1" height="1"><image xlink:href="/images/games/Catan/sheep.jpg" x="0" y="0" width="150" height="150"/> </pattern> <pattern id="brickPattern" patternUnits="objectBoundingBox" width="1" height="1"><image xlink:href="/images/games/Catan/brick.jpg" x="0" y="0" width="200" height="200"/> </pattern> </defs> <desc>Hex grid</desc> <g id="hexes"> <polygon id="h0" class="tile" style="fill:none;;" points="144,62.3538290724796 108.000000074612,124.707658101882 36.0000001492249,124.707658231114 0,62.3538293309447 35.9999997015502,1.72310052448665e-07 107.999999626938,-2.15387579771686e-07"/> <polygon id="h1" value="11" class="tile wood" style="fill:none;;" points="144,187.061487217439 108.000000074612,249.415316246841 36.0000001492249,249.415316376073 0,187.061487475904 35.9999997015502,124.707658317269 107.999999626938,124.707657929572"/> <polygon id="h2" value="4" class="tile brick" style="fill:none;;" points="144,311.769145362398 108.000000074612,374.1229743918 36.0000001492249,374.122974521033 0,311.769145620863 35.9999997015502,249.415316462228 107.999999626938,249.415316074531"/> <polygon id="h3" value="7" class="tile desert" style="fill:none;;" points="144,436.476803507357 108.000000074612,498.830632536759 36.0000001492249,498.830632665992 0,436.476803765822 35.9999997015502,374.122974607188 107.999999626938,374.12297421949"/> <polygon id="h4" class="tile" style="fill:none;;" points="144,561.184461652316 108.000000074612,623.538290681718 36.0000001492249,623.538290810951 0,561.184461910781 35.9999997015502,498.830632752147 107.999999626938,498.830632364449"/> <polygon id="h5" value="12" class="tile sheep" style="fill:none;;" points="252,124.707658144959 216.000000074612,187.061487174361 144.000000149225,187.061487303594 108,124.707658403424 143.99999970155,62.3538292447896 215.999999626938,62.353828857092"/> <polygon id="h6" value="6" class="tile ore" style="fill:none;;" points="252,249.415316289918 216.000000074612,311.76914531932 144.000000149225,311.769145448553 108,249.415316548383 143.99999970155,187.061487389749 215.999999626938,187.061487002051"/> <polygon id="h7" value="3" class="tile wood" style="fill:none;;" points="252,374.122974434877 216.000000074612,436.476803464279 144.000000149225,436.476803593512 108,374.122974693343 143.99999970155,311.769145534708 215.999999626938,311.76914514701"/> <polygon id="h8" value="8" class="tile brick" style="fill:none;;" points="252,498.830632579837 216.000000074612,561.184461609239 144.000000149225,561.184461738471 108,498.830632838302 143.99999970155,436.476803679667 215.999999626938,436.476803291969"/> <polygon id="h9" class="tile" style="fill:none;;" points="252,623.538290724796 216.000000074612,685.892119754198 144.000000149225,685.89211988343 108,623.538290983261 143.99999970155,561.184461824626 215.999999626938,561.184461436929"/> <polygon id="h10" value="9" class="tile grain" style="fill:none;;" points="360,62.3538290724796 324.000000074612,124.707658101882 252.000000149225,124.707658231114 216,62.3538293309447 251.99999970155,1.72310052448665e-07 323.999999626938,-2.15387579771686e-07"/> <polygon id="h11" value="5" class="tile brick" style="fill:none;;" points="360,187.061487217439 324.000000074612,249.415316246841 252.000000149225,249.415316376073 216,187.061487475904 251.99999970155,124.707658317269 323.999999626938,124.707657929572"/> <polygon id="h12" value="11" class="tile grain" style="fill:none;;" points="360,311.769145362398 324.000000074612,374.1229743918 252.000000149225,374.122974521033 216,311.769145620863 251.99999970155,249.415316462228 323.999999626938,249.415316074531"/> <polygon id="h13" value="10" class="tile sheep" style="fill:none;;" points="360,436.476803507357 324.000000074612,498.830632536759 252.000000149225,498.830632665992 216,436.476803765822 251.99999970155,374.122974607188 323.999999626938,374.12297421949"/> <polygon id="h14" value="5" class="tile ore" style="fill:none;;" points="360,561.184461652316 324.000000074612,623.538290681718 252.000000149225,623.538290810951 216,561.184461910781 251.99999970155,498.830632752147 323.999999626938,498.830632364449"/> <polygon id="h15" value="10" class="tile sheep" style="fill:none;;" points="468,124.707658144959 432.000000074612,187.061487174361 360.000000149225,187.061487303594 324,124.707658403424 359.99999970155,62.3538292447896 431.999999626938,62.353828857092"/> <polygon id="h16" value="4" class="tile wood" style="fill:none;;" points="468,249.415316289918 432.000000074612,311.76914531932 360.000000149225,311.769145448553 324,249.415316548383 359.99999970155,187.061487389749 431.999999626938,187.061487002051"/> <polygon id="h17" value="9" class="tile sheep" style="fill:none;;" points="468,374.122974434877 432.000000074612,436.476803464279 360.000000149225,436.476803593512 324,374.122974693343 359.99999970155,311.769145534708 431.999999626938,311.76914514701"/> <polygon id="h18" value="2" class="tile grain" style="fill:none;;" points="468,498.830632579837 432.000000074612,561.184461609239 360.000000149225,561.184461738471 324,498.830632838302 359.99999970155,436.476803679667 431.999999626938,436.476803291969"/> <polygon id="h19" class="tile" style="fill:none;;" points="468,623.538290724796 432.000000074612,685.892119754198 360.000000149225,685.89211988343 324,623.538290983261 359.99999970155,561.184461824626 431.999999626938,561.184461436929"/> <polygon id="h20" class="tile" style="fill:none;;" points="576,62.3538290724796 540.000000074612,124.707658101882 468.000000149225,124.707658231114 432,62.3538293309447 467.99999970155,1.72310052448665e-07 539.999999626938,-2.15387579771686e-07"/> <polygon id="h21" value="8" class="tile grain" style="fill:none;;" points="576,187.061487217439 540.000000074612,249.415316246841 468.000000149225,249.415316376073 432,187.061487475904 467.99999970155,124.707658317269 539.999999626938,124.707657929572"/> <polygon id="h22" value="3" class="tile ore" style="fill:none;;" points="576,311.769145362398 540.000000074612,374.1229743918 468.000000149225,374.122974521033 432,311.769145620863 467.99999970155,249.415316462228 539.999999626938,249.415316074531"/> <polygon id="h23" value="6" class="tile wood" style="fill:none;;" points="576,436.476803507357 540.000000074612,498.830632536759 468.000000149225,498.830632665992 432,436.476803765822 467.99999970155,374.122974607188 539.999999626938,374.12297421949"/> <polygon id="h24" class="tile" style="fill:none;;" points="576,561.184461652316 540.000000074612,623.538290681718 468.000000149225,623.538290810951 432,561.184461910781 467.99999970155,498.830632752147 539.999999626938,498.830632364449"/> </g> <g id="edges"> </g> <g id="vertices"> </g> <g id="tiles"> </g> </svg>',
+					  .desert {fill:rgb(247,252,194) !important; background-color:yellow; fill:url(#desertPattern) !important}\
+					</style>',
+					
+	gameboard: '\
+		<svg width="80%" height="80%" viewBox="0 0 576 686.892119797275" xmlns="http://www.w3.org/2000/svg" version="1.1"> \
+			<defs xmlns="http://www.w3.org/2000/svg"> \
+				<pattern id="desertPattern" patternUnits="objectBoundingBox" width="1" height="1">\
+					<image xlink:href="/images/games/Catan/desert.jpg" x="0" y="0" width="150" height="150"/>\
+				</pattern>\
+				<pattern id="grainPattern" patternUnits="objectBoundingBox" width="1" height="1">\
+					<image xlink:href="/images/games/Catan/grain.jpg" x="0" y="0" width="325" height="325"/>\
+				</pattern>\
+				<pattern id="orePattern" patternUnits="objectBoundingBox" width="1" height="1">\
+					<image xlink:href="/images/games/Catan/ore.jpg" x="0" y="0" width="150" height="150"/>\
+				</pattern>\
+				<pattern id="woodPattern" patternUnits="objectBoundingBox" width="1" height="1">\
+					<image xlink:href="/images/games/Catan/wood.jpg" x="0" y="0" width="300" height="300"/>\
+				</pattern>\
+				<pattern id="sheepPattern" patternUnits="objectBoundingBox" width="1" height="1">\
+					<image xlink:href="/images/games/Catan/sheep.jpg" x="0" y="0" width="150" height="150"/>\
+				</pattern>\
+				<pattern id="brickPattern" patternUnits="objectBoundingBox" width="1" height="1">\
+					<image xlink:href="/images/games/Catan/brick.jpg" x="0" y="0" width="200" height="200"/>\
+				</pattern>\
+			</defs>\
+			<desc>Hex grid</desc>\
+			<g id="hexes">\
+				<polygon id="h0" class="tile" style="fill:none;" points="144,62.3538290724796 108.000000074612,124.707658101882 36.0000001492249,124.707658231114 0,62.3538293309447 35.9999997015502,1.72310052448665e-07 107.999999626938,-2.15387579771686e-07"/>\
+				<polygon id="h1" value="" class="tile" style="fill:none;" points="144,187.061487217439 108.000000074612,249.415316246841 36.0000001492249,249.415316376073 0,187.061487475904 35.9999997015502,124.707658317269 107.999999626938,124.707657929572"/>\
+				<polygon id="h2" value="" class="tile" style="fill:none;" points="144,311.769145362398 108.000000074612,374.1229743918 36.0000001492249,374.122974521033 0,311.769145620863 35.9999997015502,249.415316462228 107.999999626938,249.415316074531"/>\
+				<polygon id="h3" value="" class="tile" style="fill:none;" points="144,436.476803507357 108.000000074612,498.830632536759 36.0000001492249,498.830632665992 0,436.476803765822 35.9999997015502,374.122974607188 107.999999626938,374.12297421949"/>\
+				<polygon id="h4" class="tile" style="fill:none;" points="144,561.184461652316 108.000000074612,623.538290681718 36.0000001492249,623.538290810951 0,561.184461910781 35.9999997015502,498.830632752147 107.999999626938,498.830632364449"/>\
+				<polygon id="h5" value="" class="tile" style="fill:none;" points="252,124.707658144959 216.000000074612,187.061487174361 144.000000149225,187.061487303594 108,124.707658403424 143.99999970155,62.3538292447896 215.999999626938,62.353828857092"/>\
+				<polygon id="h6" value="" class="tile" style="fill:none;" points="252,249.415316289918 216.000000074612,311.76914531932 144.000000149225,311.769145448553 108,249.415316548383 143.99999970155,187.061487389749 215.999999626938,187.061487002051"/>\
+				<polygon id="h7" value="" class="tile" style="fill:none;" points="252,374.122974434877 216.000000074612,436.476803464279 144.000000149225,436.476803593512 108,374.122974693343 143.99999970155,311.769145534708 215.999999626938,311.76914514701"/>\
+				<polygon id="h8" value="" class="tile" style="fill:none;" points="252,498.830632579837 216.000000074612,561.184461609239 144.000000149225,561.184461738471 108,498.830632838302 143.99999970155,436.476803679667 215.999999626938,436.476803291969"/>\
+				<polygon id="h9" class="tile" style="fill:none;;" points="252,623.538290724796 216.000000074612,685.892119754198 144.000000149225,685.89211988343 108,623.538290983261 143.99999970155,561.184461824626 215.999999626938,561.184461436929"/>\
+				<polygon id="h10" value="" class="tile" style="fill:none;" points="360,62.3538290724796 324.000000074612,124.707658101882 252.000000149225,124.707658231114 216,62.3538293309447 251.99999970155,1.72310052448665e-07 323.999999626938,-2.15387579771686e-07"/>\
+				<polygon id="h11" value="" class="tile" style="fill:none;" points="360,187.061487217439 324.000000074612,249.415316246841 252.000000149225,249.415316376073 216,187.061487475904 251.99999970155,124.707658317269 323.999999626938,124.707657929572"/>\
+				<polygon id="h12" value="" class="tile" style="fill:none;" points="360,311.769145362398 324.000000074612,374.1229743918 252.000000149225,374.122974521033 216,311.769145620863 251.99999970155,249.415316462228 323.999999626938,249.415316074531"/>\
+				<polygon id="h13" value="" class="tile" style="fill:none;" points="360,436.476803507357 324.000000074612,498.830632536759 252.000000149225,498.830632665992 216,436.476803765822 251.99999970155,374.122974607188 323.999999626938,374.12297421949"/>\
+				<polygon id="h14" value="" class="tile" style="fill:none;" points="360,561.184461652316 324.000000074612,623.538290681718 252.000000149225,623.538290810951 216,561.184461910781 251.99999970155,498.830632752147 323.999999626938,498.830632364449"/>\
+				<polygon id="h15" value="" class="tile" style="fill:none;" points="468,124.707658144959 432.000000074612,187.061487174361 360.000000149225,187.061487303594 324,124.707658403424 359.99999970155,62.3538292447896 431.999999626938,62.353828857092"/>\
+				<polygon id="h16" value="" class="tile" style="fill:none;" points="468,249.415316289918 432.000000074612,311.76914531932 360.000000149225,311.769145448553 324,249.415316548383 359.99999970155,187.061487389749 431.999999626938,187.061487002051"/>\
+				<polygon id="h17" value="" class="tile" style="fill:none;" points="468,374.122974434877 432.000000074612,436.476803464279 360.000000149225,436.476803593512 324,374.122974693343 359.99999970155,311.769145534708 431.999999626938,311.76914514701"/>\
+				<polygon id="h18" value="" class="tile" style="fill:none;" points="468,498.830632579837 432.000000074612,561.184461609239 360.000000149225,561.184461738471 324,498.830632838302 359.99999970155,436.476803679667 431.999999626938,436.476803291969"/>\
+				<polygon id="h19" class="tile" style="fill:none;" points="468,623.538290724796 432.000000074612,685.892119754198 360.000000149225,685.89211988343 324,623.538290983261 359.99999970155,561.184461824626 431.999999626938,561.184461436929"/>\
+				<polygon id="h20" class="tile" style="fill:none;" points="576,62.3538290724796 540.000000074612,124.707658101882 468.000000149225,124.707658231114 432,62.3538293309447 467.99999970155,1.72310052448665e-07 539.999999626938,-2.15387579771686e-07"/>\
+				<polygon id="h21" value="" class="tile" style="fill:none;" points="576,187.061487217439 540.000000074612,249.415316246841 468.000000149225,249.415316376073 432,187.061487475904 467.99999970155,124.707658317269 539.999999626938,124.707657929572"/>\
+				<polygon id="h22" value="" class="tile" style="fill:none;" points="576,311.769145362398 540.000000074612,374.1229743918 468.000000149225,374.122974521033 432,311.769145620863 467.99999970155,249.415316462228 539.999999626938,249.415316074531"/>\
+				<polygon id="h23" value="" class="tile" style="fill:none;" points="576,436.476803507357 540.000000074612,498.830632536759 468.000000149225,498.830632665992 432,436.476803765822 467.99999970155,374.122974607188 539.999999626938,374.12297421949"/>\
+				<polygon id="h24" class="tile" style="fill:none;" points="576,561.184461652316 540.000000074612,623.538290681718 468.000000149225,623.538290810951 432,561.184461910781 467.99999970155,498.830632752147 539.999999626938,498.830632364449"/>\
+			</g>\
+			<g id="edges">\
+			</g>\
+			<g id="vertices">\
+			</g>\
+			<g id="tiles">\
+			</g>\
+		</svg>',
+
+	hiddenTiles: ['h0', 'h4', 'h9', 'h19', 'h20', 'h24'],
+	tileLimits: {
+		 'grain': 4
+		,'ore': 3
+		,'sheep': 4
+		,'wood': 4
+		,'brick': 3
+		,'desert': 1
+	},
+	tileValues: {
+		 2: 1
+		,3: 2
+		,4: 2
+		,5: 2
+		,6: 2
+		,8: 2
+		,9: 2
+		,10: 2
+		,11: 2
+		,12: 1
+	},
+
 	
 	actions: {
 		 'placeSettlement': function(board, vid, player) {
@@ -85,14 +168,57 @@ GameBoard.prototype = {
 	},
 
 	render: function() {
-		$(this.element).html(this.gameboard);
-
+		this.renderBoard();
 		this.renderActions();
+		this.setupListeners();
+	 	this.showControls();
+	},
+
+	renderBoard: function(isRandom) {
+		$(this.element).html(this.tileClasses);
+		$(this.element).append(this.gameboard);
+
+		if (isRandom) {
+		//shuffle tiles
+			var tileList = [];
+			for (var tile in this.tileLimits) {
+				for (var i = 0; i < this.tileLimits[tile]; i++) {
+					tileList.push(tile);
+				}
+			}
+			tileList = Util.shuffle(tileList);
+
+			//shuffle numbers
+			var numberList = [];
+			for (var number in this.tileValues) {
+				for (var i = 0; i < this.tileValues[number]; i++) {
+					numberList.push(number);
+				}
+			}
+			numberList = Util.shuffle(numberList);
+
+			var self = this;
+			$('#hexes > polygon').each(function() {
+				var hexId = $(this).attr('id');
+				if (self.hiddenTiles.indexOf(hexId) < 0) {
+					var tileClass = tileList.pop();
+					$(this).attr('class', 'tile ' + tileClass);
+					if (tileClass !== 'desert') {
+						$(this).attr('value', numberList.pop());
+					}
+				}
+			});
+			//synchronize
+			if (this.activePlayer === this.playerNumber) {
+				/*this.game.connection.emit('doAction', {
+
+				});*/
+			}
+		}
+
 		this.createVertices(); 
 		this.createEdges();
 		this.renderTiles();
-		this.setupListeners();
-	 	this.showControls();
 	},
 
 	renderActions: function() {
@@ -228,7 +354,7 @@ GameBoard.prototype = {
 	placeSettlement: function() {
 		this.hideModals();
 		if (this.game.state === GameState.IDLE) {
-			Util.log('Waiting for player to place settlement...')
+			Util.log('Waiting for player to place settlement...');
 			this.disableControls();
 			
 			this.showPurchaseControls();
@@ -237,19 +363,22 @@ GameBoard.prototype = {
 			var self = this;
 			this.element.on('vertexClick',function(e,vid,player){
 				
-				if($('#'+vid).attr('class') == 'vertex unassigned')
-				{
-					$('#'+vid).attr('class','vertex ' + 'player' + player);
-					$('#vertices .unassigned').css('display','none');
-					self.element.off('vertexClick')
+				if ($('#' + vid).attr('class') == 'vertex unassigned') {
+					$('#' + vid).attr('class', 'vertex ' + 'player' + player);
+					$('#vertices .unassigned').css('display', 'none');
+					self.element.off('vertexClick');
 					self.enableControls();
 					self.hidePurchaseControls();
 					$('#actions').removeClass('hideActions');
 
-					self.game.connection.emit('doAction', {game: self.game.uniqueKey, action: 'placeSettlement', playerNumber: self.game.playerNumber, element: vid})
-				
+					self.game.connection.emit('doAction', {
+						  game: self.game.uniqueKey
+						, action: 'placeSettlement'
+						, playerNumber: self.game.playerNumber
+						, element: vid
+					});
 				} else {
-					alert('Location already chosen, select an unassigned spot ')
+					alert('Location already chosen, select an unassigned spot ');
 				}
 				
 			});
@@ -417,7 +546,12 @@ GameBoard.prototype = {
 					self.hidePurchaseControls();
 					$('#actions').removeClass('hideActions');
 					
-					self.game.connection.emit('doAction', {game: self.game.uniqueKey, action: 'placeRoad', playerNumber: self.game.playerNumber, element: eid});
+					self.game.connection.emit('doAction', {
+						 game: self.game.uniqueKey
+						,action: 'placeRoad'
+						,playerNumber: self.game.playerNumber
+						,element: eid
+					});
 					
 				} else {
 					alert('Location already chosen, select an unassigned spot ')
@@ -451,7 +585,7 @@ GameBoard.prototype = {
 
 	/* Game Board render functions */
 	renderTiles: function() {
-		//--------draw tile value inside each hex
+		// draw tile value inside each hex
 		Util.log('rendering tile values...');
 		var tileCount = 0;
 		var self = this;
@@ -459,42 +593,39 @@ GameBoard.prototype = {
 			if($(this).attr('value')) {
 				tileCount++;
 				var hexPoints = $(this).attr('points').split(' ');
-				for(var p in hexPoints){
+				for(var p in hexPoints) {
 					hexPoints[p] = hexPoints[p].split(',');
 					hexPoints[p][0] = parseInt(hexPoints[p][0]);
 					hexPoints[p][1] = parseInt(hexPoints[p][1]);
 				}
-				//Util.log(hexPoints)
+
 				var center = self.findCenterOfPolygon(hexPoints);
-				//Util.log(center)
-				var textColor = 'white'
+
+				var textColor = 'white';
 				if($(this).attr('value') == 6 || $(this).attr('value') == 8) {
-					textColor = 'red'
+					textColor = 'red';
 				}
 				
-				var tileContents = $(this).attr('value')
+				var tileContents = $(this).attr('value');
 				if(tileContents == '7') {
-					tileContents = '&#8226;'
+					tileContents = '&#8226;';
 				}
 				
-				//----Render off screen to get width and use it to center text
-				$('#tiles').append('<text id="t'+tileCount+'" x="-1000" y="1000" fill="'+textColor+'">'+tileContents+'</text>');
+				// Render off screen to get width and use it to center text
+				$('#tiles').append('<text id="t' + tileCount + '" x="-1000" y="1000" fill="' + textColor + '">' + tileContents + '</text>');
 				self.element.html(self.element.html()); //hack to allow jquery to render elements
 				
-				//Util.log($('#t"+tileCount).width())
-				//Util.log(document.getElementById('t"+tileCount).getBoundingClientRect())
-				
-				var textDimensions = document.getElementById('t'+tileCount).getBoundingClientRect();
+				var textDimensions = document.getElementById('t' + tileCount).getBoundingClientRect();
 									
 				var CONSTANT_X = parseInt(textDimensions.width / 2); //half of text width
 				var CONSTANT_Y = +7; //parseInt(textDimensions.height / 2)
 				
-				$('#t'+tileCount).attr('x', (center[0] - CONSTANT_X)).attr('y', center[1] + CONSTANT_Y);
+				$('#t' + tileCount).attr('x', (center[0] - CONSTANT_X)).attr('y', center[1] + CONSTANT_Y);
 			}
 		});
 		this.element.html(this.element.html()); //hack to allow jquery to manipulate SVG elements
 	
-		Util.log('rendered '+tileCount+' tiles');
+		Util.log('rendered ' + tileCount + ' tiles');
 		
 		//-------draw tile type
 		//TODO Desert, water, ore, brick, wood, etc...
@@ -533,16 +664,17 @@ GameBoard.prototype = {
 		});
 		this.element.html(this.element.html()); //hack to allow jquery to manipulate SVG elements
 		
-		Util.log('finished making '+totalEdgesCreated+' edges...')
+		Util.log('finished making ' + totalEdgesCreated + ' edges...');
 		
 	},
 	
 	createVertices: function() {
 		Util.log('generating verts...')
 		var vertCount = 0;
-		$('.tile').each(function(){
+		var self = this;
+		$('.tile').each(function() {
 			tid = $(this).attr('id')
-			if( tid != 'h0' && tid != 'h4' && tid != 'h9' && tid != 'h19' && tid != 'h20' && tid != 'h24' ) { //ignore hidden tiles
+			if(self.hiddenTiles.indexOf(tid) < 0) { //ignore hidden tiles
 				var tileVertsString = $(this).attr('points');
 				var tileVerts = tileVertsString.split(' ');
 			
@@ -550,7 +682,7 @@ GameBoard.prototype = {
 					var xY = tileVerts[v].split(',');
 					
 					var duplicateVertex = false
-					$('.vertex').each(function(){
+					$('.vertex').each(function() {
 						if($(this).attr('cx') == Math.round(parseFloat(xY[0])) && $(this).attr('cy') == Math.round(parseFloat(xY[1]))) {
 							duplicateVertex = true;
 							return false;
@@ -570,25 +702,25 @@ GameBoard.prototype = {
 	},
 	
 	edgeClicked: function(edgeThis) {
-		Util.log($(edgeThis).attr('id'))
+		Util.log($(edgeThis).attr('id'));
 	
 		var pNumber = this.game.playerNumber; // current player
 	
-		this.element.trigger('edgeClick',[$(edgeThis).attr('id'),pNumber]);
+		this.element.trigger('edgeClick', [$(edgeThis).attr('id'), pNumber]);
 	},
 	
 	vertexClicked: function(vertexThis) {
-		Util.log($(vertexThis).attr('id'))
+		Util.log($(vertexThis).attr('id'));
 	
 		var pNumber = this.game.playerNumber; // current player
 	
-		this.element.trigger('vertexClick',[$(vertexThis).attr('id'),pNumber]);
+		this.element.trigger('vertexClick', [$(vertexThis).attr('id'), pNumber]);
 	},
 	
 	//UTILITY FUNCTIONS:
 	
 	hideModalHack: function() {
-		$('#purchase_modal').removeClass('show_modal')
+		$('#purchase_modal').removeClass('show_modal');
 	},
 	
 	findCenterOfPolygon: function(coords) {
@@ -602,13 +734,13 @@ GameBoard.prototype = {
 	
 		var center = function(arr){
 		    var minX, maxX, minY, maxY;
-		    for(var i=0; i< arr.length; i++){
+		    for(var i=0; i< arr.length; i++) {
 		        minX = (arr[i][0] < minX || minX == null) ? arr[i][0] : minX;
 		        maxX = (arr[i][0] > maxX || maxX == null) ? arr[i][0] : maxX;
 		        minY = (arr[i][1] < minY || minY == null) ? arr[i][1] : minY;
 		        maxY = (arr[i][1] > maxY || maxY == null) ? arr[i][1] : maxY;
 		    }
-		    return [(minX + maxX) /2, (minY + maxY) /2];
+		    return [(minX + maxX) / 2, (minY + maxY) / 2];
 		}
 		var c = center(coords);
 		return c;	
