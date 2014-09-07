@@ -33,12 +33,19 @@ Player.prototype = {
 	},
 
 	displayHand: function(type, sorted) {
+		if (this.handDisplayed && this.handDisplayed === type) {
+			this.hideHand(this.handDisplayed);
+			return;
+		}
+		if (this.handDisplayed !== type) {
+			this.hideHand(this.handDisplayed);
+		}
 		if ($(this.game.element).length) {
 			if (!$('#hand' + type).length) {
 				this.game.element.append('<div id="hand' + type + '" class="hand"></div>');
 			}
 			var hand = $('#hand' + type);
-			hand.html();
+			hand.empty();
 			if (typeof this.hands[type] !== 'undefined') {
 				if (sorted) {
 					this.hands[type].sort();
@@ -48,14 +55,17 @@ Player.prototype = {
 					hand.css({'margin-left': '-' + (hand.outerWidth()/2) + 'px'})
 				}
 			}
+			this.handDisplayed = type;
+			$('#hand' + type).fadeIn('fast');
 		}
 	},
 
 	hideHand: function(type) {
-		if (!$('#hand' + type)) {
+		if (!$('#hand' + type).length) {
 			this.game.element.append('<div id="hand' + type + '"></div>');
 		}
 		$('#hand' + type).fadeOut('fast');
+		this.handDisplayed = null;
 	},
 
 	addCard: function(hand, card) {

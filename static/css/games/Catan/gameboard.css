@@ -205,6 +205,7 @@ var ResourceType = {
 	box-shadow: -5px 5px 10px black;
 	display: inline-block;
 	position: relative;
+	background-size: 100% 100% !important;
 }
 
 .card-1-1 {
@@ -232,8 +233,20 @@ var ResourceType = {
 }
 
 .card-2-2 {
-	background: url('/images/games/Catan/victorypoint.jpg');
+	background: url('/images/games/Catan/victorypoint_1.jpg');
+}/*
+.card-2-2-2 {
+	background: url('/images/games/Catan/victorypoint_2.jpg');
 }
+.card-2-2-3 {
+	background: url('/images/games/Catan/victorypoint_3.jpg');
+}
+.card-2-2-4 {
+	background: url('/images/games/Catan/victorypoint_4.jpg');
+}
+.card-2-2-5 {
+	background: url('/images/games/Catan/victorypoint_5.jpg');
+}*/
 
 .card-2-3 {
 	background: url('/images/games/Catan/monopoly.jpg');

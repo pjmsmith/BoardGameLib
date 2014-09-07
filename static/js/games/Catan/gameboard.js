@@ -260,8 +260,6 @@ GameBoard.prototype = {
 				<input id="placeCity_button" value="Settlement" type="button">\
 				<input id="upgradeSettle_button" value="City" type="button">\
 				<input id="buyDevCard_button" value="Dev. Card" type="button">\
-				<input id="showResources" value="Resources" type="button"/>\
-				<input id="showDevCards" value="Dev Cards" type="button"/>\
 			</div>');
 		var self = this;
 		$('#purchase_button').click(function(){
@@ -285,6 +283,8 @@ GameBoard.prototype = {
 				<div id="controls"> \
 					<input id="showHideCards_button" value="Cards" type="button" style="display:none;">\
 					<input id="showActions_button" value="Actions" type="button">\
+					<input id="showResources" value="Resources" type="button"/>\
+					<input id="showDevCards" value="Dev Cards" type="button"/>\
 				</div>\
 				<input id="endTurn_button" value="End Turn" type="button">\
 				<div id="purchaseControls">\
@@ -317,6 +317,22 @@ GameBoard.prototype = {
 			
 			$('#cancelAction_button').fastButton(function(){
 				self.cancelAction();
+			});
+
+			$('#showResources').click(function() {
+				self.game.players[self.game.playerNumber].displayHand(DeckType.RESOURCE, true);
+			});
+
+			$('#showDevCards').click(function() {
+				self.game.players[self.game.playerNumber].displayHand(DeckType.DEVELOPMENT, true);
+			});
+
+			$('#showResources').fastButton(function() {
+				self.game.players[self.game.playerNumber].displayHand(DeckType.RESOURCE, true);
+			});
+
+			$('#showDevCards').fastButton(function() {
+				self.game.players[self.game.playerNumber].displayHand(DeckType.DEVELOPMENT, true);
 			});
 		}
 		$('#controls').css('display','block');
@@ -359,11 +375,8 @@ GameBoard.prototype = {
 			self.placeRoadMode();
 		});
 		
-		$('#endTurn_button').click(function(){
-			Util.log('not connected');
-		});
-		
 		Util.log('set up button listeners');
+
 		this.game.connection.on('applyAction', function(data) {
 			self.actions[data.action](self, data.element, data.playerNumber, data.args);
 		});
@@ -386,13 +399,12 @@ GameBoard.prototype = {
 		if (this.game.state === GameState.IDLE) {
 			Util.log('Waiting for player to place settlement...');
 			this.disableControls();
-			
+
 			this.showPurchaseControls();
 			
 			$('#vertices .unassigned').css('display','block');
 			var self = this;
 			this.element.on('vertexClick',function(e,vid,player){
-				
 				if ($('#' + vid).attr('class') == 'vertex unassigned') {
 					$('#' + vid).attr('class', 'vertex ' + 'player' + player);
 					$('#vertices .unassigned').css('display', 'none');
@@ -410,7 +422,6 @@ GameBoard.prototype = {
 				} else {
 					alert('Location already chosen, select an unassigned spot ');
 				}
-				
 			});
 		}
 	},
@@ -661,9 +672,6 @@ GameBoard.prototype = {
 		this.element.html(this.element.html()); //hack to allow jquery to manipulate SVG elements
 	
 		Util.log('rendered ' + tileCount + ' tiles');
-		
-		//-------draw tile type
-		//TODO Desert, water, ore, brick, wood, etc...
 	},
 	
 	createEdges: function() {
@@ -752,7 +760,7 @@ GameBoard.prototype = {
 		this.element.trigger('vertexClick', [$(vertexThis).attr('id'), pNumber]);
 	},
 	
-	//UTILITY FUNCTIONS:
+	/* Utility Functions */
 	
 	hideModalHack: function() {
 		$('#purchase_modal').removeClass('show_modal');
