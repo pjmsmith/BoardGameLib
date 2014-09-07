@@ -277,7 +277,6 @@ GameBoard.prototype = {
 		});
 	
 		$('#placeRoad_button').click(function() {
-			debugger;
 			self.placeRoadMode();
 		});
 		$('#placeRoad_button').fastButton(function() {
@@ -387,34 +386,32 @@ GameBoard.prototype = {
 		
 	placeSettlement: function() {
 		this.hideModals();
-		if (this.game.state === GameState.IDLE) {
-			Util.log('Waiting for player to place settlement...');
-			this.disableControls();
+		Util.log('Waiting for player to place settlement...');
+		this.disableControls();
 
-			this.showPurchaseControls();
-			
-			$('#vertices .unassigned').css('display','block');
-			var self = this;
-			this.element.on('vertexClick',function(e, vid, player) {
-				if ($('#' + vid).attr('class') == 'vertex unassigned') {
-					$('#' + vid).attr('class', 'vertex ' + 'player' + player);
-					$('#vertices .unassigned').css('display', 'none');
-					self.element.off('vertexClick');
-					self.enableControls();
-					self.hidePurchaseControls();
-					$('#actions').removeClass('hideActions');
+		this.showPurchaseControls();
+		
+		$('#vertices .unassigned').css('display','block');
+		var self = this;
+		this.element.on('vertexClick',function(e, vid, player) {
+			if ($('#' + vid).attr('class') == 'vertex unassigned') {
+				$('#' + vid).attr('class', 'vertex ' + 'player' + player);
+				$('#vertices .unassigned').css('display', 'none');
+				self.element.off('vertexClick');
+				self.enableControls();
+				self.hidePurchaseControls();
+				$('#actions').removeClass('hideActions');
 
-					self.game.connection.emit('doAction', {
-						  game: self.game.uniqueKey
-						, action: 'placeSettlement'
-						, playerNumber: self.game.playerNumber
-						, element: vid
-					});
-				} else {
-					alert('Location already chosen, select an unassigned spot ');
-				}
-			});
-		}
+				self.game.connection.emit('doAction', {
+					  game: self.game.uniqueKey
+					, action: 'placeSettlement'
+					, playerNumber: self.game.playerNumber
+					, element: vid
+				});
+			} else {
+				alert('Location already chosen, select an unassigned spot ');
+			}
+		});
 	},
 
 	startPlayerTurn: function() {
@@ -572,34 +569,31 @@ GameBoard.prototype = {
 	
 	placeRoadMode: function(){
 		this.hideModals();
-		if (this.game.state === GameState.IDLE) {
-			Util.log('Waiting for player to place road...');
-			this.disableControls();
-			this.showPurchaseControls();
-			$('#edges .unassigned').css('display','block');
-			var self = this;	
-			this.element.on('edgeClick',function(e,eid,player){
-				if($('#'+eid).attr('class') == 'edge unassigned') {
-					$('#'+eid).attr('class','edge '+'player'+player);
-					$('#edges .unassigned').css('display','none');
-					self.element.off('edgeClick');
-					self.enableControls();
-					self.hidePurchaseControls();
-					$('#actions').removeClass('hideActions');
-					
-					self.game.connection.emit('doAction', {
-						 game: self.game.uniqueKey
-						,action: 'placeRoad'
-						,playerNumber: self.game.playerNumber
-						,element: eid
-					});
-					
-				} else {
-					alert('Location already chosen, select an unassigned spot ')
-				}
-			});
-		}
-	},
+		Util.log('Waiting for player to place road...');
+		this.disableControls();
+		this.showPurchaseControls();
+		$('#edges .unassigned').css('display','block');
+		var self = this;	
+		this.element.on('edgeClick',function(e,eid,player){
+			if($('#'+eid).attr('class') == 'edge unassigned') {
+				$('#'+eid).attr('class','edge '+'player'+player);
+				$('#edges .unassigned').css('display','none');
+				self.element.off('edgeClick');
+				self.enableControls();
+				self.hidePurchaseControls();
+				$('#actions').removeClass('hideActions');
+				
+				self.game.connection.emit('doAction', {
+					 game: self.game.uniqueKey
+					,action: 'placeRoad'
+					,playerNumber: self.game.playerNumber
+					,element: eid
+				});
+				
+			} else {
+				alert('Location already chosen, select an unassigned spot ')
+			}
+		});	},
 	
 	cancelAction: function() {
 		this.element.off('edgeClick');
