@@ -189,13 +189,15 @@ var ResourceType = {
 	border: 1px solid black;
 	position: absolute;
 	margin-top: -75px;
+	padding-left: 70px;
 }
 
 .card {
-	width: 50px;
+	width: 70px;
 	height: 100px;
 	top: 50%;
 	margin-top: -50px;
+	margin-left: -50px;
 	border-radius: 5px;
 	background-color: white;
 	border: 1px solid black;
@@ -217,7 +219,7 @@ var ResourceType = {
 }
 
 .card-1-4 {
-	background: url('/images/games/Catan/wheat.jpg');
+	background: url('/images/games/Catan/grain.jpg');
 }
 
 .card-1-5 {

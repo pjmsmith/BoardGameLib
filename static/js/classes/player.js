@@ -39,8 +39,9 @@ Player.prototype = {
 			var hand = $('#hand' + type);
 			hand.html();
 			if (typeof this.hands[type] !== 'undefined') {
+				this.hands[type].sort();
 				for (var i = 0; i < this.hands[type].length; i++) {
-					hand.append('<div class="card card-' + type + '-' + this.hands[type][i] + '" style="margin-left: ' + (i * 10 ) + 'px"></div>');
+					hand.append('<div class="card card-' + type + '-' + this.hands[type][i] + '"></div>');
 					hand.css({'margin-left': '-' + (hand.outerWidth()/2) + 'px'})
 				}
 			}

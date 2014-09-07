@@ -129,10 +129,6 @@
 		"side_bar_visible": false,
 		"status_bar_visible": false
 	},
-	"expanded_folders":
-	[
-		"/C/Users/Patrick's Desktop/Box Sync/catanclone"
-	],
 	"file_history":
 	[
 		"/C/Program Files (x86)/Steam/steamapps/common/Kerbal Space Program/GameData/LICENSE.md",
@@ -213,13 +209,6 @@
 		"whole_word": false,
 		"wrap": true
 	},
-	"folders":
-	[
-		{
-			"follow_symlinks": true,
-			"path": "C:\\Users\\Patrick's Desktop\\Box Sync\\catanclone"
-		}
-	],
 	"groups":
 	[
 		{
