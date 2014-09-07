@@ -13,6 +13,8 @@ var GameBoard = function(options) {
 	delete this.options;
 };
 GameBoard.prototype = {
+	timeout: {},
+	
 	/* Board Definition and Set-Up */
 	tileClasses: '<style>\
 					  .grain {fill:yellow; background-color:yellow; fill:url(#grainPattern) !important;}\
@@ -166,10 +168,10 @@ GameBoard.prototype = {
 			}
 			$('#dice').val(args.value);
 			$('#dice').fadeIn('fast');
-			if (board.timeout) {
-				clearTimeout(board.timeout);
+			if (board.timeout['dice']) {
+				clearTimeout(board.timeout['dice']);
 			}
-			board.timeout = setTimeout(function() {
+			board.timeout['dice'] = setTimeout(function() {
 				$('#dice').fadeOut('slow');
 			}, 3000);
 		}
@@ -484,8 +486,8 @@ GameBoard.prototype = {
 	purchaseDevelopmentCard: function() {
 		//1 sheep, 1 ore, 1 wheat
 		if (this.game.activePlayer === this.game.playerNumber) {
-			if (this.timeout) {
-				clearTimeout(this.timeout);
+			if (this.timeout['hideHand']) {
+				clearTimeout(this.timeout['hideHand']);
 			}
 			var player = this.game.players[this.game.playerNumber];
 			var devCardDeck = this.game.decks[DeckType.DEVELOPMENT];
@@ -493,7 +495,7 @@ GameBoard.prototype = {
 			player.addCard(DeckType.DEVELOPMENT, card);
 			player.displayHand(DeckType.DEVELOPMENT);
 			
-			this.timeout = setTimeout(function() {
+			this.timeout['hideHand'] = setTimeout(function() {
 				player.hideHand(DeckType.DEVELOPMENT);
 			}, 2000);
 			Util.log(devCardDeck.length + ' dev cards left');
@@ -506,8 +508,8 @@ GameBoard.prototype = {
 	startPlayerTurn: function() {
 		this.disableBuildControls();
 
-		if (this.timeout) {
-			clearTimeout(this.timeout);
+		if (this.timeout['dice']) {
+			clearTimeout(this.timeout['dice']);
 		}
 		$('#actions').addClass('hideActions');
 		Util.log(this.game.state);
@@ -539,10 +541,10 @@ GameBoard.prototype = {
 							value: result
 						}
 					});
-					if (self.timeout) {
-						clearTimeout(self.timeout);
+					if (self.timeout['dice']) {
+						clearTimeout(self.timeout['dice']);
 					}
-					self.timeout = setTimeout(function() {
+					self.timeout['dice'] = setTimeout(function() {
 						dice.fadeOut('slow');
 					}, 3000);
 					
