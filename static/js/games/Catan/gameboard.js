@@ -106,7 +106,7 @@ GameBoard.prototype = {
 	},
 	
 	actions: {
-		 'placeSettlement': function(board, vid, player) {
+		 placeSettlement: function(board, vid, player) {
 		 	Util.log('place settlement: ' + vid + '; ' + player);
 			if($('#' + vid).attr('class') == 'vertex unassigned') {
 				$('#' + vid).attr('class','vertex ' + 'player' + player);
@@ -114,7 +114,7 @@ GameBoard.prototype = {
 				$('#' + vid).show();
 			}
 		}
-		,'placeRoad': function(board, eid, player) {
+		,placeRoad: function(board, eid, player) {
 			Util.log('place road: ' + eid + '; ' + player);
 			if($('#' + eid).attr('class') == 'edge unassigned') {
 				$('#' + eid).attr('class','edge '+ 'player' + player)
@@ -122,7 +122,7 @@ GameBoard.prototype = {
 				$('#' + eid).show();
 			}
 		}
-		,'syncBoard': function(board, el, player, args) {
+		,syncBoard: function(board, el, player, args) {
 			if (board.game.playerNumber !== player) {
 				Util.log('Syncing game board tiles');
 				var tileList = args.tiles;
@@ -151,16 +151,16 @@ GameBoard.prototype = {
 				}
 			}
 		}
-		,'updatePlayerResources': function(board, el, player, args) {
+		,updatePlayerResources: function(board, el, player, args) {
 			if (typeof args.players[board.game.playerNumber] !== 'undefined') {
 				Util.log('Discard ' + args.players[board.game.playerNumber] + ' cards');
 			}
 		}
-		,'updateDeck': function(board, el, player, args) {
+		,updateDeck: function(board, el, player, args) {
 			board.game.decks[args.deckType] = args.deck;
 			Util.log('Updating deck to match player ' + player);
 		}
-		,'showRoll': function(board, el, player, args) {
+		,showRoll: function(board, el, player, args) {
 			if (!$('#dice').length) {
 				board.element.append('<input type="button" id="dice" />');
 			}
@@ -173,7 +173,7 @@ GameBoard.prototype = {
 				$('#dice').fadeOut('slow');
 			}, 3000);
 		}
-		,'endTurn': function(board, el, player, args) {
+		,endTurn: function(board, el, player, args) {
 			Util.log('endTurn: next player ' + player);
 			board.game.activePlayer = player;
 			board.game.state = args.state;
@@ -283,6 +283,20 @@ GameBoard.prototype = {
 			self.placeRoadMode();
 		});
 		
+		$('#upgradeSettle_button').click(function() {
+			self.placeCity();
+		});
+		$('#upgradeSettle_button').fastButton(function() {
+			self.placeCity();
+		});
+
+		$('#buyDevCard_button').click(function() {
+			self.purchaseDevelopmentCard();
+		});
+		$('#buyDevCard_button').fastButton(function() {
+			self.purchaseDevelopmentCard();
+		});
+
 	},
 
 	showControls: function(reRender) {
@@ -313,7 +327,6 @@ GameBoard.prototype = {
 		$('#showActions_button').click(function() {
 			$('#actions').toggleClass('hideActions');
 		});
-		
 		$('#showActions_button').fastButton(function() {
 			$('#actions').toggleClass('hideActions');
 		});
@@ -321,25 +334,42 @@ GameBoard.prototype = {
 		$('#cancelAction_button').click(function() {
 			self.cancelAction();
 		});
-		
 		$('#cancelAction_button').fastButton(function() {
 			self.cancelAction();
 		});
 
 		$('#showResources').click(function() {
-			self.game.players[self.game.playerNumber].displayHand(DeckType.RESOURCE, true);
+			var player = self.game.players[self.game.playerNumber];
+			if (player.handDisplayed === DeckType.RESOURCE) {
+				player.hideHand(DeckType.RESOURCE);
+			} else {
+				player.displayHand(DeckType.RESOURCE, true);
+			}
+		});
+		$('#showResources').fastButton(function() {
+			var player = self.game.players[self.game.playerNumber];
+			if (player.handDisplayed === DeckType.RESOURCE) {
+				player.hideHand(DeckType.RESOURCE);
+			} else {
+				player.displayHand(DeckType.RESOURCE, true);
+			}
 		});
 
 		$('#showDevCards').click(function() {
-			self.game.players[self.game.playerNumber].displayHand(DeckType.DEVELOPMENT, true);
+			var player = self.game.players[self.game.playerNumber];
+			if (player.handDisplayed === DeckType.DEVELOPMENT) {
+				player.hideHand(DeckType.DEVELOPMENT);
+			} else {
+				player.displayHand(DeckType.DEVELOPMENT, false);
+			}
 		});
-
-		$('#showResources').fastButton(function() {
-			self.game.players[self.game.playerNumber].displayHand(DeckType.RESOURCE, true);
-		});
-
 		$('#showDevCards').fastButton(function() {
-			self.game.players[self.game.playerNumber].displayHand(DeckType.DEVELOPMENT, true);
+			var player = self.game.players[self.game.playerNumber];
+			if (player.handDisplayed === DeckType.DEVELOPMENT) {
+				player.hideHand(DeckType.DEVELOPMENT);
+			} else {
+				player.displayHand(DeckType.DEVELOPMENT, false);
+			}
 		});
 	},
 
@@ -385,6 +415,8 @@ GameBoard.prototype = {
 	},
 		
 	placeSettlement: function() {
+		//1 brick, 1 wood, 1 wheat, 1 sheep
+
 		this.hideModals();
 		Util.log('Waiting for player to place settlement...');
 		this.disableControls();
@@ -414,17 +446,64 @@ GameBoard.prototype = {
 		});
 	},
 
+	placeRoadMode: function(){
+		//1 brick, 1 wood
+
+		this.hideModals();
+		Util.log('Waiting for player to place road...');
+		this.disableControls();
+		this.showPurchaseControls();
+		$('#edges .unassigned').css('display','block');
+		var self = this;	
+		this.element.on('edgeClick',function(e,eid,player){
+			if($('#'+eid).attr('class') == 'edge unassigned') {
+				$('#'+eid).attr('class','edge '+'player'+player);
+				$('#edges .unassigned').css('display','none');
+				self.element.off('edgeClick');
+				self.enableControls();
+				self.hidePurchaseControls();
+				$('#actions').removeClass('hideActions');
+				
+				self.game.connection.emit('doAction', {
+					 game: self.game.uniqueKey
+					,action: 'placeRoad'
+					,playerNumber: self.game.playerNumber
+					,element: eid
+				});
+				
+			} else {
+				alert('Location already chosen, select an unassigned spot ')
+			}
+		});
+	},
+
+	placeCity: function() {
+		//2 wheat, 3 ore
+	},
+
+	purchaseDevelopmentCard: function() {
+		//1 sheep, 1 ore, 1 wheat
+		if (this.game.activePlayer === this.game.playerNumber) {
+			if (this.timeout) {
+				clearTimeout(this.timeout);
+			}
+			var player = this.game.players[this.game.playerNumber];
+			var devCardDeck = this.game.decks[DeckType.DEVELOPMENT];
+			player.addCard(DeckType.DEVELOPMENT, devCardDeck.pop());
+			player.displayHand(DeckType.DEVELOPMENT);
+			
+			this.timeout = setTimeout(function() {
+				player.hideHand(DeckType.DEVELOPMENT);
+			}, 2000);
+			Util.log(devCardDeck.length);
+			if (this.game.decks[DeckType.DEVELOPMENT].length <= 0) {
+				$('#buyDevCard_button').attr('disabled', 'disabled');
+			}
+		}
+	},
+
 	startPlayerTurn: function() {
 		this.disableBuildControls();
-		this.game.players[this.game.playerNumber].addCard(DeckType.RESOURCE, ResourceType.SHEEP);
-		this.game.players[this.game.playerNumber].addCard(DeckType.RESOURCE, ResourceType.ORE);
-		this.game.players[this.game.playerNumber].addCard(DeckType.RESOURCE, ResourceType.WOOD);
-		this.game.players[this.game.playerNumber].addCard(DeckType.RESOURCE, ResourceType.WHEAT);
-		this.game.players[this.game.playerNumber].addCard(DeckType.RESOURCE, ResourceType.ORE);
-		this.game.players[this.game.playerNumber].addCard(DeckType.RESOURCE, ResourceType.WOOD);
-		this.game.players[this.game.playerNumber].addCard(DeckType.RESOURCE, ResourceType.BRICK);
-		this.game.players[this.game.playerNumber].addCard(DeckType.DEVELOPMENT, CardType.KNIGHT);
-
 
 		//ensure everyone has the same deck of development cards in the same order; might be better to add a sync function on the server instead
 		this.game.connection.emit('doAction', {
@@ -566,34 +645,6 @@ GameBoard.prototype = {
 	produceResources: function(value) {
 		Util.log('Producing resources for ' + value);
 	},
-	
-	placeRoadMode: function(){
-		this.hideModals();
-		Util.log('Waiting for player to place road...');
-		this.disableControls();
-		this.showPurchaseControls();
-		$('#edges .unassigned').css('display','block');
-		var self = this;	
-		this.element.on('edgeClick',function(e,eid,player){
-			if($('#'+eid).attr('class') == 'edge unassigned') {
-				$('#'+eid).attr('class','edge '+'player'+player);
-				$('#edges .unassigned').css('display','none');
-				self.element.off('edgeClick');
-				self.enableControls();
-				self.hidePurchaseControls();
-				$('#actions').removeClass('hideActions');
-				
-				self.game.connection.emit('doAction', {
-					 game: self.game.uniqueKey
-					,action: 'placeRoad'
-					,playerNumber: self.game.playerNumber
-					,element: eid
-				});
-				
-			} else {
-				alert('Location already chosen, select an unassigned spot ')
-			}
-		});	},
 	
 	cancelAction: function() {
 		this.element.off('edgeClick');

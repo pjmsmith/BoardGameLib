@@ -137,6 +137,10 @@ text {
 	width:100%;
 }
 
+#actions {
+	z-index: 30;
+}
+
 #dice {
 	background-color: white;
 	height: 80px;

@@ -33,12 +33,8 @@ Player.prototype = {
 	},
 
 	displayHand: function(type, sorted) {
-		if (this.handDisplayed) {
-			var visibleHand = this.handDisplayed;
-			this.hideHand(visibleHand);
-			if (visibleHand === type) {
-				return;
-			}
+		if (this.handDisplayed && this.handDisplayed !== type) {
+			this.hideHand(this.handDisplayed);
 		}
 		if ($(this.game.element).length) {
 			if (!$('#hand' + type).length) {
@@ -62,9 +58,6 @@ Player.prototype = {
 
 	hideHand: function(type) {
 		if (type) {
-			if (!$('#hand' + type).length) {
-				this.game.element.append('<div id="hand' + type + '"></div>');
-			}
 			$('#hand' + type).fadeOut('fast');
 		}
 		this.handDisplayed = null;
