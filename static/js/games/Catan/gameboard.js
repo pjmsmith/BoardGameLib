@@ -108,18 +108,18 @@ GameBoard.prototype = {
 	actions: {
 		 'placeSettlement': function(board, vid, player) {
 		 	Util.log('place settlement: ' + vid + '; ' + player);
-			if($('#'+vid).attr('class') == 'vertex unassigned') {
-				$('#'+vid).attr('class','vertex '+'player'+player);
+			if($('#' + vid).attr('class') == 'vertex unassigned') {
+				$('#' + vid).attr('class','vertex ' + 'player' + player);
 				$('#vertices .unassigned').css('display','none');
-				$('#'+vid).show();
+				$('#' + vid).show();
 			}
 		}
 		,'placeRoad': function(board, eid, player) {
 			Util.log('place road: ' + eid + '; ' + player);
-			if($('#'+eid).attr('class') == 'edge unassigned') {
-				$('#'+eid).attr('class','edge '+ 'player'+player)
+			if($('#' + eid).attr('class') == 'edge unassigned') {
+				$('#' + eid).attr('class','edge '+ 'player' + player)
 				$('#edges .unassigned').css('display','none');
-				$('#'+eid).show();
+				$('#' + eid).show();
 			}
 		}
 		,'syncBoard': function(board, el, player, args) {
@@ -142,6 +142,13 @@ GameBoard.prototype = {
 					}
 				});
 				board.renderTiles();
+				//rebind events
+				board.setupListeners();
+				board.renderActions();
+				board.renderControls();
+				if (board.game.playerNumber !== board.game.activePlayer) {
+					board.disableBuildControls();
+				}
 			}
 		}
 		,'updatePlayerResources': function(board, el, player, args) {
@@ -193,7 +200,7 @@ GameBoard.prototype = {
 		this.renderBoard(this.randomBoard);
 		this.renderActions();
 		this.setupListeners();
-	 	this.showControls();
+		this.renderControls();
 	},
 
 	renderBoard: function(isRandom) {
@@ -252,129 +259,113 @@ GameBoard.prototype = {
 	},
 
 	renderActions: function() {
+		$('#actions').remove();
 		$(this.game.element).append('\
 			<div id="actions" class="hideActions">\
-				<!--<input id="trade_button" value="Trade" type="button">\
-				<input id="purchase_button" value="Purchase" type="button">-->\
 				<input id="placeRoad_button" value="Road" type="button">\
 				<input id="placeCity_button" value="Settlement" type="button">\
 				<input id="upgradeSettle_button" value="City" type="button">\
 				<input id="buyDevCard_button" value="Dev. Card" type="button">\
 			</div>');
+
 		var self = this;
-		$('#purchase_button').click(function(){
-			if(!$('#purchase_modal').hasClass('show_modal')) {
-				$('#purchase_modal').addClass('show_modal')
-				self.disableControls();
-			}
+		$('#placeCity_button').click(function() {
+			self.placeSettlement();
+		});
+		$('#placeCity_button').fastButton(function() {
+			self.placeSettlement();
+		});
+	
+		$('#placeRoad_button').click(function() {
+			debugger;
+			self.placeRoadMode();
+		});
+		$('#placeRoad_button').fastButton(function() {
+			self.placeRoadMode();
 		});
 		
-		$('#cancelPurchase_button').click(function(){
-			$('#purchase_modal').removeClass('show_modal')
-			self.enableControls();
-		});
-
 	},
 
-	showControls: function() {
+	showControls: function(reRender) {
+		$('#controls').css('display', 'block');
+		$('#endTurn_button').css('display', 'block');
+	},
+
+	renderControls: function() {
+		$('#controls').remove();
+		$('#endTurn_button').remove();
+		$('#purchaseControls').remove();
+		$(this.game.element).append(' \
+			<div id="controls"> \
+				<input id="showActions_button" value="Actions" type="button">\
+				<input id="showResources" value="Resources" type="button"/>\
+				<input id="showDevCards" value="Dev Cards" type="button"/>\
+			</div>\
+			<input id="endTurn_button" value="End Turn" type="button">\
+			<div id="purchaseControls">\
+				<input id="cancelAction_button" value="cancel" type="button">\
+			</div>'
+		);
 		var self = this;
-		if (!$('#controls').length) { //render if doesn't exist yet
-			$(this.game.element).append(' \
-				<div id="controls"> \
-					<input id="showHideCards_button" value="Cards" type="button" style="display:none;">\
-					<input id="showActions_button" value="Actions" type="button">\
-					<input id="showResources" value="Resources" type="button"/>\
-					<input id="showDevCards" value="Dev Cards" type="button"/>\
-				</div>\
-				<input id="endTurn_button" value="End Turn" type="button">\
-				<div id="purchaseControls">\
-					<input id="cancelAction_button" value="cancel" type="button">\
-				</div>'
-			);
-			$('#showHideCards_button').click(function(){
-				$('#hand').toggleClass('hideCards');
-			});
-			
-			$('#endTurn_button').click(function(){
-				self.endPlayerTurn();
-			});
-			
-			$('#showHideCards_button').fastButton(function(){
-				$('#hand').toggleClass('hideCards');
-			});
-			
-			$('#showActions_button').click(function(){
-				$('#actions').toggleClass('hideActions');
-			});
-			
-			$('#showActions_button').fastButton(function(){
-				$('#actions').toggleClass('hideActions');
-			});
-			
-			$('#cancelAction_button').click(function(){
-				self.cancelAction();
-			});
-			
-			$('#cancelAction_button').fastButton(function(){
-				self.cancelAction();
-			});
+		$('#endTurn_button').click(function() {
+			self.endPlayerTurn();
+		});
+		
+		$('#showActions_button').click(function() {
+			$('#actions').toggleClass('hideActions');
+		});
+		
+		$('#showActions_button').fastButton(function() {
+			$('#actions').toggleClass('hideActions');
+		});
+		
+		$('#cancelAction_button').click(function() {
+			self.cancelAction();
+		});
+		
+		$('#cancelAction_button').fastButton(function() {
+			self.cancelAction();
+		});
 
-			$('#showResources').click(function() {
-				self.game.players[self.game.playerNumber].displayHand(DeckType.RESOURCE, true);
-			});
+		$('#showResources').click(function() {
+			self.game.players[self.game.playerNumber].displayHand(DeckType.RESOURCE, true);
+		});
 
-			$('#showDevCards').click(function() {
-				self.game.players[self.game.playerNumber].displayHand(DeckType.DEVELOPMENT, true);
-			});
+		$('#showDevCards').click(function() {
+			self.game.players[self.game.playerNumber].displayHand(DeckType.DEVELOPMENT, true);
+		});
 
-			$('#showResources').fastButton(function() {
-				self.game.players[self.game.playerNumber].displayHand(DeckType.RESOURCE, true);
-			});
+		$('#showResources').fastButton(function() {
+			self.game.players[self.game.playerNumber].displayHand(DeckType.RESOURCE, true);
+		});
 
-			$('#showDevCards').fastButton(function() {
-				self.game.players[self.game.playerNumber].displayHand(DeckType.DEVELOPMENT, true);
-			});
-		}
-		$('#controls').css('display','block');
-		$('#endTurn_button').css('display','block');
+		$('#showDevCards').fastButton(function() {
+			self.game.players[self.game.playerNumber].displayHand(DeckType.DEVELOPMENT, true);
+		});
 	},
 
 	setupListeners: function() {
 		var self = this;
 		if(!Util.mobileCheck()){ //If a desktop browser, enable mouse hover to show debug info. This confuses touch events when trying to select vertex
-			$('.tile').mouseover(function(){
-				$('#debug').html($(this).attr('id')+" : "+$(this).attr('class'))
+			$('.tile').mouseover(function() {
+				$('#debug').html($(this).attr('id') + " : " + $(this).attr('class'))
 			})
 		}
 		
-		$('.edge').fastButton(function(){
+		$('.edge').fastButton(function() {
 			self.edgeClicked(this);
 		});
-		$('.edge').click(function(){
+		$('.edge').click(function() {
 			self.edgeClicked(this);
 		});
 		
-		$('.vertex').fastButton(function(){
+		$('.vertex').fastButton(function() {
 			self.vertexClicked(this);
 		});
-		$('.vertex').click(function(){
+		$('.vertex').click(function() {
 			self.vertexClicked(this);
 		});
 	
-		$('#placeCity_button').click(function(){
-			self.placeSettlement();
-		});
-		$('#placeCity_button').fastButton(function(){
-			self.placeSettlement();
-		});
-	
-		$('#placeRoad_button').click(function(){
-			self.placeRoadMode();
-		});
-		$('#placeRoad_button').fastButton(function(){
-			self.placeRoadMode();
-		});
-		
 		Util.log('set up button listeners');
 
 		this.game.connection.on('applyAction', function(data) {
@@ -382,7 +373,7 @@ GameBoard.prototype = {
 		});
 	},
 	
-	hideModals: function(){
+	hideModals: function() {
 		this.hideModalHack();
 	},
 
@@ -404,7 +395,7 @@ GameBoard.prototype = {
 			
 			$('#vertices .unassigned').css('display','block');
 			var self = this;
-			this.element.on('vertexClick',function(e,vid,player){
+			this.element.on('vertexClick',function(e, vid, player) {
 				if ($('#' + vid).attr('class') == 'vertex unassigned') {
 					$('#' + vid).attr('class', 'vertex ' + 'player' + player);
 					$('#vertices .unassigned').css('display', 'none');
@@ -428,6 +419,15 @@ GameBoard.prototype = {
 
 	startPlayerTurn: function() {
 		this.disableBuildControls();
+		this.game.players[this.game.playerNumber].addCard(DeckType.RESOURCE, ResourceType.SHEEP);
+		this.game.players[this.game.playerNumber].addCard(DeckType.RESOURCE, ResourceType.ORE);
+		this.game.players[this.game.playerNumber].addCard(DeckType.RESOURCE, ResourceType.WOOD);
+		this.game.players[this.game.playerNumber].addCard(DeckType.RESOURCE, ResourceType.WHEAT);
+		this.game.players[this.game.playerNumber].addCard(DeckType.RESOURCE, ResourceType.ORE);
+		this.game.players[this.game.playerNumber].addCard(DeckType.RESOURCE, ResourceType.WOOD);
+		this.game.players[this.game.playerNumber].addCard(DeckType.RESOURCE, ResourceType.BRICK);
+		this.game.players[this.game.playerNumber].addCard(DeckType.DEVELOPMENT, CardType.KNIGHT);
+
 
 		//ensure everyone has the same deck of development cards in the same order; might be better to add a sync function on the server instead
 		this.game.connection.emit('doAction', {
@@ -601,7 +601,7 @@ GameBoard.prototype = {
 		}
 	},
 	
-	cancelAction: function(){
+	cancelAction: function() {
 		this.element.off('edgeClick');
 		this.element.off('vertexClick');
 		$('#edges .unassigned').css('display','none');
@@ -610,16 +610,20 @@ GameBoard.prototype = {
 		this.enableControls();
 	},
 	
-	disableControls: function(){
+	disableControls: function() {
 		//Use when you're asking a user to perform action
 		$('#controls').css('display','none');
 		$('#endTurn_button').css('display','none');
 		$('#actions').addClass('hideActions');
+		$('#showResources').css('display', 'none');
+		$('#showDevCards').css('display', 'none');
 	},
 	
-	enableControls: function(){
+	enableControls: function() {
 		$('#controls').css('display','block');
 		$('#endTurn_button').css('display','block');
+		$('#showResources').css('display', 'inline-block');
+		$('#showDevCards').css('display', 'inline-block');
 		$('#showActions_button').removeAttr('disabled');
 		$('#endTurn_button').removeAttr('disabled');
 	},

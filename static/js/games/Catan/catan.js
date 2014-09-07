@@ -119,15 +119,6 @@ Game.Catan = function(options) {
 		},
 
 		startPlayerTurn: function() {
-			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.SHEEP);
-			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.ORE);
-			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.WOOD);
-			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.WHEAT);
-			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.ORE);
-			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.WOOD);
-			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.BRICK);
-			this.players[this.playerNumber].addCard(DeckType.DEVELOPMENT, CardType.KNIGHT);
-
 			this.board.startPlayerTurn();
 		},
 

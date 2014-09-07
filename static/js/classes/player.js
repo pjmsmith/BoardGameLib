@@ -33,16 +33,16 @@ Player.prototype = {
 	},
 
 	displayHand: function(type, sorted) {
-		if (this.handDisplayed && this.handDisplayed === type) {
-			this.hideHand(this.handDisplayed);
-			return;
-		}
-		if (this.handDisplayed !== type) {
-			this.hideHand(this.handDisplayed);
+		if (this.handDisplayed) {
+			var visibleHand = this.handDisplayed;
+			this.hideHand(visibleHand);
+			if (visibleHand === type) {
+				return;
+			}
 		}
 		if ($(this.game.element).length) {
 			if (!$('#hand' + type).length) {
-				this.game.element.append('<div id="hand' + type + '" class="hand"></div>');
+				this.game.element.append('<div id="hand' + type + '" class="hand" style="display:none"></div>');
 			}
 			var hand = $('#hand' + type);
 			hand.empty();
@@ -54,17 +54,19 @@ Player.prototype = {
 					hand.append('<div class="card card-' + type + '-' + this.hands[type][i] + '"></div>');
 					hand.css({'margin-left': '-' + (hand.outerWidth()/2) + 'px'})
 				}
+				this.handDisplayed = type;
+				$('#hand' + type).fadeIn('fast');
 			}
-			this.handDisplayed = type;
-			$('#hand' + type).fadeIn('fast');
 		}
 	},
 
 	hideHand: function(type) {
-		if (!$('#hand' + type).length) {
-			this.game.element.append('<div id="hand' + type + '"></div>');
+		if (type) {
+			if (!$('#hand' + type).length) {
+				this.game.element.append('<div id="hand' + type + '"></div>');
+			}
+			$('#hand' + type).fadeOut('fast');
 		}
-		$('#hand' + type).fadeOut('fast');
 		this.handDisplayed = null;
 	},
 
