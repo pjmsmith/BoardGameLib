@@ -166,14 +166,17 @@ GameBoard.prototype = {
 			if (!$('#dice').length) {
 				board.element.append('<input type="button" id="dice" />');
 			}
-			$('#dice').val(args.value);
-			$('#dice').fadeIn('fast');
-			if (board.timeout['dice']) {
-				clearTimeout(board.timeout['dice']);
+			if (player !== board.game.playerNumber) {
+				$('#dice').val(args.value);
+				$('#dice').fadeIn('fast');
+				if (board.timeout['dice']) {
+					clearTimeout(board.timeout['dice']);
+				}
+				board.timeout['dice'] = setTimeout(function() {
+					$('#dice').fadeOut('slow');
+				}, 3000);
+				board.produceResources(args.value);
 			}
-			board.timeout['dice'] = setTimeout(function() {
-				$('#dice').fadeOut('slow');
-			}, 3000);
 		}
 		,endTurn: function(board, el, player, args) {
 			Util.log('endTurn: next player ' + player);
