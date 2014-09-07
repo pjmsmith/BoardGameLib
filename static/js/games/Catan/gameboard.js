@@ -14,7 +14,7 @@ var GameBoard = function(options) {
 };
 GameBoard.prototype = {
 	timeout: {},
-	
+
 	/* Board Definition and Set-Up */
 	tileClasses: '<style>\
 					  .grain {fill:yellow; background-color:yellow; fill:url(#grainPattern) !important;}\
@@ -416,82 +416,119 @@ GameBoard.prototype = {
 		$('#purchaseControls').css('display','none');
 	},
 		
-	placeSettlement: function() {
+	placeSettlement: function(isFree) {
 		//1 brick, 1 wood, 1 wheat, 1 sheep
-
-		this.hideModals();
-		Util.log('Waiting for player to place settlement...');
-		this.disableControls();
-
-		this.showPurchaseControls();
-		
-		$('#vertices .unassigned').css('display','block');
-		var self = this;
-		this.element.on('vertexClick',function(e, vid, player) {
-			if ($('#' + vid).attr('class') == 'vertex unassigned') {
-				$('#' + vid).attr('class', 'vertex ' + 'player' + player);
-				$('#vertices .unassigned').css('display', 'none');
-				self.element.off('vertexClick');
-				self.enableControls();
-				self.hidePurchaseControls();
-				$('#actions').removeClass('hideActions');
-
-				self.game.connection.emit('doAction', {
-					  game: self.game.uniqueKey
-					, action: 'placeSettlement'
-					, playerNumber: self.game.playerNumber
-					, element: vid
-				});
-			} else {
-				alert('Location already chosen, select an unassigned spot ');
+		if (this.game.activePlayer === this.game.playerNumber) {
+			var player = this.game.players[this.game.playerNumber];
+			if (!this.canAfford(player, 'settlement')) {
+				return;
 			}
-		});
+			this.hideModals();
+			Util.log('Waiting for player to place settlement...');
+			this.disableControls();
+
+			this.showPurchaseControls();
+			
+			$('#vertices .unassigned').css('display','block');
+			var self = this;
+			this.element.on('vertexClick',function(e, vid, player) {
+				if ($('#' + vid).attr('class') == 'vertex unassigned') {
+					$('#' + vid).attr('class', 'vertex ' + 'player' + player);
+					$('#vertices .unassigned').css('display', 'none');
+					self.element.off('vertexClick');
+					self.enableControls();
+					self.hidePurchaseControls();
+					$('#actions').removeClass('hideActions');
+
+					self.game.connection.emit('doAction', {
+						  game: self.game.uniqueKey
+						, action: 'placeSettlement'
+						, playerNumber: self.game.playerNumber
+						, element: vid
+					});
+					if (!isFree) {
+						player.removeCard(DeckType.RESOURCE, ResourceType.BRICK);
+						player.removeCard(DeckType.RESOURCE, ResourceType.WOOD);
+					}
+				} else {
+					alert('Location already chosen, select an unassigned spot ');
+				}
+			});
+		}
 	},
 
-	placeRoadMode: function(){
+	placeRoadMode: function(isFree){
 		//1 brick, 1 wood
-
-		this.hideModals();
-		Util.log('Waiting for player to place road...');
-		this.disableControls();
-		this.showPurchaseControls();
-		$('#edges .unassigned').css('display','block');
-		var self = this;	
-		this.element.on('edgeClick',function(e,eid,player){
-			if($('#'+eid).attr('class') == 'edge unassigned') {
-				$('#'+eid).attr('class','edge '+'player'+player);
-				$('#edges .unassigned').css('display','none');
-				self.element.off('edgeClick');
-				self.enableControls();
-				self.hidePurchaseControls();
-				$('#actions').removeClass('hideActions');
-				
-				self.game.connection.emit('doAction', {
-					 game: self.game.uniqueKey
-					,action: 'placeRoad'
-					,playerNumber: self.game.playerNumber
-					,element: eid
-				});
-				
-			} else {
-				alert('Location already chosen, select an unassigned spot ')
+		if (this.game.activePlayer === this.game.playerNumber) {
+			var player = this.game.players[this.game.playerNumber];
+			if (!this.canAfford(player, 'road')) {
+				return;
 			}
-		});
+			this.hideModals();
+			Util.log('Waiting for player to place road...');
+			this.disableControls();
+			this.showPurchaseControls();
+			$('#edges .unassigned').css('display','block');
+			var self = this;	
+			this.element.on('edgeClick',function(e,eid,player){
+				if($('#'+eid).attr('class') == 'edge unassigned') {
+					$('#'+eid).attr('class','edge '+'player'+player);
+					$('#edges .unassigned').css('display','none');
+					self.element.off('edgeClick');
+					self.enableControls();
+					self.hidePurchaseControls();
+					$('#actions').removeClass('hideActions');
+					
+					self.game.connection.emit('doAction', {
+						 game: self.game.uniqueKey
+						,action: 'placeRoad'
+						,playerNumber: self.game.playerNumber
+						,element: eid
+					});
+					if (!isFree) {
+						player.removeCard(DeckType.RESOURCE, ResourceType.BRICK);
+						player.removeCard(DeckType.RESOURCE, ResourceType.WOOD);
+					}
+				} else {
+					alert('Location already chosen, select an unassigned spot ')
+				}
+			});
+		}
 	},
 
 	placeCity: function() {
 		//2 wheat, 3 ore
+		if (this.game.activePlayer === this.game.playerNumber) {
+			var player = this.game.players[this.game.playerNumber];
+			if (!this.canAfford(player, 'city')) {
+				return;
+			}
+
+			player.removeCard(DeckType.RESOURCE, ResourceType.WHEAT);
+			player.removeCard(DeckType.RESOURCE, ResourceType.WHEAT);
+			player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
+			player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
+			player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
+		}
 	},
 
 	purchaseDevelopmentCard: function() {
 		//1 sheep, 1 ore, 1 wheat
 		if (this.game.activePlayer === this.game.playerNumber) {
+			var player = this.game.players[this.game.playerNumber];
+			if (!this.canAfford(player, 'devCard')) {
+				return;
+			}
 			if (this.timeout['hideHand']) {
 				clearTimeout(this.timeout['hideHand']);
 			}
-			var player = this.game.players[this.game.playerNumber];
 			var devCardDeck = this.game.decks[DeckType.DEVELOPMENT];
 			var card = devCardDeck.pop();
+
+			player.removeCard(DeckType.RESOURCE, ResourceType.SHEEP);
+			player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
+			player.removeCard(DeckType.RESOURCE, ResourceType.WHEAT);
+
 			player.addCard(DeckType.DEVELOPMENT, card);
 			player.displayHand(DeckType.DEVELOPMENT);
 			
@@ -503,6 +540,38 @@ GameBoard.prototype = {
 				$('#buyDevCard_button').attr('disabled', 'disabled');
 			}
 		}
+	},
+
+	canAfford: function(player, item) {
+		var resources = {};
+		if (typeof player.getHand(DeckType.RESOURCE) !== 'undefined') {
+			for (var i = 0; i < player.getHand(DeckType.RESOURCE).length; i++) {
+				var resource = player.getHand(DeckType.RESOURCE);
+				resources[resource] += 1;
+			}
+
+			switch (item) {
+				case 'devCard':
+					return (resources[ResourceType.SHEEP] >= 1 
+						 && resources[ResourceType.ORE] >= 1
+						 && resources[ResourceType.WHEAT] >= 1);
+				case 'road':
+					return (resources[ResourceType.BRICK] >= 1 
+						 && resources[ResourceType.WOOD] >= 1);
+				case 'settlement':
+					return (resources[ResourceType.SHEEP] >= 1 
+						 && resources[ResourceType.WOOD] >= 1
+						 && resources[ResourceType.BRICK] >= 1
+						 && resources[ResourceType.WHEAT] >= 1);
+				case 'city':
+					return (resources[ResourceType.ORE] >= 3
+						 && resources[ResourceType.WHEAT] >= 2);
+
+				default:
+					break;
+			}
+		}
+		return false;
 	},
 
 	startPlayerTurn: function() {

@@ -74,7 +74,7 @@ Player.prototype = {
 		if (typeof this.hands[hand] !== 'undefined') {
 			var index = this.hands[hand].indexOf(card);
 			if (index > -1) {
-				this.hands[hand](index, 1);
+				this.hands[hand].splice(index, 1);
 			} else {
 				Util.log('Card does not exist!');
 			}
