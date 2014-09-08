@@ -534,7 +534,8 @@ GameBoard.prototype = {
 			this.hideModals();
 			Util.log('Waiting for player to place city...');
 			this.disableControls();
-
+			this.showPurchaseControls();
+			
 			var settlements = $('#vertices .player' + this.game.playerNumber);
 			if (settlements.length) {
 				settlements.css('display','block');
