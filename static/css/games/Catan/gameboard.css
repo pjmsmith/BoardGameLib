@@ -49,83 +49,99 @@ line.unassigned:hover {
 }
 
 #h0, #h4, #h9, #h19, #h20, #h24 {
-	display:none;
+	display: none;
 }
 
 .unassigned {
-	display:none;
+	display: none;
 }
 
 circle.player1 {
-	fill:red !important;
+	fill: red !important;
 }
 circle.player1:hover {
-	fill:red !important;
+	fill: red !important;
 }
 line.player1 {
-	stroke:red !important;
+	stroke: red !important;
 }
 line.player1:hover {
-	stroke:red !important;
+	stroke: red !important;
 }
 
 .player1 {
-	color:red !important;
+	color: red !important;
 }
 
 circle.player2 {
-	fill:blue !important;
+	fill: blue !important;
 }
 circle.player2:hover {
-	fill:blue !important;
+	fill: blue !important;
 }
 line.player2 {
-	stroke:blue !important;
+	stroke: blue !important;
 }
 line.player2:hover {
-	stroke:blue !important;
+	stroke: blue !important;
 }
 
 .player2 {
-	color:blue !important;
+	color: blue !important;
 }
 
 circle.player3 {
-	fill:green !important;
+	fill: green !important;
 }
 circle.player3:hover {
-	fill:green !important;
+	fill: green !important;
 }
 line.player3 {
-	stroke:green !important;
+	stroke: green !important;
 }
 line.player3:hover {
-	stroke:green !important;
+	stroke: green !important;
 }
 
 .player3 {
-	color:green !important;
+	color: green !important;
 }
 
 circle.player4 {
-	fill:darkgray !important;
+	fill: darkgray !important;
 }
 circle.player4:hover {
-	fill:darkgray !important;
+	fill: darkgray !important;
 }
 line.player4 {
-	stroke:darkgray !important;
+	stroke: darkgray !important;
 }
 line.player4:hover {
-	stroke:darkgray !important;
+	stroke: darkgray !important;
 }
 .player4 {
-	color:darkgray !important;
+	color: darkgray !important;
+}
+
+circle.player5 {
+	fill: yellow !important;
+}
+circle.player5:hover {
+	fill: yellow !important;
+}
+line.player5 {
+	stroke: yellow !important;
+}
+line.player5:hover {
+	stroke: yellow !important;
+}
+.player5 {
+	color: yellow !important;
 }
 
 text {
 	font-size:22pt;
-	font-weight:bold;
+	font-weight: bold;
 	text-shadow: 0px 0px 5px black, -2px -2px 5px black;
 }
 
@@ -211,6 +227,13 @@ var ResourceType = {
 	background-size: 100% 100% !important;
 }
 
+.card:hover {
+	z-index: 100;
+}
+.card:active {
+	z-index: 100;
+}
+
 .card-1-1 {
 	background: url('/images/games/Catan/sheep.jpg');
 }
@@ -237,7 +260,8 @@ var ResourceType = {
 
 .card-2-2 {
 	background: url('/images/games/Catan/victorypoint_1.jpg');
-}/*
+}
+/*
 .card-2-2-2 {
 	background: url('/images/games/Catan/victorypoint_2.jpg');
 }

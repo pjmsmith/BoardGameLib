@@ -28,7 +28,7 @@ var loadFilesOfType = function(directory, type, files) {
 		if (!allFiles.hasOwnProperty(i) || typeof validFileTypePaths[allFiles[i].split('.').pop()] === 'undefined') {
 			continue;
 		}
-		var name = directory+'/'+allFiles[i];
+		var name = directory + '/' + allFiles[i];
 		if (fs.statSync(name).isDirectory()){
 			loadFilesOfType(name, type, files);
 		} else {

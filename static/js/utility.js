@@ -33,7 +33,7 @@ Util.Color = {
 
 		// Recursion handlers
 		recursionLimit: 15,
-		recursion: function(){
+		recursion: function() {
 			throw 'Recursion Error in Random Color Generator, ' +
 				'too many tries on finding random color, ' +
 				'[Limit ' + this.recursionLimit + ']';
@@ -45,7 +45,7 @@ Util.Color = {
 
 	// Returns a random color in hex code form, and caches
 	// find in the stack.
-	random: function(i){
+	random: function(i) {
 		var self = this,
 			defaults = self.defaults,
 			r = self.rand(),
@@ -77,34 +77,34 @@ Util.Color = {
 	},
 
 	// Returns random number within range
-	rand: function(){
+	rand: function() {
 		var defaults = this.defaults;
 		return defaults.rangeMin + Math.floor(Math.random()*(defaults.rangeMax+1));
 	},
 
 	// Clears the stack
-	reset: function(){
+	reset: function() {
 		var self = this,
 			predef = self.defaults.predef,
 			i = -1, l = predef.length;
 		self.stack = {};
 		if (l > 0)
 			for ( ; ++i < l; )
-				self.stack[ predef[i] ] = true;
+				self.stack[predef[i]] = true;
 	},
 
 	// Returns hex code
-	rgb2hex: function(r, g, b){
+	rgb2hex: function(r, g, b) {
 		var str = '0123456789ABCDEF';
 		return '#' + [
-			str.charAt((r-r%16)/16) + str.charAt(r%16),
-			str.charAt((g-g%16)/16) + str.charAt(g%16),
-			str.charAt((b-b%16)/16) + str.charAt(b%16)
+			str.charAt((r - r % 16)/16) + str.charAt(r % 16),
+			str.charAt((g - g % 16)/16) + str.charAt(g % 16),
+			str.charAt((b - b % 16)/16) + str.charAt(b % 16)
 		].join('');
 	},
 
 	// Returns in array form [red, green, blue]
-	hex2rgb: function(hex){
+	hex2rgb: function(hex) {
 		if (hex.substr(0, 1) === '#')
 			hex = hex.substr(1);
 

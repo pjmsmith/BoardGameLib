@@ -304,7 +304,7 @@ GameBoard.prototype = {
 
 	},
 
-	showControls: function(reRender) {
+	showControls: function() {
 		$('#controls').css('display', 'block');
 		$('#endTurn_button').css('display', 'block');
 	},
@@ -380,7 +380,7 @@ GameBoard.prototype = {
 
 	setupListeners: function() {
 		var self = this;
-		if(!Util.mobileCheck()){ //If a desktop browser, enable mouse hover to show debug info. This confuses touch events when trying to select vertex
+		if(!Util.mobileCheck()) { //If a desktop browser, enable mouse hover to show debug info. This confuses touch events when trying to select vertex
 			$('.tile').mouseover(function() {
 				$('#debug').html($(this).attr('id') + " : " + $(this).attr('class'))
 			})
@@ -522,11 +522,27 @@ GameBoard.prototype = {
 				return;
 			}
 
-			player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
-			player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
-			player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
-			player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
-			player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
+			this.hideModals();
+			Util.log('Waiting for player to place city...');
+			this.disableControls();
+
+			var settlements = $('#vertices .player' + this.game.playerNumber);
+			if (settlements.length) {
+				settlements.css('display','block');
+				var self = this;
+				this.element.on('vertexClick',function(e, vid, player) {
+					self.enableControls();
+					self.hidePurchaseControls();
+					$('#actions').removeClass('hideActions');
+
+					var player = self.game.players[self.game.playerNumber];
+					player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
+					player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
+					player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
+					player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
+					player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
+				});
+			}
 		}
 	},
 
