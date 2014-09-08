@@ -80,6 +80,8 @@ Game.Catan = function(options) {
 	//Inherit from base Game class
 	$.extend(this, new Game(options));
 	$.extend(this, {
+		winningScore: 10,
+
 		initialize: function() {
 			if (this.lobby && typeof this.lobby.clearError === 'function') {
 				this.lobby.clearError();
@@ -119,11 +121,6 @@ Game.Catan = function(options) {
 		},
 
 		startPlayerTurn: function() {
-			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.GRAIN);
-			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.GRAIN);
-			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.ORE);
-			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.ORE);
-			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.ORE);
 			this.board.startPlayerTurn();
 		},
 
@@ -150,14 +147,12 @@ Game.Catan = function(options) {
 		getPieces: function(player) {
 			var pieces = {};
 			if (typeof this.players[player] !== 'undefined') {
-				if (this.players[player].pieces === 'undefined') {
-					for (var type in PieceType) {
-						pieces[PieceType[type]] = PieceLimits[type];
-					}
-					this.players[player].pieces = pieces;
+				this.players[player].pieces = {};
+				debugger;
+				for (var type in PieceType) {
+					pieces[PieceType[type]] = PieceLimits[PieceType[type]];
 				}
-				
-				pieces = this.players[player].pieces;
+				this.players[player].pieces = pieces;
 			} 
 			return pieces;
 		},
@@ -188,6 +183,16 @@ Game.Catan = function(options) {
 				this.decks[DeckType.DEVELOPMENT] = Util.shuffle(this.decks[DeckType.DEVELOPMENT]);
 			}
 			return this.decks[DeckType.DEVELOPMENT]
+		},
+
+		isGameOver: function() {
+			for (var player in this.players) {
+				var score = this.players[player].score;
+				if (score >= this.winningScore) {
+					return true;
+				}
+			}
+			return false;
 		}
 	});
 };

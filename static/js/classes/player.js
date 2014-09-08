@@ -84,23 +84,23 @@ Player.prototype = {
 	},
 
 	addPiece: function(type) {
-		if (typeof pieces[type] !== 'undefined') {
-			pieces[type] += 1;
+		if (typeof this.pieces[type] !== 'undefined') {
+			this.pieces[type] += 1;
 		} else {
-			pieces[type] = 1;
+			this.pieces[type] = 1;
 		}
 	},
 
 	removePiece: function(type) {
-		if (typeof pieces[type] !== 'undefined' && pieces[type] > 0) {
-			pieces[type] -= 1;
+		if (typeof this.pieces[type] !== 'undefined' && this.pieces[type] > 0) {
+			this.pieces[type] -= 1;
 		}
 	},
 
 	pieceCount: function(type) {
 		var count = 0;
-		if (typeof pieces[type] !== 'undefined') {
-			count = pieces[type];
+		if (typeof this.pieces[type] !== 'undefined') {
+			count = this.pieces[type];
 		} else {
 			count = -1;
 		}

@@ -310,7 +310,6 @@ GameBoard.prototype = {
 		$('#buyDevCard_button').fastButton(function() {
 			self.purchaseDevelopmentCard();
 		});
-
 	},
 
 	showControls: function() {
@@ -446,6 +445,7 @@ GameBoard.prototype = {
 			this.element.on('vertexClick',function(e, vid, player) {
 				if ($('#' + vid).attr('class') == 'vertex unassigned') {
 					$('#' + vid).attr('class', 'vertex ' + 'player' + player);
+					$('#' + vid).show();
 					$('#vertices .unassigned').css('display', 'none');
 					self.element.off('vertexClick');
 					self.enableControls();
@@ -459,13 +459,23 @@ GameBoard.prototype = {
 						, element: vid
 					});
 					var player = self.game.players[self.game.playerNumber];
+					player.removePiece(PieceType.SETTLEMENT);
+					player.score++;
+					Util.log('Player ' + self.game.playerNumber + ' score: ' + player.score);
 					if (!isFree) {
 						player.removeCard(DeckType.RESOURCE, ResourceType.BRICK);
 						player.removeCard(DeckType.RESOURCE, ResourceType.WOOD);
 						player.removeCard(DeckType.RESOURCE, ResourceType.SHEEP);
 						player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
+
+						self.game.decks[DeckType.RESOURCE][ResourceType.BRICK]++;
+						self.game.decks[DeckType.RESOURCE][ResourceType.WOOD]++;
+						self.game.decks[DeckType.RESOURCE][ResourceType.SHEEP]++;
+						self.game.decks[DeckType.RESOURCE][ResourceType.GRAIN]++;
+						self.updateActionStates();
 					} else {
 						player.settlementPlaced = true;
+						self.updateActionStates();
 						if (player.roadPlaced) {
 							self.endPlayerTurn();
 						}
@@ -507,11 +517,16 @@ GameBoard.prototype = {
 						,element: eid
 					});
 					var player = self.game.players[self.game.playerNumber];
+					player.removePiece(PieceType.ROAD);
 					if (!isFree) {
 						player.removeCard(DeckType.RESOURCE, ResourceType.BRICK);
 						player.removeCard(DeckType.RESOURCE, ResourceType.WOOD);
+						self.game.decks[DeckType.RESOURCE][ResourceType.WOOD]++;
+						self.game.decks[DeckType.RESOURCE][ResourceType.BRICK]++;
+						self.updateActionStates();
 					} else {
 						player.roadPlaced = true;
+						self.updateActionStates();
 						if (player.settlementPlaced) { 
 							self.endPlayerTurn();
 						}
@@ -535,7 +550,7 @@ GameBoard.prototype = {
 			Util.log('Waiting for player to place city...');
 			this.disableControls();
 			this.showPurchaseControls();
-			
+
 			var settlements = $('#vertices .player' + this.game.playerNumber);
 			if (settlements.length) {
 				settlements.css('display','block');
@@ -543,6 +558,7 @@ GameBoard.prototype = {
 				var self = this;
 				this.element.on('vertexClick',function(e, vid, player) {
 					if($('#c' + vid).attr('class') == 'city vertex unassigned') {
+						self.element.off('vertexClick');
 						self.enableControls();
 						self.hidePurchaseControls();
 						$('#actions').removeClass('hideActions');
@@ -552,11 +568,19 @@ GameBoard.prototype = {
 						$('#c' + vid).attr('class', 'city ' + $('#' + vid).attr('class'));
 
 						var player = self.game.players[self.game.playerNumber];
+						player.score++;
+						player.removePiece(PieceType.CITY);
+						Util.log('Player ' + self.game.playerNumber + ' score: ' + player.score);
+
 						player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
 						player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
 						player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
 						player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
 						player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
+						self.game.decks[DeckType.RESOURCE][ResourceType.GRAIN] += 2;
+						self.game.decks[DeckType.RESOURCE][ResourceType.ORE] += 3;
+
+						self.updateActionStates();
 					}
 				});
 			}
@@ -580,16 +604,22 @@ GameBoard.prototype = {
 			player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
 			player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
 
+			this.game.decks[DeckType.RESOURCE][ResourceType.SHEEP]++;
+			this.game.decks[DeckType.RESOURCE][ResourceType.GRAIN]++;
+			this.game.decks[DeckType.RESOURCE][ResourceType.ORE]++;
+
 			player.addCard(DeckType.DEVELOPMENT, card);
+			if (card === CardType.VICTORY_POINT) {
+				player.score++;
+				Util.log('Player ' + this.game.playerNumber + ' score: ' + player.score);
+			}
 			player.displayHand(DeckType.DEVELOPMENT);
 			
 			this.timeout['hideHand'] = setTimeout(function() {
 				player.hideHand(DeckType.DEVELOPMENT);
 			}, 2000);
 			Util.log(devCardDeck.length + ' dev cards left');
-			if (this.game.decks[DeckType.DEVELOPMENT].length <= 0) {
-				$('#buyDevCard_button').attr('disabled', 'disabled');
-			}
+			this.updateActionStates();
 		}
 	},
 
@@ -639,104 +669,108 @@ GameBoard.prototype = {
 	},
 
 	startPlayerTurn: function() {
-		this.disableBuildControls();
+		if (!this.game.isGameOver()) {
+			this.disableBuildControls();
 
-		if (this.timeout['dice']) {
-			clearTimeout(this.timeout['dice']);
-		}
-		$('#actions').addClass('hideActions');
-		Util.log(this.game.state);
-		var player = this.game.players[this.game.activePlayer];
-		if (this.game.state !== GameState.FIRST_ROUND) {
-			player.roadPlaced = false;
-			player.settlementPlaced = false;
-			//roll dice
-			if (!$('#dice').length) {
-				$(this.element).append('<input type="button" id="dice" />');
+			if (this.timeout['dice']) {
+				clearTimeout(this.timeout['dice']);
 			}
-			var dice = $('#dice');
-			dice.removeAttr('disabled');
-			dice.fadeIn('fast');
-			dice.val('Roll');
-			var self = this;
-			dice.click(function() {
-				var player = self.game.players[self.game.activePlayer];
-				if (player.handDisplayed) {
-					player.hideHand(player.handDisplayed);
+			$('#actions').addClass('hideActions');
+			Util.log(this.game.state);
+			var player = this.game.players[this.game.activePlayer];
+			if (this.game.state !== GameState.FIRST_ROUND) {
+				player.roadPlaced = false;
+				player.settlementPlaced = false;
+				//roll dice
+				if (!$('#dice').length) {
+					$(this.element).append('<input type="button" id="dice" />');
 				}
-				if (!dice.attr('disabled') && dice.is(':visible')) {
-					dice.val();
-					dice.attr('disabled', 'disabled');
-					var result = 0;
-					var sides = self.game.dice.sides;
-					for (var i = 1; i <= self.game.dice.number; i++) {
-						result += Math.floor(sides * Math.random()) + 1;
+				var dice = $('#dice');
+				dice.removeAttr('disabled');
+				dice.fadeIn('fast');
+				dice.val('Roll');
+				var self = this;
+				dice.click(function() {
+					var player = self.game.players[self.game.activePlayer];
+					if (player.handDisplayed) {
+						player.hideHand(player.handDisplayed);
 					}
-					dice.val(result);
-					self.game.connection.emit('doAction', {
-						  game: self.game.uniqueKey
-						, action: 'showRoll'
-						, playerNumber: self.game.activePlayer
-						, args: {
-							value: result
+					if (!dice.attr('disabled') && dice.is(':visible')) {
+						dice.val();
+						dice.attr('disabled', 'disabled');
+						var result = 0;
+						var sides = self.game.dice.sides;
+						for (var i = 1; i <= self.game.dice.number; i++) {
+							result += Math.floor(sides * Math.random()) + 1;
 						}
-					});
-					if (self.timeout['dice']) {
-						clearTimeout(self.timeout['dice']);
-					}
-					self.timeout['dice'] = setTimeout(function() {
-						dice.fadeOut('slow');
-					}, 3000);
-					
-					if (result === 7) {
-						//force everyone with > 7 resource cards to discard 4 or half
-						var playerNumbers = {};
-						for (var player in self.game.players) {
-							var deck = self.game.players[player].getHand(DeckType.RESOURCE);
-							var numCards = (deck) ? deck.length : 0;
-							if (numCards > 7) {
-								Util.log('Player' + player + ' has more than 7 cards');
-								playerNumbers[player] = numCards / 2;
+						dice.val(result);
+						self.game.connection.emit('doAction', {
+							  game: self.game.uniqueKey
+							, action: 'showRoll'
+							, playerNumber: self.game.activePlayer
+							, args: {
+								value: result
 							}
+						});
+						if (self.timeout['dice']) {
+							clearTimeout(self.timeout['dice']);
 						}
-						if (Object.keys(playerNumbers).length > 0) {
-							self.game.connection.emit('doAction', {
-								  game: self.game.uniqueKey
-								, action: 'updatePlayerResources'
-								, playerNumber: self.game.activePlayer
-								, args: {
-									players: playerNumbers
+						self.timeout['dice'] = setTimeout(function() {
+							dice.fadeOut('slow');
+						}, 3000);
+						
+						if (result === 7) {
+							//force everyone with > 7 resource cards to discard 4 or half
+							var playerNumbers = {};
+							for (var player in self.game.players) {
+								var deck = self.game.players[player].getHand(DeckType.RESOURCE);
+								var numCards = (deck) ? deck.length : 0;
+								if (numCards > 7) {
+									Util.log('Player' + player + ' has more than 7 cards');
+									playerNumbers[player] = numCards / 2;
 								}
-							});
+							}
+							if (Object.keys(playerNumbers).length > 0) {
+								self.game.connection.emit('doAction', {
+									  game: self.game.uniqueKey
+									, action: 'updatePlayerResources'
+									, playerNumber: self.game.activePlayer
+									, args: {
+										players: playerNumbers
+									}
+								});
+							}
+
+							//active player can move the robber
+							self.disableControls();
+							//display message "Click a tile to move the robber."
+
+							self.game.state = GameState.MOVING_ROBBER;
+
+							//temp 
+							self.enableControls();
+						} else {
+							//assign resources
+							self.produceResources(result);
+							self.enableControls();
+
+							//purchase/build, trade, or play dev card loop
+							self.game.state = GameState.IDLE;
 						}
-
-						//active player can move the robber
-						self.disableControls();
-						//display message "Click a tile to move the robber."
-
-						self.game.state = GameState.MOVING_ROBBER;
-
-						//temp 
-						self.enableControls();
-					} else {
-						//assign resources
-						self.produceResources(result);
-						self.enableControls();
-
-						//purchase/build, trade, or play dev card loop
-						self.game.state = GameState.IDLE;
 					}
-				}
-			});
-		} else {
-			//First round, take turns placing 1 settlement and 1 road in snake order (1, 2, 3, 3, 2, 1)
-			Util.log('Placing initial settlements');
-			player.roadPlaced = false;
-			player.settlementPlaced = false;
+				});
+			} else {
+				//First round, take turns placing 1 settlement and 1 road in snake order (1, 2, 3, 3, 2, 1)
+				Util.log('Placing initial settlements');
+				player.roadPlaced = false;
+				player.settlementPlaced = false;
 
-			this.enableControls();
+				this.enableControls();
+			}
+		} else {
+			//Game Over
+			alert('Game Over');
 		}
-		
 	},
 	
 	endPlayerTurn: function() {
@@ -820,9 +854,46 @@ GameBoard.prototype = {
 			if (receivedResource) {
 				player.displayHand(DeckType.RESOURCE, true);
 			}
+			this.updateActionStates();
 		}
 	},
 	
+	updateActionStates: function() {
+		var player = this.game.players[this.game.playerNumber];
+		var buyRoad = $('#placeRoad_button');
+		var buySettlement = $('#placeCity_button');
+		var buyCity = $('#upgradeSettle_button');
+		var buyDevCard = $('#buyDevCard_button');
+
+		Util.log('Updating action button states');
+		//settlements
+		if ((this.game.state === GameState.FIRST_ROUND && !player.settlementPlaced) 
+		 || (this.canAfford(player, 'settlement') && player.pieceCount(PieceType.SETTLEMENT) > 0)) {
+			buySettlement.removeAttr('disabled');
+		} else {
+			buySettlement.attr('disabled', 'disabled');
+		}
+		//road
+		if ((this.game.state === GameState.FIRST_ROUND && !player.roadPlaced) 
+		 || (this.canAfford(player, 'road') && player.pieceCount(PieceType.ROAD) > 0)) {
+			buyRoad.removeAttr('disabled');
+		} else {
+			buyRoad.attr('disabled', 'disabled');
+		}
+		//city
+		if (this.canAfford(player, 'city') && player.pieceCount(PieceType.CITY) > 0) {
+			buyCity.removeAttr('disabled');	
+		} else {
+			buyCity.attr('disabled', 'disabled');
+		}
+		//dev card
+		if (this.canAfford(player, 'devCard') && this.game.decks[DeckType.DEVELOPMENT].length > 0) {
+			buyDevCard.removeAttr('disabled');
+		} else {
+			buyDevCard.attr('disabled', 'disabled');
+		}
+	},
+
 	cancelAction: function() {
 		this.element.off('edgeClick');
 		this.element.off('vertexClick');
@@ -848,6 +919,7 @@ GameBoard.prototype = {
 		$('#showDevCards').css('display', 'inline-block');
 		$('#showActions_button').removeAttr('disabled');
 		$('#endTurn_button').removeAttr('disabled');
+		this.updateActionStates();
 	},
 
 	/* Game Board render functions */

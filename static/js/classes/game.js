@@ -186,6 +186,10 @@ Game.prototype = {
 
 	endPlayerTurn: function() {
 		//Child class must implement
+	},
+
+	isGameOver: function() {
+		//Child class must implement
 	}
 };
 
