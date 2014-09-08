@@ -119,6 +119,11 @@ Game.Catan = function(options) {
 		},
 
 		startPlayerTurn: function() {
+			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.GRAIN);
+			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.GRAIN);
+			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.ORE);
+			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.ORE);
+			this.players[this.playerNumber].addCard(DeckType.RESOURCE, ResourceType.ORE);
 			this.board.startPlayerTurn();
 		},
 

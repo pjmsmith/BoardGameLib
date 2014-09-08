@@ -48,6 +48,14 @@ line.unassigned:hover {
 	cursor:pointer;
 }
 
+.city .unassigned {
+	display: none;
+}
+
+.city {
+	display: block;
+}
+
 #h0, #h4, #h9, #h19, #h20, #h24 {
 	display: none;
 }
@@ -60,6 +68,12 @@ circle.player1 {
 	fill: red !important;
 }
 circle.player1:hover {
+	fill: red !important;
+}
+rect.player1 {
+	fill: red !important;
+}
+rect.player1:hover {
 	fill: red !important;
 }
 line.player1 {
@@ -79,6 +93,12 @@ circle.player2 {
 circle.player2:hover {
 	fill: blue !important;
 }
+rect.player2 {
+	fill: blue !important;
+}
+rect.player2:hover {
+	fill: blue !important;
+}
 line.player2 {
 	stroke: blue !important;
 }
@@ -94,6 +114,12 @@ circle.player3 {
 	fill: green !important;
 }
 circle.player3:hover {
+	fill: green !important;
+}
+rect.player3 {
+	fill: green !important;
+}
+rect.player3:hover {
 	fill: green !important;
 }
 line.player3 {
@@ -113,6 +139,12 @@ circle.player4 {
 circle.player4:hover {
 	fill: darkgray !important;
 }
+rect.player4 {
+	fill: darkgray !important;
+}
+rect.player4:hover {
+	fill: darkgray !important;
+}
 line.player4 {
 	stroke: darkgray !important;
 }
@@ -127,6 +159,12 @@ circle.player5 {
 	fill: yellow !important;
 }
 circle.player5:hover {
+	fill: yellow !important;
+}
+rect.player5 {
+	fill: yellow !important;
+}
+rect.player5:hover {
 	fill: yellow !important;
 }
 line.player5 {

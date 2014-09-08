@@ -124,6 +124,15 @@ GameBoard.prototype = {
 				$('#' + eid).show();
 			}
 		}
+		,placeCity: function(board, vid, player) {
+			Util.log('place city: ' + vid + '; ' + player);
+			if($('#' + vid).attr('class') == 'vertex player' + player) {
+				$('#' + vid).hide();
+				$('#c' + vid).show();
+				$('#c' + vid).attr('class', 'city ' + $('#' + vid).attr('class'));
+				$('#vertices .unassigned').css('display','none');
+			}
+		}
 		,syncBoard: function(board, el, player, args) {
 			if (board.game.playerNumber !== player) {
 				Util.log('Syncing game board tiles');
@@ -432,7 +441,7 @@ GameBoard.prototype = {
 
 			this.showPurchaseControls();
 			
-			$('#vertices .unassigned').css('display','block');
+			$('#vertices .unassigned:not(.city)').css('display','block');
 			var self = this;
 			this.element.on('vertexClick',function(e, vid, player) {
 				if ($('#' + vid).attr('class') == 'vertex unassigned') {
@@ -529,18 +538,25 @@ GameBoard.prototype = {
 			var settlements = $('#vertices .player' + this.game.playerNumber);
 			if (settlements.length) {
 				settlements.css('display','block');
+
 				var self = this;
 				this.element.on('vertexClick',function(e, vid, player) {
-					self.enableControls();
-					self.hidePurchaseControls();
-					$('#actions').removeClass('hideActions');
+					if($('#c' + vid).attr('class') == 'city vertex unassigned') {
+						self.enableControls();
+						self.hidePurchaseControls();
+						$('#actions').removeClass('hideActions');
+						
+						$('#' + vid).hide();
+						$('#c' + vid).show();
+						$('#c' + vid).attr('class', 'city ' + $('#' + vid).attr('class'));
 
-					var player = self.game.players[self.game.playerNumber];
-					player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
-					player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
-					player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
-					player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
-					player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
+						var player = self.game.players[self.game.playerNumber];
+						player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
+						player.removeCard(DeckType.RESOURCE, ResourceType.GRAIN);
+						player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
+						player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
+						player.removeCard(DeckType.RESOURCE, ResourceType.ORE);
+					}
 				});
 			}
 		}
@@ -784,12 +800,16 @@ GameBoard.prototype = {
 			for (var i = 0; i < settlements.length; i++) {
 				 var settlement = settlements[i];
 				 var neighbors = this.getNeighbors($(settlement));
-				 if (neighbors) {
+				 if (neighbors && settlement.style.display !== 'none') {
 				 	for (var j = 0; j < neighbors.length; j++) {
 				 		var tile = $('#' + neighbors[j]);
 				 		var tileValue = tile.attr('value');
 				 		if (tileValue && parseInt(tileValue) === value) {
-							this.addResourceCard(player, this.getTileType(tile));
+				 			var resourceType = this.getTileType(tile);
+							this.addResourceCard(player, resourceType);
+							if ($(settlement).attr('class').split(' ').indexOf('city') > -1) {
+								this.addResourceCard(player, resourceType);
+							}
 							receivedResource = true;
 				 		}
 				 	}
@@ -925,7 +945,8 @@ GameBoard.prototype = {
 			if(self.hiddenTiles.indexOf(tid) < 0) { //ignore hidden tiles
 				var tileVertsString = $(this).attr('points');
 				var tileVerts = tileVertsString.split(' ');
-			
+				var existingCityVertex;
+				
 				for(var v in tileVerts) {
 					var xY = tileVerts[v].split(',');
 					var duplicateVertex = false;
@@ -934,6 +955,7 @@ GameBoard.prototype = {
 						if($(this).attr('cx') == Math.round(parseFloat(xY[0])) && $(this).attr('cy') == Math.round(parseFloat(xY[1]))) {
 							duplicateVertex = true;
 							existingVertex = this;
+							existingCityVertex = $('#c' + $(this).attr('id'));
 							return false;
 
 						}
@@ -942,9 +964,12 @@ GameBoard.prototype = {
 					if(!duplicateVertex) {
 						vertCount++;
 						$('#vertices').append('<circle id="v'+vertCount+'" class="vertex unassigned" cx="'+Math.round(parseFloat(xY[0]))+'" cy="'+Math.round(parseFloat(xY[1]))+'" r="15"/>');
+						$('#vertices').append('<rect id="cv'+vertCount+'" class="city vertex unassigned" x="'+Math.round(parseFloat(xY[0]) - 15)+'" y="'+Math.round(parseFloat(xY[1]) - 15)+'" width="30" height="30" />');
 						existingVertex = $('#v' + vertCount);
+						existingCityVertex = $('#cv' + vertCount);
 					}
 					$(existingVertex).attr('neighbors', existingNeighbors + tid);
+					$(existingCityVertex).attr('neighbors', existingNeighbors + tid);
 				}
 			}
 		});
