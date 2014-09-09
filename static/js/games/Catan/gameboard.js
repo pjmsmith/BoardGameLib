@@ -690,75 +690,7 @@ GameBoard.prototype = {
 				dice.fadeIn('fast');
 				dice.val('Roll');
 				var self = this;
-				dice.click(function() {
-					var player = self.game.players[self.game.activePlayer];
-					if (player.handDisplayed) {
-						player.hideHand(player.handDisplayed);
-					}
-					if (!dice.attr('disabled') && dice.is(':visible')) {
-						dice.val();
-						dice.attr('disabled', 'disabled');
-						var result = 0;
-						var sides = self.game.dice.sides;
-						for (var i = 1; i <= self.game.dice.number; i++) {
-							result += Math.floor(sides * Math.random()) + 1;
-						}
-						dice.val(result);
-						self.game.connection.emit('doAction', {
-							  game: self.game.uniqueKey
-							, action: 'showRoll'
-							, playerNumber: self.game.activePlayer
-							, args: {
-								value: result
-							}
-						});
-						if (self.timeout['dice']) {
-							clearTimeout(self.timeout['dice']);
-						}
-						self.timeout['dice'] = setTimeout(function() {
-							dice.fadeOut('slow');
-						}, 3000);
-						
-						if (result === 7) {
-							//force everyone with > 7 resource cards to discard 4 or half
-							var playerNumbers = {};
-							for (var player in self.game.players) {
-								var deck = self.game.players[player].getHand(DeckType.RESOURCE);
-								var numCards = (deck) ? deck.length : 0;
-								if (numCards > 7) {
-									Util.log('Player' + player + ' has more than 7 cards');
-									playerNumbers[player] = numCards / 2;
-								}
-							}
-							if (Object.keys(playerNumbers).length > 0) {
-								self.game.connection.emit('doAction', {
-									  game: self.game.uniqueKey
-									, action: 'updatePlayerResources'
-									, playerNumber: self.game.activePlayer
-									, args: {
-										players: playerNumbers
-									}
-								});
-							}
-
-							//active player can move the robber
-							self.disableControls();
-							//display message "Click a tile to move the robber."
-
-							self.game.state = GameState.MOVING_ROBBER;
-
-							//temp 
-							self.enableControls();
-						} else {
-							//assign resources
-							self.produceResources(result);
-							self.enableControls();
-
-							//purchase/build, trade, or play dev card loop
-							self.game.state = GameState.IDLE;
-						}
-					}
-				});
+				dice.click(this.rollDice.bind(this));
 			} else {
 				//First round, take turns placing 1 settlement and 1 road in snake order (1, 2, 3, 3, 2, 1)
 				Util.log('Placing initial settlements');
@@ -766,10 +698,82 @@ GameBoard.prototype = {
 				player.settlementPlaced = false;
 
 				this.enableControls();
+				$('#actions').removeClass('hideActions');
 			}
 		} else {
 			//Game Over
 			alert('Game Over');
+		}
+	},
+
+	rollDice: function() {
+		var dice = $('#dice');
+		var player = this.game.players[this.game.activePlayer];
+		if (player.handDisplayed) {
+			player.hideHand(player.handDisplayed);
+		}
+		if (!dice.attr('disabled') && dice.is(':visible')) {
+			dice.val();
+			dice.attr('disabled', 'disabled');
+			var result = 0;
+			var sides = this.game.dice.sides;
+			for (var i = 1; i <= this.game.dice.number; i++) {
+				result += Math.floor(sides * Math.random()) + 1;
+			}
+			dice.val(result);
+			this.game.connection.emit('doAction', {
+				  game: this.game.uniqueKey
+				, action: 'showRoll'
+				, playerNumber: this.game.activePlayer
+				, args: {
+					value: result
+				}
+			});
+			if (this.timeout['dice']) {
+				clearTimeout(this.timeout['dice']);
+			}
+			this.timeout['dice'] = setTimeout(function() {
+				dice.fadeOut('slow');
+			}, 3000);
+			
+			if (result === 7) {
+				//force everyone with > 7 resource cards to discard 4 or half
+				var playerNumbers = {};
+				for (var player in this.game.players) {
+					var deck = this.game.players[player].getHand(DeckType.RESOURCE);
+					var numCards = (deck) ? deck.length : 0;
+					if (numCards > 7) {
+						Util.log('Player' + player + ' has more than 7 cards');
+						playerNumbers[player] = numCards / 2;
+					}
+				}
+				if (Object.keys(playerNumbers).length > 0) {
+					this.game.connection.emit('doAction', {
+						  game: this.game.uniqueKey
+						, action: 'updatePlayerResources'
+						, playerNumber: this.game.activePlayer
+						, args: {
+							players: playerNumbers
+						}
+					});
+				}
+
+				//active player can move the robber
+				this.disableControls();
+				//display message "Click a tile to move the robber."
+
+				this.game.state = GameState.MOVING_ROBBER;
+
+				//temp 
+				this.enableControls();
+			} else {
+				//assign resources
+				this.produceResources(result);
+				this.enableControls();
+
+				//purchase/build, trade, or play dev card loop
+				this.game.state = GameState.IDLE;
+			}
 		}
 	},
 	
@@ -874,7 +878,7 @@ GameBoard.prototype = {
 			buySettlement.attr('disabled', 'disabled');
 		}
 		//road
-		if ((this.game.state === GameState.FIRST_ROUND && !player.roadPlaced) 
+		if ((this.game.state === GameState.FIRST_ROUND && player.settlementPlaced && !player.roadPlaced) 
 		 || (this.canAfford(player, 'road') && player.pieceCount(PieceType.ROAD) > 0)) {
 			buyRoad.removeAttr('disabled');
 		} else {
@@ -972,36 +976,75 @@ GameBoard.prototype = {
 		Util.log('rendered ' + tileCount + ' tiles');
 	},
 	
+	//somewhat complicated function, excessive commenting to follow
 	createEdges: function() {
-		Util.log('generating edges...')
-		
+		Util.log('generating edges...');
+
 		var totalEdgesCreated = 0;
-		$('.vertex').each(function(){
-			var vertexI = $(this)
-			$('.vertex').each(function(){
-				var edgeCounter = 0;
-				var vertexJ = $(this)
-				
-				var horizontalDistance = Math.abs(parseInt(vertexI.attr('cx')) - parseInt(vertexJ.attr('cx')))
-				var verticalDistance = Math.abs(parseInt(vertexI.attr('cy')) - parseInt(vertexJ.attr('cy')))
-				
-				if(vertexI.attr('cy') == vertexJ.attr('cy') && horizontalDistance < 100) {
-					$('#edges').append('<line id="e'+totalEdgesCreated+'" class="edge unassigned" x1="'+vertexI.attr('cx')+'" y1="'+vertexI.attr('cy')+'" x2="'+vertexJ.attr('cx')+'" y2="'+vertexJ.attr('cy')+'" />');
-					edgeCounter++;
-					totalEdgesCreated++;
+
+		var vertexEdgeCount = {};
+
+		//keep track of which edges connect to vertexI so they can be quickly referenced later
+		var vertexEdgesI = [];
+		//for all vertices
+		$('circle.vertex').each(function() {
+			var vertexI = $(this);
+			//initialize vertex element edge list
+			vertexI.attr('edges', '');
+			//initialize edge count for this vertex
+			vertexEdgeCount[vertexI.attr('id')] = 0;
+
+			//check all the other vertices to see if they are connected by an edge
+			$('circle.vertex').each(function() {
+				//keep track of how many edges have connected to this vertex already, only add 3 max
+				if (vertexEdgeCount[vertexI.attr('id')] < 3) {
+					var vertexJ = $(this);
+					
+					//don't bother if vertexJ is the same as vertexI, obviously no edge exists in that case
+					if (vertexJ.attr('id') !== vertexI.attr('id') && (vertexEdgesI.indexOf(vertexJ.attr('id')) < 0)) {
+						//get the distance between the two vertices on the x axis
+						var horizontalDistance = Math.abs(parseInt(vertexI.attr('cx')) - parseInt(vertexJ.attr('cx')));
+						//get the distance between the two vertices on the y axis
+						var verticalDistance = Math.abs(parseInt(vertexI.attr('cy')) - parseInt(vertexJ.attr('cy')));
+
+						//keep track of the two vertices for this edge so they can be quickily referenced later
+						var endPoints = vertexI.attr('id') + ' ' + vertexJ.attr('id');
+
+						//if the vertices have the same y position and they are not the middle vertices, then they are either the top or bottom edge of a tile
+						if(vertexI.attr('cy') == vertexJ.attr('cy') && horizontalDistance < 100) {
+							//create an edge, add the endpoints as an attribute
+							$('#edges').append('<line endpoints="' + endPoints + '" id="e' + totalEdgesCreated + '" class="edge unassigned" x1="' + vertexI.attr('cx') + '" y1="' + vertexI.attr('cy') + '" x2="' + vertexJ.attr('cx') + '" y2="' + vertexJ.attr('cy') + '" />');
+							//add edge to vertexI as a connected edge
+							vertexI.attr('edges', ((vertexI.attr('edges').length) ? (vertexI.attr('edges')) + ' ' : '') + 'e' + totalEdgesCreated);
+							//increase edge count for vertexI
+							vertexEdgeCount[vertexI.attr('id')]++;
+							vertexEdgesI.push(vertexI.attr('id'));
+							totalEdgesCreated++;
+						}
+						
+						//if vertical distance is less than the the height of the tile, the edge must exist on a side that is neither the top or bottom edge
+						if(verticalDistance > 61 && verticalDistance < 64 && horizontalDistance < 50) { //These magic numbers need to be configurable based on tile size...
+							//create an edge, add the endpoints as an attribute
+							$('#edges').append('<line endpoints="' + endPoints + '" id="e' + totalEdgesCreated + '" class="edge unassigned" x1="' + vertexI.attr('cx') + '" y1="' + vertexI.attr('cy') + '" x2="' + vertexJ.attr('cx') + '" y2="' + vertexJ.attr('cy') + '" />');
+							//add edge to vertexI as a connected edge
+							vertexI.attr('edges', ((vertexI.attr('edges').length) ? (vertexI.attr('edges')) + ' ' : '') + 'e' + totalEdgesCreated);
+							//increase edge count for vertexI
+							vertexEdgeCount[vertexI.attr('id')]++;
+							vertexEdgesI.push(vertexI.attr('id'));
+							totalEdgesCreated++;
+						}
+
+						//a vertex of a hex tile can only have 3 connected edges so stop searching if 3 edges created
+						if (vertexEdgeCount[vertexI.attr('id')] === 3) { 
+							return false;
+						}
+						
+					}
 				}
-				
-				if(verticalDistance > 61 && verticalDistance < 64 && horizontalDistance < 50 ) {
-					$('#edges').append('<line id="e'+totalEdgesCreated+'" class="edge unassigned" x1="'+vertexI.attr('cx')+'" y1="'+vertexI.attr('cy')+'" x2="'+vertexJ.attr('cx')+'" y2="'+vertexJ.attr('cy')+'" />');
-					edgeCounter++;
-					totalEdgesCreated++;
-				}
-				
-				if (edgeCounter == 3) { //vert can only have 3 connected edges so stop searching if 3 edges created
-					return false;
-				}
-				
 			});
+			//apply edge attribute to corresponding city element
+			$('#c' + vertexI.attr('id')).attr('edges', vertexI.attr('edges').trim());
+
 		});
 		this.element.html(this.element.html()); //hack to allow jquery to manipulate SVG elements
 		

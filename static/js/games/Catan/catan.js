@@ -148,7 +148,6 @@ Game.Catan = function(options) {
 			var pieces = {};
 			if (typeof this.players[player] !== 'undefined') {
 				this.players[player].pieces = {};
-				debugger;
 				for (var type in PieceType) {
 					pieces[PieceType[type]] = PieceLimits[PieceType[type]];
 				}
