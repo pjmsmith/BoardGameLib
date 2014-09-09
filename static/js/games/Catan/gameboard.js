@@ -531,6 +531,7 @@ GameBoard.prototype = {
 							self.endPlayerTurn();
 						}
 					}
+					self.getLongestRoad();
 				} else {
 					alert('Location already chosen, select an unassigned spot ')
 				}
@@ -666,6 +667,48 @@ GameBoard.prototype = {
 		} else {
 			Util.log('Ran out of ' + type + ' cards');
 		}
+	},
+
+	getLongestRoad: function() {
+		var roadTree = {};
+		this.longestRoad = this.longestRoad ? this.longestRoad : 4;
+		var self = this;
+		var endPointEdges = [];
+		for (var player in this.game.players) {
+			$('.edge.player' + player).each(function() {
+				var edge = $(this);
+				console.log(edge.attr('id') + ' ' + self.getEdgeConnections(edge));
+			});
+		}
+		return this.longestRoad;
+	},
+
+	getEdgeConnections: function(edge) {
+		var endPoints = edge.attr('endpoints').split(' ');
+		var connected = [];
+		//for both of the given edge's endpoints
+		for (var i = 0; i < endPoints.length; i++) {
+			//check if the endpoint is unassigned or owned by the player, otherwise it is blocked and this edge is not connected
+			if (!this.isVertexBlocked($('#' + endPoints[i]))) {
+				//check all edges connected to this endpoint (except the given edge)
+				var edges = $('#' + endPoints[i]).attr('edges').split(' ');
+				for (var j = 0; j < edges.length; j++) {
+					//if at least one of the other edges is owned by the player, it is connected to the given edge
+					if (edges[j] !== edge.attr('id') && $('#' + edges[j]).attr('class').indexOf('player' + this.game.playerNumber) >= 0) {
+						if (!connected[i]) {
+							connected.push(true);
+						}
+					}
+				}
+			}
+		}
+		//if an edge has 0 connections, it is a road of length 1; if it has 1 connection, it is an endpoint for a road; if it has 2, it's somewhere in the middle
+		return connected.length;
+	},
+
+	isVertexBlocked: function(vertex) {
+		var vertexClasses = vertex.attr('class').split(' ');
+		return !(vertexClasses.indexOf('player' + this.game.playerNumber) < 0 || vertexClasses.indexOf('unassigned') < 0);
 	},
 
 	startPlayerTurn: function() {
@@ -981,11 +1024,8 @@ GameBoard.prototype = {
 		Util.log('generating edges...');
 
 		var totalEdgesCreated = 0;
-
 		var vertexEdgeCount = {};
-
-		//keep track of which edges connect to vertexI so they can be quickly referenced later
-		var vertexEdgesI = [];
+		var self = this;
 		//for all vertices
 		$('circle.vertex').each(function() {
 			var vertexI = $(this);
@@ -999,9 +1039,8 @@ GameBoard.prototype = {
 				//keep track of how many edges have connected to this vertex already, only add 3 max
 				if (vertexEdgeCount[vertexI.attr('id')] < 3) {
 					var vertexJ = $(this);
-					
 					//don't bother if vertexJ is the same as vertexI, obviously no edge exists in that case
-					if (vertexJ.attr('id') !== vertexI.attr('id') && (vertexEdgesI.indexOf(vertexJ.attr('id')) < 0)) {
+					if (vertexJ.attr('id') !== vertexI.attr('id')) {
 						//get the distance between the two vertices on the x axis
 						var horizontalDistance = Math.abs(parseInt(vertexI.attr('cx')) - parseInt(vertexJ.attr('cx')));
 						//get the distance between the two vertices on the y axis
@@ -1010,27 +1049,30 @@ GameBoard.prototype = {
 						//keep track of the two vertices for this edge so they can be quickily referenced later
 						var endPoints = vertexI.attr('id') + ' ' + vertexJ.attr('id');
 
+						var x1 = vertexI.attr('cx');
+						var y1 = vertexI.attr('cy');
+						var x2 = vertexJ.attr('cx');
+						var y2 = vertexJ.attr('cy');
+
 						//if the vertices have the same y position and they are not the middle vertices, then they are either the top or bottom edge of a tile
-						if(vertexI.attr('cy') == vertexJ.attr('cy') && horizontalDistance < 100) {
+						if(vertexI.attr('cy') == vertexJ.attr('cy') && horizontalDistance < 100 && !self.isEdgeDuplicate(x1, y1, x2, y2)) {
 							//create an edge, add the endpoints as an attribute
-							$('#edges').append('<line endpoints="' + endPoints + '" id="e' + totalEdgesCreated + '" class="edge unassigned" x1="' + vertexI.attr('cx') + '" y1="' + vertexI.attr('cy') + '" x2="' + vertexJ.attr('cx') + '" y2="' + vertexJ.attr('cy') + '" />');
+							$('#edges').append('<line endpoints="' + endPoints + '" id="e' + totalEdgesCreated + '" class="edge unassigned" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" />');
 							//add edge to vertexI as a connected edge
 							vertexI.attr('edges', ((vertexI.attr('edges').length) ? (vertexI.attr('edges')) + ' ' : '') + 'e' + totalEdgesCreated);
 							//increase edge count for vertexI
 							vertexEdgeCount[vertexI.attr('id')]++;
-							vertexEdgesI.push(vertexI.attr('id'));
 							totalEdgesCreated++;
 						}
 						
 						//if vertical distance is less than the the height of the tile, the edge must exist on a side that is neither the top or bottom edge
-						if(verticalDistance > 61 && verticalDistance < 64 && horizontalDistance < 50) { //These magic numbers need to be configurable based on tile size...
+						if(verticalDistance > 61 && verticalDistance < 64 && horizontalDistance < 50 && !self.isEdgeDuplicate(x1, y1, x2, y2)) { //These magic numbers need to be configurable based on tile size...
 							//create an edge, add the endpoints as an attribute
-							$('#edges').append('<line endpoints="' + endPoints + '" id="e' + totalEdgesCreated + '" class="edge unassigned" x1="' + vertexI.attr('cx') + '" y1="' + vertexI.attr('cy') + '" x2="' + vertexJ.attr('cx') + '" y2="' + vertexJ.attr('cy') + '" />');
+							$('#edges').append('<line endpoints="' + endPoints + '" id="e' + totalEdgesCreated + '" class="edge unassigned" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" />');
 							//add edge to vertexI as a connected edge
 							vertexI.attr('edges', ((vertexI.attr('edges').length) ? (vertexI.attr('edges')) + ' ' : '') + 'e' + totalEdgesCreated);
 							//increase edge count for vertexI
 							vertexEdgeCount[vertexI.attr('id')]++;
-							vertexEdgesI.push(vertexI.attr('id'));
 							totalEdgesCreated++;
 						}
 
@@ -1050,6 +1092,22 @@ GameBoard.prototype = {
 		
 		Util.log('finished making ' + totalEdgesCreated + ' edges...');
 		
+	},
+
+	isEdgeDuplicate: function(x1, y1, x2, y2) {
+		var duplicate = false;
+		$('.edge').each(function() {
+			var edge = $(this);
+			var edgeX1 = edge.attr('x1');
+			var edgeY1 = edge.attr('y1');
+			var edgeX2 = edge.attr('x2');
+			var edgeY2 = edge.attr('y2');
+			if (edgeX1 === x2 && edgeY1 === y2 && edgeX2 === x1 && edgeY2 === y1) {
+				duplicate = true;
+				return true;
+			}
+		});
+		return duplicate;
 	},
 	
 	createVertices: function() {
