@@ -51,7 +51,9 @@ Player.prototype = {
 					hand.css({'margin-left': '-' + (hand.outerWidth()/2) + 'px'})
 				}
 				this.handDisplayed = type;
-				$('#hand' + type).fadeIn('fast');
+				if (this.hands[type].length) {
+					$('#hand' + type).fadeIn('fast');
+				}
 			}
 		}
 	},

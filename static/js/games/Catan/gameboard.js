@@ -443,9 +443,21 @@ GameBoard.prototype = {
 			$('#vertices .unassigned:not(.city)').css('display','block');
 			var self = this;
 			this.element.on('vertexClick',function(e, vid, player) {
-				if ($('#' + vid).attr('class') == 'vertex unassigned') {
-					$('#' + vid).attr('class', 'vertex ' + 'player' + player);
-					$('#' + vid).show();
+				var vertex = $('#' + vid);
+				var edges = vertex.attr('edges').split(' ');
+				var tooClose = false;
+				//prevent player from placing a settlement less than 2 spaces away from an existing settlement
+				for( var i = 0; i < edges.length; i++) {
+					var endPoints = $('#' + edges[i]).attr('endpoints').split(' ');
+					for (var j = 0; j < endPoints.length; j++) {
+						if ($('#' + endPoints[j]).attr('class').split(' ').indexOf('unassigned') < 0) {
+							tooClose = true;
+						}
+					}
+				}
+				if (!tooClose && vertex.attr('class') == 'vertex unassigned') {
+					vertex.attr('class', 'vertex ' + 'player' + player);
+					vertex.show();
 					$('#vertices .unassigned').css('display', 'none');
 					self.element.off('vertexClick');
 					self.enableControls();
@@ -481,7 +493,7 @@ GameBoard.prototype = {
 						}
 					}
 				} else {
-					alert('Location already chosen, select an unassigned spot ');
+					alert('Location already chosen or too close, select an unassigned spot ');
 				}
 			});
 		}
@@ -674,11 +686,24 @@ GameBoard.prototype = {
 		this.longestRoad = this.longestRoad ? this.longestRoad : 4;
 		var self = this;
 		var endPointEdges = [];
+		var startingCandidates = [];
+		var backupCandidates = [];
 		for (var player in this.game.players) {
 			$('.edge.player' + player).each(function() {
 				var edge = $(this);
-				console.log(edge.attr('id') + ' ' + self.getEdgeConnections(edge));
+				var connections = self.getEdgeConnections(edge);
+				if (connections === 1) {
+					startingCandidates.push(edge);
+				} else if (connections === 2) {
+					backupCandidates.push(edge);
+				}
 			});
+			if (!startingCandidates.length && backupCandidates.length > 0) {
+				//pick a road at random to start with
+				Util.log('Picking road at random as a starting point for longest road');
+			} else {
+				Util.log('Have ' + startingCandidates.length + ' roads as starting point candidates for longest road');
+			}
 		}
 		return this.longestRoad;
 	},
@@ -1026,6 +1051,7 @@ GameBoard.prototype = {
 		var totalEdgesCreated = 0;
 		var vertexEdgeCount = {};
 		var self = this;
+
 		//for all vertices
 		$('circle.vertex').each(function() {
 			var vertexI = $(this);
@@ -1058,8 +1084,7 @@ GameBoard.prototype = {
 						if(vertexI.attr('cy') == vertexJ.attr('cy') && horizontalDistance < 100 && !self.isEdgeDuplicate(x1, y1, x2, y2)) {
 							//create an edge, add the endpoints as an attribute
 							$('#edges').append('<line endpoints="' + endPoints + '" id="e' + totalEdgesCreated + '" class="edge unassigned" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" />');
-							//add edge to vertexI as a connected edge
-							vertexI.attr('edges', ((vertexI.attr('edges').length) ? (vertexI.attr('edges')) + ' ' : '') + 'e' + totalEdgesCreated);
+							
 							//increase edge count for vertexI
 							vertexEdgeCount[vertexI.attr('id')]++;
 							totalEdgesCreated++;
@@ -1069,8 +1094,7 @@ GameBoard.prototype = {
 						if(verticalDistance > 61 && verticalDistance < 64 && horizontalDistance < 50 && !self.isEdgeDuplicate(x1, y1, x2, y2)) { //These magic numbers need to be configurable based on tile size...
 							//create an edge, add the endpoints as an attribute
 							$('#edges').append('<line endpoints="' + endPoints + '" id="e' + totalEdgesCreated + '" class="edge unassigned" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" />');
-							//add edge to vertexI as a connected edge
-							vertexI.attr('edges', ((vertexI.attr('edges').length) ? (vertexI.attr('edges')) + ' ' : '') + 'e' + totalEdgesCreated);
+							
 							//increase edge count for vertexI
 							vertexEdgeCount[vertexI.attr('id')]++;
 							totalEdgesCreated++;
@@ -1080,14 +1104,31 @@ GameBoard.prototype = {
 						if (vertexEdgeCount[vertexI.attr('id')] === 3) { 
 							return false;
 						}
-						
 					}
 				}
 			});
-			//apply edge attribute to corresponding city element
-			$('#c' + vertexI.attr('id')).attr('edges', vertexI.attr('edges').trim());
-
 		});
+
+		//assign edges to vertices
+		$('.edge').each(function() {
+			var edge = $(this);
+			var id = edge.attr('id');
+			var endPoints = edge.attr('endpoints').split(' ');
+
+			for (var i = 0; i < endPoints.length; i++) {
+				var vertexId = endPoints[i];
+				var vertex = $('#' + vertexId);
+				var city = $('#c' + vertexId);
+				var edges = vertex.attr('edges').split(' ');
+
+				if (edges.indexOf(id) < 0) {
+					var existingEdges = (vertex.attr('edges').length > 0) ? vertex.attr('edges') + ' ' : '';
+					vertex.attr('edges', existingEdges + id);
+					city.attr('edges', existingEdges + id);
+				}
+			}
+		});
+
 		this.element.html(this.element.html()); //hack to allow jquery to manipulate SVG elements
 		
 		Util.log('finished making ' + totalEdgesCreated + ' edges...');
