@@ -134,8 +134,19 @@ Util.shuffle = function(arr) {
 	return arr;
 };
 
-Util.logObject = function logObject(o) {
+Util.logObject = function(o) {
 	return JSON.stringify(o, null, 2);
+};
+
+Util.logArray = function (arr) {
+	var output = '';
+	for (var i = 0; i < arr.length; i++) {
+		output += arr[i] + ', '; 
+	}
+	if (output.length) {
+		output.substr(0, output.length - 2);
+	}
+	return output;
 };
 
 Util.log = function(msg) {

@@ -62,6 +62,7 @@ io.set('close timeout', 60);
 io.set('heartbeat timeout', 15);
 
 //global server variables
+//TODO: change games to use 2 dimensional store so we can load different games with the same lobby names
 var games = {};
 var userList = {};
 var userCount = 0;

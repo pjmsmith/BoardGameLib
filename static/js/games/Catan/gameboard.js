@@ -84,7 +84,7 @@ GameBoard.prototype = {
 			</g>\
 		</svg>',
 
-	randomBoard: true,
+	randomBoard: false,
 	hiddenTiles: ['h0', 'h4', 'h9', 'h19', 'h20', 'h24'],
 	tileLimits: {
 		 'grain': 4
@@ -240,18 +240,16 @@ GameBoard.prototype = {
 			numberList = Util.shuffle(numberList);
 
 			var self = this;
-			var i = 0;
 			$('#hexes > polygon').each(function() {
 				var hexId = $(this).attr('id');
 				if (self.hiddenTiles.indexOf(hexId) < 0) {
-					var tileClass = tileList[i];
+					var tileClass = tileList.pop();
 					$(this).attr('class', tileClass + ' tile');
 					if (tileClass !== 'desert') {
-						$(this).attr('value', numberList[i]);
+						$(this).attr('value', numberList.pop());
 					} else {
 						$(this).attr('value', 7);
 					}
-					i++;
 				}
 			});
 
@@ -528,6 +526,7 @@ GameBoard.prototype = {
 						,playerNumber: self.game.playerNumber
 						,element: eid
 					});
+
 					var player = self.game.players[self.game.playerNumber];
 					player.removePiece(PieceType.ROAD);
 					if (!isFree) {
@@ -543,7 +542,26 @@ GameBoard.prototype = {
 							self.endPlayerTurn();
 						}
 					}
-					self.getLongestRoad();
+
+					//check for longest road
+					var previousLongestRoadHolder = self.game.longestRoadHolder;
+					var longestRoad = self.getLongestRoad(player.playerNumber);
+					if (longestRoad > this.longestRoad) {
+						this.longestRoad = longestRoad;
+						if (previousLongestRoadHolder !== player.playerNumber) {
+							if (previousLongestRoadHolder) {
+								//emit message to subtract 2 points from this player
+								self.game.connection.emit('doAction', {
+									 game: self.game.uniqueKey
+									,action: 'loseLongestRoad'
+									,playerNumber: previousLongestRoadHolder
+									,element: eid
+								});
+							}
+							player.score += 2;
+							self.game.longestRoadHolder = player.playerNumber
+						}
+					}
 				} else {
 					alert('Location already chosen, select an unassigned spot ')
 				}
@@ -681,34 +699,77 @@ GameBoard.prototype = {
 		}
 	},
 
-	getLongestRoad: function() {
-		var roadTree = {};
-		this.longestRoad = this.longestRoad ? this.longestRoad : 4;
+	getLongestRoad: function(player) {
+		var longestRoad = 0;
 		var self = this;
-		var endPointEdges = [];
 		var startingCandidates = [];
 		var backupCandidates = [];
-		for (var player in this.game.players) {
-			$('.edge.player' + player).each(function() {
-				var edge = $(this);
-				var connections = self.getEdgeConnections(edge);
-				if (connections === 1) {
-					startingCandidates.push(edge);
-				} else if (connections === 2) {
-					backupCandidates.push(edge);
-				}
-			});
-			if (!startingCandidates.length && backupCandidates.length > 0) {
-				//pick a road at random to start with
-				Util.log('Picking road at random as a starting point for longest road');
-			} else {
-				Util.log('Have ' + startingCandidates.length + ' roads as starting point candidates for longest road');
+		$('.edge.player' + player).each(function() {
+			var edge = $(this);
+			var connections = self.getNumEdgeConnections(edge);
+			if (connections === 1) {
+				startingCandidates.push(edge.attr('id'));
+			} else if (connections >= 2) {
+				backupCandidates.push(edge.attr('id'));
 			}
+		});
+		Util.log('1 connection: ' + Util.logArray(startingCandidates));
+		Util.log('2+ connections: ' + Util.logArray(backupCandidates));
+
+		var roadTrees = {}; // starting points -> new tree of connected edges
+		if (!startingCandidates.length && backupCandidates.length > 0) {
+			//pick a road at random to start with
+			Util.log('Picking road at random as a starting point for longest road');
+			startingCandidates.push(backupCandidates.pop());
+		} 
+
+		Util.log('Have ' + startingCandidates.length + ' roads as starting point candidates for longest road');
+		if (startingCandidates.length) {
+			var root = startingCandidates.pop();
+			var roadTree = {};
+			roadTree[root] = this.buildRoadTree(root, player);
+			Util.log('Road starting from ' + root + ': ' + Util.logObject(roadTree));
 		}
-		return this.longestRoad;
+		
+		return longestRoad;
 	},
 
-	getEdgeConnections: function(edge) {
+	/* { e1: {e2: null, e3: {e4: null}}} */
+	buildRoadTree: function(root, player, nodeList) {
+		var tree = {};
+		if (typeof nodeList === 'undefined') {
+			nodeList = [];
+		}
+		nodeList.push(root);
+		var endPoints =  $('#' + root).attr('endpoints').split(' ');
+		//debugger;
+		for (var i = 0; i < endPoints.length; i++) {
+			if (!this.isVertexBlocked($('#' + endPoints[i]))) {
+				//check all edges connected to this endpoint (except the given edge)
+				var edges = $('#' + endPoints[i]).attr('edges').split(' ');
+				for (var j = 0; j < edges.length; j++) {
+					//if at least one of the other edges is owned by the player, it is connected to the given edge
+					if (edges[j] !== root && $('#' + edges[j]).attr('class').indexOf('player' + player) >= 0) {
+						//make sure there aren't any cycles
+						if (nodeList.indexOf(edges[j]) < 0) {
+							tree[edges[j]] = null;
+							nodeList.push(edges[j]);
+						}
+					}
+				}
+			}
+		}
+
+		for (var node in tree) {
+			if (!tree[node]) {
+				tree[node] = this.buildRoadTree(node, player, nodeList);
+			}
+		}
+
+		return tree;
+	},
+
+	getNumEdgeConnections: function(edge) {
 		var endPoints = edge.attr('endpoints').split(' ');
 		var connected = [];
 		//for both of the given edge's endpoints
@@ -722,13 +783,29 @@ GameBoard.prototype = {
 					if (edges[j] !== edge.attr('id') && $('#' + edges[j]).attr('class').indexOf('player' + this.game.playerNumber) >= 0) {
 						if (!connected[i]) {
 							connected.push(true);
+							Util.log('Connected to ' + edges[j] + ' from ' + edge.attr('id'));
+						} else {
+							Util.log('Already connected to ' + edges[j] + ' from ' + edge.attr('id'));
 						}
 					}
 				}
+			} else {
+				Util.log('Endpoint ' + endPoints[i] + ' blocked for ' + edge.attr('id'));
 			}
 		}
 		//if an edge has 0 connections, it is a road of length 1; if it has 1 connection, it is an endpoint for a road; if it has 2, it's somewhere in the middle
 		return connected.length;
+	},
+
+	existsInTree: function(tree, node) {
+		for (var n in tree) {
+			if (n === node) {
+				return true;
+			} else if (tree[n] !== null) {
+				return this.existsInTree(tree[n], node);
+			}
+		}
+		return false;
 	},
 
 	isVertexBlocked: function(vertex) {

@@ -81,6 +81,12 @@ Game.Catan = function(options) {
 	$.extend(this, new Game(options));
 	$.extend(this, {
 		winningScore: 10,
+		
+		longestRoadHolder: null,
+		longestRoad: 4,
+
+		largestArmyHolder: null,
+		largestArmy: 2,
 
 		initialize: function() {
 			if (this.lobby && typeof this.lobby.clearError === 'function') {
@@ -130,7 +136,7 @@ Game.Catan = function(options) {
 			this.board.addResourceCard(this.players[this.playerNumber], ResourceType.WOOD);
 			this.board.addResourceCard(this.players[this.playerNumber], ResourceType.WOOD);
 			this.board.addResourceCard(this.players[this.playerNumber], ResourceType.WOOD);
-			
+
 			this.board.startPlayerTurn();
 		},
 
