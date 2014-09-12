@@ -136,6 +136,14 @@ Game.Catan = function(options) {
 			this.board.addResourceCard(this.players[this.playerNumber], ResourceType.WOOD);
 			this.board.addResourceCard(this.players[this.playerNumber], ResourceType.WOOD);
 			this.board.addResourceCard(this.players[this.playerNumber], ResourceType.WOOD);
+			this.board.addResourceCard(this.players[this.playerNumber], ResourceType.BRICK);
+			this.board.addResourceCard(this.players[this.playerNumber], ResourceType.BRICK);
+			this.board.addResourceCard(this.players[this.playerNumber], ResourceType.BRICK);
+			this.board.addResourceCard(this.players[this.playerNumber], ResourceType.BRICK);
+			this.board.addResourceCard(this.players[this.playerNumber], ResourceType.WOOD);
+			this.board.addResourceCard(this.players[this.playerNumber], ResourceType.WOOD);
+			this.board.addResourceCard(this.players[this.playerNumber], ResourceType.WOOD);
+			this.board.addResourceCard(this.players[this.playerNumber], ResourceType.WOOD);
 
 			this.board.startPlayerTurn();
 		},

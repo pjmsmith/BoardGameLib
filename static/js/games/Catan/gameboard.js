@@ -84,7 +84,7 @@ GameBoard.prototype = {
 			</g>\
 		</svg>',
 
-	randomBoard: false,
+	randomBoard: true,
 	hiddenTiles: ['h0', 'h4', 'h9', 'h19', 'h20', 'h24'],
 	tileLimits: {
 		 'grain': 4
@@ -138,18 +138,17 @@ GameBoard.prototype = {
 				Util.log('Syncing game board tiles');
 				var tileList = args.tiles;
 				var numberList = args.values;
-				var i = 0;
+
 				$('#hexes > polygon').each(function() {
 					var hexId = $(this).attr('id');
 					if (board.hiddenTiles.indexOf(hexId) < 0) {
-						var tileClass = tileList[i];
+						var tileClass = tileList.pop();
 						$(this).attr('class',  tileClass + ' tile');
 						if (tileClass !== 'desert') {
-							$(this).attr('value', numberList[i]);
+							$(this).attr('value', numberList.pop());
 						} else {
 							$(this).attr('value', 7);
 						}
-						i++;
 					}
 				});
 				board.renderTiles();
@@ -240,6 +239,18 @@ GameBoard.prototype = {
 			numberList = Util.shuffle(numberList);
 
 			var self = this;
+
+			//synchronize
+			this.game.connection.emit('doAction', {
+				  game: self.game.uniqueKey
+				, action: 'syncBoard'
+				, playerNumber: self.game.activePlayer
+				, args: {
+					 tiles: tileList
+					,values: numberList
+				}
+			});
+
 			$('#hexes > polygon').each(function() {
 				var hexId = $(this).attr('id');
 				if (self.hiddenTiles.indexOf(hexId) < 0) {
@@ -250,17 +261,6 @@ GameBoard.prototype = {
 					} else {
 						$(this).attr('value', 7);
 					}
-				}
-			});
-
-			//synchronize
-			this.game.connection.emit('doAction', {
-					  game: self.game.uniqueKey
-				, action: 'syncBoard'
-				, playerNumber: self.game.activePlayer
-				, args: {
-					 tiles: tileList
-					,values: numberList
 				}
 			});
 		}
@@ -737,6 +737,7 @@ GameBoard.prototype = {
 	/* { e1: {e2: null, e3: {e4: null}}} */
 	buildRoadTree: function(root, player, nodeList) {
 		var tree = {};
+		var children = {};
 		if (typeof nodeList === 'undefined') {
 			nodeList = [];
 		}
@@ -752,16 +753,16 @@ GameBoard.prototype = {
 					if (edges[j] !== root && $('#' + edges[j]).attr('class').indexOf('player' + player) >= 0) {
 						//make sure there aren't any cycles
 						if (nodeList.indexOf(edges[j]) < 0) {
-							tree[edges[j]] = null;
-							nodeList.push(edges[j]);
+							children[edges[j]] = null;
 						}
 					}
 				}
 			}
 		}
-
-		for (var node in tree) {
-			if (!tree[node]) {
+		//TODO: don't choose other edge connected to the endpoint yet, that's a different road
+		for (var node in children) {
+			if (!tree[node] && nodeList.indexOf(node) < 0) {
+				nodeList.push(edges[j]); //mark as visited
 				tree[node] = this.buildRoadTree(node, player, nodeList);
 			}
 		}
