@@ -1,2 +1,9 @@
 node_modules
 .DS_Store
+static/images/games/Catan/knight.jpg
+
+static/images/games/Catan/monopoly.jpg
+
+*.jpg
+
+*.jpg
