@@ -18,7 +18,7 @@ Lobby.prototype = {
 				errorMsgs += errors[msg] + '<br/>';
 			}
 			$('#error-msg').html(errorMsgs);
-			if (!$('#error').is('visible')) {
+			if (!$('#error').is(':visible')) {
 				$('#error').slideDown('fast');
 			}
 		}
@@ -89,6 +89,7 @@ Lobby.prototype = {
 			var playerNumber = data.playerNumber;
 			self.createNewGame(gameName, {
 				 title: gameName
+				,lobby: self
 				,element: self.element
 				,username: username
 				,playerNumber: playerNumber
